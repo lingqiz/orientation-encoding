@@ -5,6 +5,32 @@ import numpy as np
 import random
 
 from sampler import sample_orientation
+from datetime import datetime
+
+class DataRecord:
+    def __init__(self):
+        self.stimulus = []
+        self.response = []
+        self.react_time = []
+    
+    def add_stimulus(self, stim):
+        self.stimulus.append(stim)
+    
+    def add_response(self, resp):
+        self.response.append(resp)
+
+    def add_react_time(self, time):
+        self.react_time.append(time)
+
+    def to_numpy(self):
+        n_trial = len(self.stimulus)
+
+        data_mtx = np.zeros([3, n_trial])
+        data_mtx[0, :] = self.stimulus
+        data_mtx[1, :] = self.response
+        data_mtx[2, :] = self.react_time
+
+        return data_mtx
 
 class PriorLearning:
     '''base class for our prior learning experiment'''
@@ -27,9 +53,12 @@ class PriorLearning:
         self.target = visual.GratingStim(self.win, sf=0.5, size=7.5, mask='gauss', contrast=0.10)
         self.fixation = visual.GratingStim(self.win, color=-1, colorSpace='rgb', tex=None, mask='circle', size=0.2)
         self.feedback = visual.Line(self.win, start=(0.0, -2.0), end=(0.0, 2.0), lineWidth=5.0, lineColor='white', size=1, contrast=0.75)
+
         return
 
     def start(self):
+        self.sub_val = input("enter subject name/ID: ")
+
         # show welcome message and instruction
         self.welcome.draw()
         self.inst1.draw()
@@ -37,10 +66,7 @@ class PriorLearning:
         self.win.flip()
 
         self.io_wait()
-
-        self.stimulus = []
-        self.response = []
-        self.react_time = []
+        self.record = DataRecord()
 
         return
 
@@ -51,28 +77,28 @@ class PriorLearning:
             self.win.flip()
             core.wait(0.5)
             
-            # Draw stimulus for 200 ms
+            # Draw stimulus for 100 ms
             # Sample from an orientation distribution (uniform/natural)
             targetOri = sample_orientation(n_sample=1, uniform=self.uniform)
             targetOri = float(targetOri)
-            self.stimulus.append(targetOri)
+            self.record.add_stimulus(targetOri)
             
             self.target.setOri(targetOri)
             self.target.draw()
             self.fixation.draw()
             self.win.flip()
-            core.wait(0.2)
+            core.wait(0.1)
 
-            # blank screen for 2s            
+            # blank screen for 1s            
             self.win.flip()
-            core.wait(2.0)
+            core.wait(1.0)
 
             # record response
             clock = core.Clock()
             response = self.io_response()
 
-            self.response.append(response)
-            self.react_time.append(clock.getTime())
+            self.record.add_response(response)
+            self.record.add_react_time(clock.getTime())
 
             # blank screen for 0.2s            
             self.win.flip()
@@ -86,14 +112,21 @@ class PriorLearning:
             self.win.flip()
             core.wait(0.5)
 
+        return
+
     def end(self):
-        print(self.stimulus)
-        print(self.response)
-        print(self.react_time)
+        data_mtx = self.record.to_numpy()
+
+        time = datetime.now()
+        dt_string = time.strftime("%d_%m_%Y_%H_%M_")
+        file_name = dt_string + self.sub_val
+
+        np.savetxt(file_name + '.csv', data_mtx, delimiter=",")
+        np.save(file_name + '.npy', data_mtx)
 
     # No implementaion for pause (during the experiment) for now
     def pause(self):
-        pass
+        print('pause implementation not required for now')        
 
     def io_wait(self):
         raise NotImplementedError("method not implemented in the base class")

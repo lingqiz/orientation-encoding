@@ -2,7 +2,7 @@ from prior_learning import *
 
 # create the experiment with n_trial and uniform/non-uniform
 # learning conditions
-experiment = PriorLearningKeyboard(n_trial=5, uniform=True)
+experiment = PriorLearningKeyboard(n_trial=2, uniform=True)
 
 # running the experiment
 experiment.start()
