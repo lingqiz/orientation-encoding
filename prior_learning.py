@@ -47,7 +47,7 @@ class PriorLearning:
         self.uniform = uniform
         
         # initialize window, message
-        self.win = visual.Window([1024, 768], fullscr=True, allowGUI=True, monitor='testMonitor', units='deg')
+        self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, winType='glfw', monitor='testMonitor', units='deg')
         self.welcome = visual.TextStim(self.win, pos=[0,-5], text='Thanks for your time. Press "space" to continue.')
         self.inst1 = visual.TextStim(self.win, pos=[0,+5], text='You will first see a quickly flashed gabor stimulus.')
         self.inst2 = visual.TextStim(self.win, pos=[0,0], text='After the stimulus, adjust the prob using <-- and --> to match its orientation.')
@@ -58,7 +58,7 @@ class PriorLearning:
         self.feedback = visual.Line(self.win, start=(0.0, -2.0), end=(0.0, 2.0), lineWidth=5.0, lineColor='white', size=1, contrast=0.75)
 
         return
-        
+
     def start(self):        
         # show welcome message and instruction
         self.welcome.draw()
