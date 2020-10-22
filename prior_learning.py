@@ -1,4 +1,4 @@
-from psychopy import core, visual, gui, data
+from psychopy import core, visual
 import keyboard
 
 import numpy as np 
