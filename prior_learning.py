@@ -11,9 +11,13 @@ from sampler import sample_orientation
 n_trial = 500
 
 win = visual.Window([1920, 1080], allowGUI=True, monitor='testMonitor', units='deg')
-welcome = visual.TextStim(win, pos=[0,-5], text='Thanks for your time. Press any key to continue.')
-inst1 = visual.TextStim(win, pos=[0,+5], text='You will first see a quickly flashed gabor stimulus.')
-inst2 = visual.TextStim(win, pos=[0,0], text='After the stimulus, adjust the prob using <- and -> to match its orientation.')
+
+welcome = visual.TextStim(win, pos=[0,-5], \
+    text='Thanks for your time. Press any key to continue.')   
+inst1 = visual.TextStim(win, pos=[0,+5], \
+    text='You will first see a quickly flashed gabor stimulus.')
+inst2 = visual.TextStim(win, pos=[0,0], \
+    text='After the stimulus, adjust the prob using <-- and --> to match its orientation.')
 
 welcome.draw()
 inst1.draw()
@@ -25,9 +29,9 @@ event.waitKeys()
 # run experiment with stimulus
 target = visual.GratingStim(win, sf=1, size=10, mask='gauss', contrast=0.1)
 fixation = visual.GratingStim(win, color=-1, colorSpace='rgb', tex=None, mask='circle', size=0.2)
-message = visual.TextStim(win, pos=[0, +10], text='use <- and -> key for response')
-kb = keyboard.Keyboard()
+message = visual.TextStim(win, pos=[0, +10], text='use <-- and --> key for response')
 
+kb = keyboard.Keyboard()
 for idx in range(n_trial):
     # ISI for 500 ms
     fixation.draw()
@@ -49,10 +53,11 @@ for idx in range(n_trial):
             
     # get response
     resp_ori = int(sample_orientation(n_sample=1, uniform=True))
-    prob = visual.Line(win, start=(-1.25, -1.25), end=(1.25, 1.25), lineWidth=7.5, lineColor='white', size=1, ori=resp_ori, contrast=0.75)
+    prob = visual.Line(win, start=(-1.50, -1.50), end=(1.50, 1.50), lineWidth=10.0, \
+        lineColor='black', size=1, ori=resp_ori, contrast=0.75)
     
-    message.draw()    
-    prob.draw()    
+    message.draw()
+    prob.draw()
     win.flip()
     
     def resp_callback(increment, current_val, prob):        
@@ -64,7 +69,7 @@ for idx in range(n_trial):
     resp_flag = True
     kb.clearEvents()
     while resp_flag:
-        allKeys = kb.getKeys(['right', 'left', 'space', 'escape'], waitRelease=True)        
+        allKeys = kb.getKeys(['right', 'left', 'space', 'escape'], waitRelease=True)
         for thisKey in allKeys:
             if thisKey=='space':
                 # confirm response
@@ -80,6 +85,6 @@ for idx in range(n_trial):
                 # abort experiment
                 core.quit()  
         
-            message.draw()            
-            prob.draw()            
-            win.flip()        
+            message.draw()
+            prob.draw()
+            win.flip()
