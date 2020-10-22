@@ -35,6 +35,9 @@ class DataRecord:
 class PriorLearning:
     '''base class for our prior learning experiment'''
     def __init__(self, n_trial, uniform):
+        # subject name/id
+        self.sub_val = input("enter subject name/ID: ")
+
         # will be used for recording response
         self.resp_flag = True
         self.increment = 0
@@ -44,7 +47,7 @@ class PriorLearning:
         self.uniform = uniform
         
         # initialize window, message
-        self.win = visual.Window([1024, 768], allowGUI=True, monitor='testMonitor', units='deg')
+        self.win = visual.Window([1024, 768], fullscr=True, allowGUI=True, monitor='testMonitor', units='deg')
         self.welcome = visual.TextStim(self.win, pos=[0,-5], text='Thanks for your time. Press "space" to continue.')
         self.inst1 = visual.TextStim(self.win, pos=[0,+5], text='You will first see a quickly flashed gabor stimulus.')
         self.inst2 = visual.TextStim(self.win, pos=[0,0], text='After the stimulus, adjust the prob using <-- and --> to match its orientation.')
@@ -55,10 +58,8 @@ class PriorLearning:
         self.feedback = visual.Line(self.win, start=(0.0, -2.0), end=(0.0, 2.0), lineWidth=5.0, lineColor='white', size=1, contrast=0.75)
 
         return
-
-    def start(self):
-        self.sub_val = input("enter subject name/ID: ")
-
+        
+    def start(self):        
         # show welcome message and instruction
         self.welcome.draw()
         self.inst1.draw()
