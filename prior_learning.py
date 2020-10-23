@@ -148,9 +148,9 @@ class PriorLearningKeyboard(PriorLearning):
         '''override io_wait'''
         keyboard.wait('space')
         return
-
-    '''override io_response'''
+    
     def io_response(self):
+        '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
 
         prob = visual.Line(self.win, start=(0.0, -2.0), end=(0.0, 2.0), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.75)
