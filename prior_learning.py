@@ -116,6 +116,7 @@ class PriorLearning:
         return
 
     def end(self):
+        # write data as both .CSV and .NPY file
         data_mtx = self.record.to_numpy()
 
         time = datetime.now()
@@ -150,9 +151,11 @@ class PriorLearningKeyboard(PriorLearning):
         prob = visual.Line(self.win, start=(0.0, -2.0), end=(0.0, 2.0), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.75)
         message = visual.TextStim(self.win, pos=[0, +10], text='use <-- and --> key for response, press "space" to confirm')
 
+        # global variable for recording response
         self.resp_flag = True
         self.increment = 0
 
+        # define callback function for keyboard event
         def left_callback(event):
             self.increment = -1.0
 
@@ -170,13 +173,15 @@ class PriorLearningKeyboard(PriorLearning):
             self.win.close()
             core.quit()
 
-        keyboard.on_press_key('left', left_callback)
-        keyboard.on_press_key('right', right_callback)
-        keyboard.on_release_key('left', release_callback)
-        keyboard.on_release_key('right', release_callback)
-        keyboard.hook_key('space', confirm_callback)
-        keyboard.hook_key('escape', aboard_callback)
+        # key binding for recording response
+        key_bind = {'left':left_callback, 'right':right_callback, 'space':confirm_callback, 'escape':aboard_callback}
+        for key, callback in key_bind.items():
+            keyboard.on_press_key(key, callback)
 
+        for key in ['left', 'right']:
+            keyboard.on_release_key(key, release_callback)                
+
+        # wait/record for response
         while self.resp_flag:            
             if not self.increment == 0:                
                 resp += self.increment
