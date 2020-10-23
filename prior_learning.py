@@ -1,11 +1,15 @@
 from psychopy import core, visual
-import keyboard
-
-import numpy as np 
-import random
-
-from sampler import sample_orientation
 from datetime import datetime
+from sampler import sample_orientation
+
+import numpy as np
+import sys
+
+try:
+    import keyboard
+except Exception as exc:    
+    print('Unable to import keyboard module, keyboard IO will not be available')
+    print(exc)
 
 class DataRecord:
     def __init__(self):
@@ -127,14 +131,15 @@ class PriorLearning:
         np.save(file_name + '.npy', data_mtx)
 
     # No implementaion for pause (during the experiment) for now
+    # TODO: Add message/screen for pause the experiment
     def pause(self):
-        print('pause implementation not required for now')        
+        pass
 
     def io_wait(self):
-        raise NotImplementedError("method not implemented in the base class")
+        raise NotImplementedError("IO Method not implemented in the base class")
     
     def io_response(self):
-        raise NotImplementedError("method not implemented in the base class")
+        raise NotImplementedError("IO Method not implemented in the base class")
 
 # implement io method with keyboard
 class PriorLearningKeyboard(PriorLearning):
