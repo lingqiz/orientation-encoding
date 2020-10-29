@@ -1,20 +1,30 @@
+# TODO: Control stimulus distribuion (fixed sample + permutation)
+# TODO: JP 2020 Dataset analysis
 from prior_learning import *
 
-# create the experiment with n_trial and uniform/non-uniform
-# learning conditions
-experiment = PriorLearningKeyboard(n_trial=2, uniform=True)
+# create the experiment with n_trial for each block
+experiment = PriorLearningKeyboard(n_trial=5)
 
-# running the experiment
+# start running the experiment
 experiment.start()
 
-# learning block with natural orientation prior
-experiment.uniform = False
+# unifrom without feedback
+experiment.uniform = True
+experiment.show_fb = False
 experiment.run()
 
 experiment.pause()
 
-# learning block with uniform prior
+# learning block with novel stim distribution
+experiment.uniform = False
+experiment.show_fb = True
+experiment.run()
+
+experiment.pause()
+
+# uniform without feedback
 experiment.uniform = True
+experiment.show_fb = False
 experiment.run()
 
 # end and record the experiment
