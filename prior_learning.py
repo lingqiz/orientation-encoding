@@ -129,11 +129,9 @@ class PriorLearning:
         np.save(file_name + '.npy', data_mtx)
 
         return
-
-    # No implementaion for pause (during the experiment) for now
-    # TODO: Add message/screen for pause the experiment
+    
     def pause(self):
-        pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Take a short break. Press "space" when you are ready.')
+        pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Take a short break. Press "space" when you are ready to continue.')
         pause_msg.draw()
         self.win.flip()
         self.io_wait()
