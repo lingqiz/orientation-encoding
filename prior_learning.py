@@ -1,9 +1,7 @@
 from psychopy import core, visual
 from datetime import datetime
 from sampler import sample_orientation, sample_stimuli
-
 import numpy as np
-import sys
 
 try:
     import keyboard
