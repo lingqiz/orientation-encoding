@@ -9,21 +9,21 @@ experiment = PriorLearningKeyboard(n_trial=5)
 experiment.start()
 
 # unifrom without feedback
-experiment.uniform = True
+experiment.mode = 'uniform'
 experiment.show_fb = False
 experiment.run()
 
 experiment.pause()
 
 # learning block with novel stim distribution
-experiment.uniform = False
+experiment.mode = 'oblique'
 experiment.show_fb = True
 experiment.run()
 
 experiment.pause()
 
 # uniform without feedback
-experiment.uniform = True
+experiment.mode = 'uniform'
 experiment.show_fb = False
 experiment.run()
 

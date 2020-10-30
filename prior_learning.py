@@ -1,6 +1,6 @@
 from psychopy import core, visual
 from datetime import datetime
-from sampler import sample_orientation
+from sampler import sample_orientation, sample_stimuli
 
 import numpy as np
 import sys
@@ -38,7 +38,7 @@ class DataRecord:
 
 class PriorLearning:
     '''base class for our prior learning experiment'''
-    def __init__(self, n_trial, uniform=True, show_fb=False):
+    def __init__(self, n_trial, mode='uniform', show_fb=False):
         # subject name/id
         self.sub_val = input("enter subject name/ID: ")
 
@@ -48,7 +48,7 @@ class PriorLearning:
 
         # parameter for the experiment
         self.n_trial = n_trial
-        self.uniform = uniform
+        self.mode = mode
         self.show_fb = show_fb
         
         # initialize window, message
@@ -77,16 +77,15 @@ class PriorLearning:
         return
 
     def run(self):
+        targets = sample_stimuli(n_sample=self.n_trial, mode=self.mode)
         for idx in range(self.n_trial):
             # ISI for 1.0 s
             self.fixation.draw()
             self.win.flip()
             core.wait(1.0)
             
-            # Draw stimulus for 200 ms
-            # Sample from an orientation distribution (uniform/natural)
-            targetOri = sample_orientation(n_sample=1, uniform=self.uniform)
-            targetOri = float(targetOri)
+            # Draw stimulus for 200 ms                                    
+            targetOri = float(targets[idx])
             self.record.add_stimulus(targetOri)
             
             self.target.setOri(targetOri)
