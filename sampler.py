@@ -11,12 +11,14 @@ def sample_orientation(n_sample, uniform=True):
     delta = 0.1
     theta = np.arange(0, 180, delta)
 
+    # probability distribution we would like to sample from
     prob  = 2 - 1.25 * np.abs(np.sin(2 * theta / 180 * np.pi))
+
+    # find the CDF of the distribution
     prob  = prob / np.trapz(prob)
     cprob = np.cumsum(prob)
 
-    return np.interp(seed, cprob, theta)
-    # find the CDF of the distribution    
+    return np.interp(seed, cprob, theta)    
 
 def sample_stimuli(n_sample, mode='uniform'):
     # using stratified sampling over [0, 1] to ensure uniformity

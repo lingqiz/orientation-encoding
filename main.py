@@ -1,5 +1,3 @@
-# TODO: Control stimulus distribuion (fixed sample + permutation)
-# TODO: Add Joystick implementaion 
 from prior_learning import *
 
 # create the experiment with n_trial for each block
