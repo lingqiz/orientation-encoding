@@ -60,8 +60,7 @@ class PriorLearning:
         self.pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Take a short break. Press "space" when you are ready to continue.')
 
         # initialize stimulus
-        self.target = visual.GratingStim(self.win, sf=0.5, size=6.0, mask='gauss', contrast=0.10)
-        self.center = visual.GratingStim(self.win, sf = 0.0, size=1.0, mask='gauss', contrast=0.1)
+        self.target = visual.GratingStim(self.win, sf=0.5, size=6.0, mask='gauss', contrast=0.10)        
         self.fixation = visual.GratingStim(self.win, color=-1, colorSpace='rgb', tex=None, mask='circle', size=0.2)
         self.feedback = visual.Line(self.win, start=(0.0, -2.0), end=(0.0, 2.0), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)
 
@@ -98,7 +97,6 @@ class PriorLearning:
             
             self.target.setOri(targetOri)
             self.target.draw()
-            self.center.draw()
             self.fixation.draw()
             self.win.flip()
             core.wait(0.2)
