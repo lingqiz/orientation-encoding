@@ -291,3 +291,7 @@ class PriorLearningJoystick(PriorLearningButtons):
                 prob.setOri(resp)
 
         return resp
+
+    def confirm_press(self):
+        return self.joy.getButton(self.L1) or \
+                self.joy.getButton(self.R1)
