@@ -264,6 +264,8 @@ class PriorLearningJoystick(PriorLearning):
                 self.joy.getButton(self.R2)
 
     def pause(self):
+        core.wait(0.5)
+        self.win.flip()
         while not self.confirm_press():
             self.pause_msg.draw()
             self.win.flip()
