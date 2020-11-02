@@ -9,6 +9,9 @@ except Exception as exc:
     print('Unable to import keyboard module, keyboard IO will not be available')
     print(exc)
 
+from psychopy.hardware import joystick
+joystick.backend='pyglet'
+
 class DataRecord:
     def __init__(self):
         self.stimulus = []
@@ -50,10 +53,11 @@ class PriorLearning:
         self.show_fb = show_fb
         
         # initialize window, message
-        self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, monitor='testMonitor', units='deg')
+        self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, monitor='testMonitor', units='deg', winType='pyglet')
         self.welcome = visual.TextStim(self.win, pos=[0,-5], text='Thanks for your time. Press "space" to continue.')
         self.inst1 = visual.TextStim(self.win, pos=[0,+5], text='You will first see a quickly flashed gabor stimulus.')
         self.inst2 = visual.TextStim(self.win, pos=[0,0], text='After the stimulus, adjust the prob using <-- and --> to match its orientation.')
+        self.pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Take a short break. Press "space" when you are ready to continue.')
 
         # initialize stimulus
         self.target = visual.GratingStim(self.win, sf=0.5, size=6.0, mask='gauss', contrast=0.10)
@@ -65,13 +69,18 @@ class PriorLearning:
 
     def start(self):        
         # show welcome message and instruction
+        self.start_message()
+
+        self.io_wait()
+        self.record = DataRecord()
+
+        return
+
+    def start_message(self):
         self.welcome.draw()
         self.inst1.draw()
         self.inst2.draw()
         self.win.flip()
-
-        self.io_wait()
-        self.record = DataRecord()
 
         return
 
@@ -130,9 +139,8 @@ class PriorLearning:
 
         return
     
-    def pause(self):
-        pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Take a short break. Press "space" when you are ready to continue.')
-        pause_msg.draw()
+    def pause(self):        
+        self.pause_msg.draw()
         self.win.flip()
         self.io_wait()
 
@@ -204,5 +212,58 @@ class PriorLearningKeyboard(PriorLearning):
         return resp
 
 # TODO: implement io method with joy stick
-class PriorLearningKeyboardJoystick(PriorLearning):
-    pass
+class PriorLearningJoystick(PriorLearning):
+
+    def __init__(self, n_trial, mode='uniform', show_fb=False, joy_id=0):
+        super(PriorLearningJoystick, self).__init__(n_trial, mode, show_fb)
+        self.L1 = 4
+        self.L2 = 6
+        self.R1 = 5
+        self.R2 = 7
+
+        self.welcome = visual.TextStim(self.win, pos=[0,-5], text='Thanks for your time. Press L2 or R2 to continue.')
+        self.pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Take a short break. Press L2 or R2 when you are ready to continue.')
+
+        nJoys = joystick.getNumJoysticks()
+        if nJoys < joy_id:
+            print('Joystick Not Found')
+
+        self.joy = joystick.Joystick(joy_id)
+
+    def io_wait(self):
+        '''override io_wait'''        
+        while not self.confirm_press():
+            self.start_message()
+
+    def io_response(self):
+        '''override io_response'''
+        resp = int(sample_orientation(n_sample=1, uniform=True))
+
+        prob = visual.Line(self.win, start=(0.0, -2.0), end=(0.0, 2.0), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)
+        message = visual.TextStim(self.win, pos=[0, +10], text='use L1 and R1 for response, press L2 or R2 to confirm')
+                
+        while not self.confirm_press():
+            message.draw()
+            prob.draw()
+            self.win.flip()
+
+            if self.joy.getButton(self.L1):
+                resp -= 1
+                resp %= 180
+                prob.setOri(resp)
+            
+            if self.joy.getButton(self.R1):
+                resp += 1
+                resp %= 180
+                prob.setOri(resp)
+
+        return resp
+
+    def confirm_press(self):
+        return self.joy.getButton(self.L2) or \
+                self.joy.getButton(self.R2)
+
+    def pause(self):
+        while not self.confirm_press():
+            self.pause_msg.draw()
+            self.win.flip()

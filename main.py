@@ -1,7 +1,8 @@
 from prior_learning import *
 
 # create the experiment with n_trial for each block
-experiment = PriorLearningKeyboard(n_trial=5)
+# experiment = PriorLearningKeyboard(n_trial=5)
+experiment = PriorLearningJoystick(n_trial=5)
 
 # start running the experiment
 experiment.start()
