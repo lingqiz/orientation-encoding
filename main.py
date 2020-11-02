@@ -4,10 +4,10 @@ from prior_learning import *
 # different class for choices of IO methods 
 
 n_trial = 5
-input_type = 'joystick'
+input_type = 'keyboard'
 if input_type == 'keyboard':
     experiment = PriorLearningKeyboard(n_trial=n_trial)
-elif: input_type == 'buttons':
+elif input_type == 'buttons':
     experiment = PriorLearningButtons(n_trial=n_trial)
 elif input_type == 'joystick':
     experiment = PriorLearningJoystick(n_trial=n_trial)
