@@ -211,11 +211,11 @@ class PriorLearningKeyboard(PriorLearning):
         keyboard.unhook_all()
         return resp
 
-# TODO: implement io method with joy stick
-class PriorLearningJoystick(PriorLearning):
+# IO with joystick button push
+class PriorLearningButtons(PriorLearning):
 
     def __init__(self, n_trial, mode='uniform', show_fb=False, joy_id=0):
-        super(PriorLearningJoystick, self).__init__(n_trial, mode, show_fb)
+        super(PriorLearningButtons, self).__init__(n_trial, mode, show_fb)
         self.L1 = 4
         self.L2 = 6
         self.R1 = 5
@@ -269,3 +269,25 @@ class PriorLearningJoystick(PriorLearning):
         while not self.confirm_press():
             self.pause_msg.draw()
             self.win.flip()
+
+# Response with Joystick Axis
+class PriorLearningJoystick(PriorLearningButtons):
+    def io_response(self):
+        '''override io_response'''
+        resp = int(sample_orientation(n_sample=1, uniform=True))
+
+        prob = visual.Line(self.win, start=(0.0, -2.0), end=(0.0, 2.0), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)
+        message = visual.TextStim(self.win, pos=[0, +10], text='use L1 and R1 for response, press L2 or R2 to confirm')
+                
+        while not self.confirm_press():
+            message.draw()
+            prob.draw()
+            self.win.flip()
+
+            x = self.joy.getX()
+            y = self.joy.getY()
+            if np.sqrt(x ** 2 + y ** 2) >= 1:
+                resp = (np.arctan(y / x) / np.pi * 180.0 - 90) % 180
+                prob.setOri(resp)
+
+        return resp
