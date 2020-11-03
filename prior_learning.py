@@ -3,15 +3,18 @@ from datetime import datetime
 from sampler import sample_orientation, sample_stimuli
 import numpy as np
 
+# for keyboard IO
 try:
     import keyboard
 except Exception as exc:    
     print('Unable to import keyboard module, keyboard IO will not be available')
     print(exc)
 
+# for joystick IO
 from psychopy.hardware import joystick
 joystick.backend='pyglet'
 
+# simple class for experiment data
 class DataRecord:
     def __init__(self):
         self.stimulus = []
@@ -68,21 +71,16 @@ class PriorLearning:
 
     def start(self):        
         # show welcome message and instruction
-        self.start_message()
-
-        self.io_wait()
-        self.record = DataRecord()
-
-        return
-
-    def start_message(self):
         self.welcome.draw()
         self.inst1.draw()
         self.inst2.draw()
         self.win.flip()
 
-        return
+        self.io_wait()
+        self.record = DataRecord()
 
+        return
+    
     def run(self):
         targets = sample_stimuli(n_sample=self.n_trial, mode=self.mode)
         for idx in range(self.n_trial):
@@ -91,7 +89,7 @@ class PriorLearning:
             self.win.flip()
             core.wait(1.0)
             
-            # Draw stimulus for 200 ms                                    
+            # draw stimulus for 200 ms                                    
             targetOri = float(targets[idx])
             self.record.add_stimulus(targetOri)
             
@@ -150,7 +148,7 @@ class PriorLearning:
     def io_response(self):
         raise NotImplementedError("IO Method not implemented in the base class")
 
-# implement io method with keyboard
+# Implement IO method with keyboard
 class PriorLearningKeyboard(PriorLearning):
     
     def io_wait(self):
@@ -228,10 +226,26 @@ class PriorLearningButtons(PriorLearning):
 
         self.joy = joystick.Joystick(joy_id)
 
-    def io_wait(self):
-        '''override io_wait'''        
+    def start(self):
         while not self.confirm_press():
-            self.start_message()
+            self.welcome.draw()
+            self.inst1.draw()
+            self.inst2.draw()
+            self.win.flip()
+        
+        self.record = DataRecord()
+
+    def pause(self):
+        core.wait(0.5)
+        self.win.flip()
+        while not self.confirm_press():
+            self.pause_msg.draw()
+            self.win.flip()
+
+    # override start and pause so io_wait is not required anymore
+    def io_wait(self):
+        '''override io_wait'''
+        return        
 
     def io_response(self):
         '''override io_response'''
@@ -260,14 +274,7 @@ class PriorLearningButtons(PriorLearning):
     def confirm_press(self):
         return self.joy.getButton(self.L2) or \
                 self.joy.getButton(self.R2)
-
-    def pause(self):
-        core.wait(0.5)
-        self.win.flip()
-        while not self.confirm_press():
-            self.pause_msg.draw()
-            self.win.flip()
-
+    
 # Response with Joystick Axis
 class PriorLearningJoystick(PriorLearningButtons):
     def io_response(self):
@@ -290,6 +297,7 @@ class PriorLearningJoystick(PriorLearningButtons):
 
         return resp
 
+    # use different buttons to confirm response
     def confirm_press(self):
         return self.joy.getButton(self.L1) or \
                 self.joy.getButton(self.R1)
