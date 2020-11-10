@@ -25,15 +25,15 @@ experiment.run()
 experiment.pause()
 
 # learning block with novel stim distribution
-experiment.mode = 'oblique'
+experiment.mode = 'cardinal'
 experiment.show_fb = True
 experiment.run()
 
 experiment.pause()
 
-# uniform without feedback
-experiment.mode = 'uniform'
-experiment.show_fb = False
+# repeat for another block
+experiment.mode = 'cardinal'
+experiment.show_fb = True
 experiment.run()
 
 # end and record the experiment

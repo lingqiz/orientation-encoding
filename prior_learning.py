@@ -11,8 +11,9 @@ except Exception as exc:
     print(exc)
 
 # for joystick IO
+window_backend = 'glfw'
 from psychopy.hardware import joystick
-joystick.backend='glfw'
+joystick.backend = window_backend
 
 # simple class for experiment data
 class DataRecord:
@@ -54,18 +55,19 @@ class PriorLearning:
         self.n_trial = n_trial
         self.mode = mode
         self.show_fb = show_fb
+        self.line_len = 3.0
         
         # initialize window, message
-        self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, monitor='rm_413', units='deg', winType='glfw')
+        self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, monitor='rm_413', units='deg', winType=window_backend)
         self.welcome = visual.TextStim(self.win, pos=[0,-5], text='Thanks for your time. Press "space" to continue.')
         self.inst1 = visual.TextStim(self.win, pos=[0,+5], text='You will first see a quickly flashed gabor stimulus.')
         self.inst2 = visual.TextStim(self.win, pos=[0,0], text='After the stimulus, adjust the prob using <-- and --> to match its orientation.')
         self.pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Take a short break. Press "space" when you are ready to continue.')
 
         # initialize stimulus
-        self.target = visual.GratingStim(self.win, sf=0.5, size=10.0, mask='gauss', contrast=0.10)        
+        self.target = visual.GratingStim(self.win, sf=0.5, size=12.0, mask='gauss', contrast=0.075)        
         self.fixation = visual.GratingStim(self.win, color=-1, colorSpace='rgb', tex=None, mask='circle', size=0.2)
-        self.feedback = visual.Line(self.win, start=(0.0, -2.5), end=(0.0, 2.5), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)
+        self.feedback = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)
 
         return
 
@@ -99,10 +101,10 @@ class PriorLearning:
             self.win.flip()
             core.wait(0.2)
 
-            # blank screen for 2s
+            # blank screen for 1.5s
             self.fixation.draw()           
             self.win.flip()            
-            core.wait(2.0)
+            core.wait(1.5)
 
             # record response
             clock = core.Clock()
@@ -160,7 +162,7 @@ class PriorLearningKeyboard(PriorLearning):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
 
-        prob = visual.Line(self.win, start=(0.0, -2.5), end=(0.0, 2.5), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)
+        prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)
         # message = visual.TextStim(self.win, pos=[0, +7.5], text='use <-- and --> key for response, press "space" to confirm')
 
         # global variable for recording response
@@ -251,7 +253,7 @@ class PriorLearningButtons(PriorLearning):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
 
-        prob = visual.Line(self.win, start=(0.0, -2.0), end=(0.0, 2.0), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)
+        prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)
         # message = visual.TextStim(self.win, pos=[0, +10], text='use L1 and R1 for response, press L2 or R2 to confirm')
                 
         while not self.confirm_press():
@@ -281,7 +283,7 @@ class PriorLearningJoystick(PriorLearningButtons):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
 
-        prob = visual.Line(self.win, start=(0.0, -2.0), end=(0.0, 2.0), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)
+        prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)
         # message = visual.TextStim(self.win, pos=[0, +10], text='use L1 and R1 for response, press L2 or R2 to confirm')
                 
         while not self.confirm_press():
