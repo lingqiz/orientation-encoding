@@ -12,7 +12,7 @@ except Exception as exc:
 
 # for joystick IO
 from psychopy.hardware import joystick
-joystick.backend='pyglet'
+joystick.backend='glfw'
 
 # simple class for experiment data
 class DataRecord:
@@ -56,14 +56,14 @@ class PriorLearning:
         self.show_fb = show_fb
         
         # initialize window, message
-        self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, monitor='rm_413', units='deg', winType='pyglet')
+        self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, monitor='rm_413', units='deg', winType='glfw')
         self.welcome = visual.TextStim(self.win, pos=[0,-5], text='Thanks for your time. Press "space" to continue.')
         self.inst1 = visual.TextStim(self.win, pos=[0,+5], text='You will first see a quickly flashed gabor stimulus.')
         self.inst2 = visual.TextStim(self.win, pos=[0,0], text='After the stimulus, adjust the prob using <-- and --> to match its orientation.')
         self.pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Take a short break. Press "space" when you are ready to continue.')
 
         # initialize stimulus
-        self.target = visual.GratingStim(self.win, sf=0.5, size=8.0, mask='gauss', contrast=0.10)        
+        self.target = visual.GratingStim(self.win, sf=0.5, size=10.0, mask='gauss', contrast=0.10)        
         self.fixation = visual.GratingStim(self.win, color=-1, colorSpace='rgb', tex=None, mask='circle', size=0.2)
         self.feedback = visual.Line(self.win, start=(0.0, -2.5), end=(0.0, 2.5), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)
 
