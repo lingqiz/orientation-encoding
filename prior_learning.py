@@ -55,7 +55,7 @@ class PriorLearning:
         self.n_trial = n_trial
         self.mode = mode
         self.show_fb = show_fb
-        self.line_len = 3.0
+        self.line_len = 2.75
         
         # initialize window, message
         self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, monitor='rm_413', units='deg', winType=window_backend)
