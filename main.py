@@ -3,33 +3,40 @@ from prior_learning import *
 # create the experiment with n_trial for each block
 # different class for choices of IO methods 
 
-n_trial = 300
+n_trial = 200
 input_type = 'buttons'
 if input_type == 'keyboard':
-    experiment = PriorLearningKeyboard(n_trial=n_trial)
+    exp = PriorLearningKeyboard(n_trial=n_trial)
 elif input_type == 'buttons':
-    experiment = PriorLearningButtons(n_trial=n_trial)
+    exp = PriorLearningButtons(n_trial=n_trial)
 elif input_type == 'joystick':
-    experiment = PriorLearningJoystick(n_trial=n_trial)
+    exp = PriorLearningJoystick(n_trial=n_trial)
 else:
     raise ValueError('invalid input method')
 
 # start running the experiment
-experiment.start()
+exp.start()
 
 # learning block with novel stim distribution
-experiment.mode = 'cardinal'
-experiment.show_fb = True
-experiment.run()
+exp.mode = 'cardinal'
+exp.show_fb = True
+exp.run()
 
-experiment.pause()
+exp.pause()
 
 # learning block with novel stim distribution
-experiment.mode = 'cardinal'
-experiment.show_fb = True
-experiment.run()
+exp.mode = 'cardinal'
+exp.show_fb = True
+exp.run()
 
-experiment.pause()
+exp.pause()
+
+# learning block with novel stim distribution
+exp.mode = 'cardinal'
+exp.show_fb = True
+exp.run()
+
+exp.pause()
 
 # end and record the experiment
-experiment.end()
+exp.end()
