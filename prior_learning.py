@@ -65,8 +65,8 @@ class PriorLearning:
         self.pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Take a short break. Press "space" when you are ready to continue.')
 
         # initialize stimulus
-        self.target = visual.GratingStim(self.win, sf=0.5, size=12.0, mask='gauss', contrast=0.075)        
-        self.fixation = visual.GratingStim(self.win, color=-1, colorSpace='rgb', tex=None, mask='circle', size=0.2)
+        self.target = visual.GratingStim(self.win, sf=0.5, size=12.0, mask='gauss', contrast=0.10)        
+        self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='circle', size=0.2)
         self.feedback = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)
 
         return
@@ -119,6 +119,7 @@ class PriorLearning:
 
                 self.target.draw()
                 self.feedback.draw()
+                self.fixation.draw()
                 self.win.flip()
                 core.wait(1.0)
 
@@ -162,8 +163,7 @@ class PriorLearningKeyboard(PriorLearning):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
 
-        prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)
-        # message = visual.TextStim(self.win, pos=[0, +7.5], text='use <-- and --> key for response, press "space" to confirm')
+        prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)        
 
         # global variable for recording response
         self.resp_flag = True
@@ -201,9 +201,9 @@ class PriorLearningKeyboard(PriorLearning):
                 resp += self.increment
                 resp %= 180
                 prob.setOri(resp)
-
-            # message.draw()
+            
             prob.draw()
+            self.fixation.draw()
             self.win.flip()
 
         keyboard.unhook_all()
@@ -254,11 +254,10 @@ class PriorLearningButtons(PriorLearning):
         resp = int(sample_orientation(n_sample=1, uniform=True))
 
         prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)
-        # message = visual.TextStim(self.win, pos=[0, +10], text='use L1 and R1 for response, press L2 or R2 to confirm')
                 
         while not self.confirm_press():
-            # message.draw()
             prob.draw()
+            self.fixation.draw()
             self.win.flip()
 
             if self.joy.getButton(self.L1):
@@ -283,12 +282,11 @@ class PriorLearningJoystick(PriorLearningButtons):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
 
-        prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)
-        # message = visual.TextStim(self.win, pos=[0, +10], text='use L1 and R1 for response, press L2 or R2 to confirm')
+        prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)       
                 
-        while not self.confirm_press():
-            # message.draw()
+        while not self.confirm_press():            
             prob.draw()
+            self.fixation.draw()
             self.win.flip()
 
             x = self.joy.getX()
