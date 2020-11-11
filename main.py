@@ -4,7 +4,7 @@ from prior_learning import *
 # different class for choices of IO methods 
 
 n_trial = 300
-input_type = 'keyboard'
+input_type = 'buttons'
 if input_type == 'keyboard':
     experiment = PriorLearningKeyboard(n_trial=n_trial)
 elif input_type == 'buttons':
