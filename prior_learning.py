@@ -11,6 +11,7 @@ except Exception as exc:
     print(exc)
 
 # for joystick IO
+# 'glfw' or 'pyglet' for backend
 window_backend = 'glfw'
 from psychopy.hardware import joystick
 joystick.backend = window_backend
@@ -56,8 +57,9 @@ class PriorLearning:
         self.mode = mode
         self.show_fb = show_fb
         self.line_len = 2.75
-        
+                
         # initialize window, message
+        # monitor = 'testMonitor' or 'rm_413'
         self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, monitor='rm_413', units='deg', winType=window_backend)
         self.welcome = visual.TextStim(self.win, pos=[0,-5], text='Thanks for your time. Press "space" to continue.')
         self.inst1 = visual.TextStim(self.win, pos=[0,+5], text='You will first see a quickly flashed gabor stimulus.')
@@ -101,10 +103,10 @@ class PriorLearning:
             self.win.flip()
             core.wait(0.2)
 
-            # blank screen for 1.5s
+            # blank screen for 2.0s
             self.fixation.draw()           
             self.win.flip()            
-            core.wait(1.5)
+            core.wait(2.0)
 
             # record response
             clock = core.Clock()
