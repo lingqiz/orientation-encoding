@@ -56,7 +56,7 @@ class PriorLearning:
         self.n_trial = n_trial
         self.mode = mode
         self.show_fb = show_fb
-        self.line_len = 2.75
+        self.line_len = 2.85
                 
         # initialize window, message
         # monitor = 'testMonitor' or 'rm_413'
