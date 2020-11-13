@@ -19,6 +19,7 @@ exp.start()
 
 # learning block with novel stim distribution
 exp.mode = 'cardinal'
+# exp.mode = 'oblique'
 exp.show_fb = True
 exp.run()
 
@@ -26,6 +27,7 @@ exp.pause()
 
 # learning block with novel stim distribution
 exp.mode = 'cardinal'
+# exp.mode = 'oblique'
 exp.show_fb = True
 exp.run()
 
@@ -33,6 +35,7 @@ exp.pause()
 
 # learning block with novel stim distribution
 exp.mode = 'cardinal'
+# exp.mode = 'oblique'
 exp.show_fb = True
 exp.run()
 
