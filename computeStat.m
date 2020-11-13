@@ -16,6 +16,9 @@ target_raw = target;
 response = response / 180 * (2 * pi);
 bias_raw = wrapToPi(response - target);
 
+% data augmentation
+% copy data from 0-90 deg to 90-180 deg and vice versa
+% assume pattern with a period of 90 deg
 if mirror
     target_lh   = target(target <= pi) + pi;
     response_lh = response(target <= pi) + pi;
@@ -35,10 +38,12 @@ support = 0 : 0.0125 : 2 * pi;
 average = zeros(1, length(support));
 kappa  = zeros(1, length(support));
 
+% sliding window with size of binSize
 for idx = 1:length(support)
     binLB = support(idx) - delta;
     binUB = support(idx) + delta;
     
+    % edge condition
     if binLB < 0
         binLB = wrapTo2Pi(binLB);
         binData = response(target >= binLB | target <= binUB);
@@ -49,13 +54,15 @@ for idx = 1:length(support)
         binData = response(target >= binLB & target <= binUB);
     end
     
+    % circular mean and variance calculation
     meanRes = circ_mean(binData);
     average(idx) = wrapToPi(meanRes - support(idx));
     kappa(idx)  = circ_kappa(binData);
 end
 
+% return result as a struct
 result = struct('target', target_raw, 'bias', bias_raw, ...
-    'average', average, 'kappa', kappa, 'support', support);
+    'support', support, 'average', average, 'kappa', kappa);
 
 end
 
