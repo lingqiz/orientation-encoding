@@ -9,8 +9,9 @@ dataMtx  = readmatrix(fileName);
 
 % Analysis
 % moving average bin size
-numBlock = 3;
 binSize = 18;
+
+numBlock = 3;
 blockLength = 200;
 
 plotAll(dataMtx, numBlock, blockLength, binSize);
