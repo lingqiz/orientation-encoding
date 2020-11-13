@@ -56,7 +56,7 @@ class PriorLearning:
         self.n_trial = n_trial
         self.mode = mode
         self.show_fb = show_fb
-        self.line_len = 2.85
+        self.line_len = 3.0
                 
         # initialize window, message
         # monitor = 'testMonitor' or 'rm_413'
@@ -67,7 +67,7 @@ class PriorLearning:
         self.pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Take a short break. Press "space" when you are ready to continue.')
 
         # initialize stimulus
-        self.target = visual.GratingStim(self.win, sf=0.5, size=12.0, mask='gauss', contrast=0.10)        
+        self.target = visual.GratingStim(self.win, sf=0.5, size=15.0, mask='gauss', contrast=0.10)        
         self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='circle', size=0.2)
         self.feedback = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)
 
