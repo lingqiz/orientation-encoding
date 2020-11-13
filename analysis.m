@@ -4,11 +4,11 @@ addpath('./ExpData/');
 
 %% Load Data
 fileName = '10_11_2020_18_04_LQ_0.csv';
-% fileName = '11_11_2020_09_08_LQ_0.csv';
+fileName = '11_11_2020_09_08_LQ_0.csv';
 dataMtx  = readmatrix(fileName);
 
 %% Analysis
-% figure();
+figure();
 subplot(1, 3, 1);
 scatterPlot(dataMtx, 1);
 
