@@ -164,7 +164,6 @@ class PriorLearningKeyboard(PriorLearning):
     def io_response(self):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
-
         prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)        
 
         # global variable for recording response
@@ -254,7 +253,6 @@ class PriorLearningButtons(PriorLearning):
     def io_response(self):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
-
         prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)
                 
         while not self.confirm_press():
@@ -283,7 +281,6 @@ class PriorLearningJoystick(PriorLearningButtons):
     def io_response(self):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
-
         prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)       
                 
         while not self.confirm_press():            
