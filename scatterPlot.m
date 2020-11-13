@@ -10,6 +10,7 @@ markerColor = ones(1, 3) * 0.5;
 scatter(target, bias, 12, 'MarkerFaceColor', markerColor, 'MarkerEdgeColor', markerColor); hold on;
 plot(support, average, 'k', 'LineWidth', 2); hold on;
 
+% axis and axis ticks
 xlim([0, 180]);
 ylim([-25, 25]);
 

@@ -4,7 +4,7 @@ p = inputParser;
 p.addParameter('blockIndex', 1, @(x)(isnumeric(x) && numel(x) == 1));
 p.addParameter('blockLength', 200, @(x)(isnumeric(x) && numel(x) == 1));
 p.addParameter('binSize', 5, @(x)(isnumeric(x) && numel(x) == 1));
-p.addParameter('mirror', false, @(x)(isnumeric(x) && numel(x) == 1));
+p.addParameter('mirror', false, @islogical);
 parse(p, varargin{:});
 
 blockIndex   = p.Results.blockIndex;
