@@ -23,7 +23,6 @@ exp.mode = 'cardinal'
 
 exp.show_fb = True
 exp.run()
-
 exp.pause()
 
 # learning block with novel stim distribution and feedback
@@ -32,7 +31,6 @@ exp.mode = 'cardinal'
 
 exp.show_fb = True
 exp.run()
-
 exp.pause()
 
 # learning block with novel stim distribution and feedback
