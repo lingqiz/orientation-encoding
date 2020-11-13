@@ -1,4 +1,12 @@
-function [target_raw, bias_raw, average, kappa, support] = computeStat(target, response, binSize, mirror)
+function result = computeStat(target, response, varargin)
+
+p = inputParser;
+p.addParameter('binSize', 10, @(x)(isnumeric(x) && numel(x) == 1));
+p.addParameter('mirror', false, @islogical);
+parse(p, varargin{:});
+
+binSize = p.Results.binSize;
+mirror  = p.Results.mirror;
 
 % convert to [0, 2 pi] range
 target = target / 180 * (2 * pi);
@@ -6,11 +14,6 @@ target_raw = target;
 
 response = response / 180 * (2 * pi);
 bias_raw = wrapToPi(response - target);
-
-% mirroring the data
-if ~exist('mirror', 'var')
-    mirror = false;
-end
 
 if mirror
     target_lh   = target(target <= pi) + pi;
@@ -25,8 +28,8 @@ end
 
 % bias & variance calculation
 nBins = 180 / binSize;
-delta = (2*pi / nBins) / 2;
-support = 0: 0.025: 2*pi;
+delta = (2 * pi / nBins) / 2;
+support = 0 : 0.0125 : 2 * pi;
 
 average = zeros(1, length(support));
 kappa  = zeros(1, length(support));
@@ -49,6 +52,9 @@ for idx = 1:length(support)
     average(idx) = wrapToPi(meanRes - support(idx));
     kappa(idx)  = circ_kappa(binData);
 end
+
+result = struct('target', target_raw, 'bias', bias_raw, ...
+    'average', average, 'kappa', kappa, 'support', support);
 
 end
 
