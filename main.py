@@ -3,7 +3,7 @@ from prior_learning import *
 # create the experiment with n_trial for each block
 # different class for choices of IO methods 
 
-n_trial = 200
+n_trial = 240
 input_type = 'buttons'
 if input_type == 'keyboard':
     exp = PriorLearningKeyboard(n_trial=n_trial)
@@ -41,8 +41,6 @@ exp.mode = 'cardinal'
 
 exp.show_fb = True
 exp.run()
-
-exp.pause()
 
 # end and record the experiment
 exp.end()
