@@ -1,5 +1,6 @@
 function result = computeStat(target, response, varargin)
 
+% parameter for the analysis
 p = inputParser;
 p.addParameter('binSize', 10, @(x)(isnumeric(x) && numel(x) == 1));
 p.addParameter('mirror', false, @islogical);
@@ -26,7 +27,7 @@ if mirror
     response = wrapTo2Pi([response; response_lh; response_hh]);
 end
 
-% bias & variance calculation
+% bias and variance calculation
 nBins = 180 / binSize;
 delta = (2 * pi / nBins) / 2;
 support = 0 : 0.0125 : 2 * pi;
