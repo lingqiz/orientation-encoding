@@ -3,7 +3,7 @@ from prior_learning import *
 # create the experiment with n_trial for each block
 # different class for choices of IO methods 
 
-n_trial = 240
+n_trial = 250
 input_type = 'buttons'
 if input_type == 'keyboard':
     exp = PriorLearningKeyboard(n_trial=n_trial)
@@ -17,7 +17,7 @@ else:
 # start running the experiment
 exp.start()
 
-# learning block with novel stim distribution
+# learning block with novel stim distribution and feedback
 exp.mode = 'cardinal'
 # exp.mode = 'oblique'
 
@@ -26,7 +26,7 @@ exp.run()
 
 exp.pause()
 
-# learning block with novel stim distribution
+# learning block with novel stim distribution and feedback
 exp.mode = 'cardinal'
 # exp.mode = 'oblique'
 
@@ -35,7 +35,7 @@ exp.run()
 
 exp.pause()
 
-# learning block with novel stim distribution
+# learning block with novel stim distribution and feedback
 exp.mode = 'cardinal'
 # exp.mode = 'oblique'
 
