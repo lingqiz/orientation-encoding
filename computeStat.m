@@ -4,6 +4,7 @@ function result = computeStat(target, response, varargin)
 p = inputParser;
 p.addParameter('binSize', 10, @(x)(isnumeric(x) && numel(x) == 1));
 p.addParameter('mirror', false, @islogical);
+p.addParameter('smooth', false, @islogical);
 parse(p, varargin{:});
 
 binSize = p.Results.binSize;
@@ -60,9 +61,22 @@ for idx = 1:length(support)
     kappa(idx)  = circ_kappa(binData);
 end
 
+if p.Results.smooth
+    average = smooth(average);
+    kappa   = smooth(kappa);
+end
+
+% raw fisher information calculation
+stdv = sqrt(1 ./ kappa);
+fisher = abs((1 + gradient(average, support))) ./ stdv;
+
+total_fisher = trapz(support, fisher);
+norm_fisher  = fisher ./ total_fisher;
+
 % return result as a struct
 result = struct('target', target_raw, 'bias', bias_raw, ...
-    'support', support, 'average', average, 'kappa', kappa);
+    'support', support, 'average', average, 'kappa', kappa, ...
+    'stdv', stdv, 'totalFI', total_fisher, 'patternFI', norm_fisher);
 
 end
 
