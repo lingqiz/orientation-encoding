@@ -17,7 +17,10 @@ total_fisher = trapz(support, fisher);
 norm_fisher  = fisher ./ total_fisher;
 
 support = result.support / (2 * pi) * 180;
-plot(support, norm_fisher, 'k', 'LineWidth', 2); hold on;
+indice = (support > 2) & (support < 178);
+
+title('Norm FI');
+plot(support(indice), norm_fisher(indice), 'k', 'LineWidth', 2); hold on;
 
 xlim([0, 180]);
 xticks(0:45:180);
