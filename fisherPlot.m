@@ -19,8 +19,8 @@ norm_fisher  = fisher ./ total_fisher;
 support = result.support / (2 * pi) * 180;
 indice = (support > 2) & (support < 178);
 
-title('Norm FI');
 plot(support(indice), norm_fisher(indice), 'k', 'LineWidth', 2); hold on;
+title('Norm FI');
 
 xlim([0, 180]);
 xticks(0:45:180);
