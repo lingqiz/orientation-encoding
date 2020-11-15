@@ -14,30 +14,26 @@ elif input_type == 'joystick':
 else:
     raise ValueError('invalid input method')
 
+# 'uniform', 'cardinal' or 'oblique'
+# with feedback (True) or without (False)
+exp.mode = 'oblique'
+exp.show_fb = True
+
 # start running the experiment
 exp.start()
 
 # learning block with novel stim distribution and feedback
-exp.mode = 'cardinal'
-# exp.mode = 'oblique'
-
-exp.show_fb = True
+# block 1
 exp.run()
 exp.pause()
 
 # learning block with novel stim distribution and feedback
-exp.mode = 'cardinal'
-# exp.mode = 'oblique'
-
-exp.show_fb = True
+# block 2
 exp.run()
 exp.pause()
 
 # learning block with novel stim distribution and feedback
-exp.mode = 'cardinal'
-# exp.mode = 'oblique'
-
-exp.show_fb = True
+# block 3
 exp.run()
 
 # end and record the experiment
