@@ -3,12 +3,11 @@ addpath('./CircStat/');
 addpath('./ExpData/');
 
 %% Load Data
-% fileName = '10_11_2020_18_04_LQ_0.csv';
-% fileName = '11_11_2020_09_08_LQ_0.csv';
-% fileName = '13_11_2020_18_30_LQ_1.csv';
-fileName = '14_11_2020_18_51_taka_0.csv';
+fileName = {'10_11_2020_18_04_LQ_0.csv', '11_11_2020_09_08_LQ_0.csv', ...
+    '13_11_2020_18_30_LQ_1.csv', '14_11_2020_18_51_taka_0.csv'};
 
-dataMtx  = readmatrix(fileName);
+subId = 1;
+dataMtx  = readmatrix(fileName{subId});
 
 % Analysis
 % moving average bin size
@@ -31,6 +30,7 @@ function plotAll(dataMtx, numBlock, blockLength, binSize)
         subplot(1, numBlock, idx);
         histogram(dataMtx(1, ((idx - 1) * blockLength + 1) : idx * blockLength), 20);
         
+        % analysis data of the particular block with computeStat function       
         result = analysisBlock(dataMtx, 'blockIndex', idx, 'blockLength', blockLength, ...
             'binSize', binSize, 'mirror', true, 'smooth', false);
         
@@ -42,8 +42,9 @@ function plotAll(dataMtx, numBlock, blockLength, binSize)
         subplot(1, numBlock, idx);
         stdvPlot(result);
         
+        % fisherPlot applies addtional smoothing before calculating the FI        
         figure(fisher);
         subplot(1, numBlock, idx);
-        fisherPlot(result);
+        fisherPlot(result, 'smoothPara', 0.075);
     end
 end
