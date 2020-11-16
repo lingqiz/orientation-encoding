@@ -8,7 +8,7 @@ title(strcat('Total FI:', num2str(result.totalFI)));
 
 % axis and axis ticks
 xlim([0, 180]);
-ylim([5, 15]);
+ylim([0, 15]);
 xticks(0:45:180);
 
 % add reference lines
