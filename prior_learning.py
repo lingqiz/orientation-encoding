@@ -67,7 +67,7 @@ class PriorLearning:
         self.pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Take a short break. Press "space" when you are ready to continue.')
 
         # initialize stimulus
-        self.target = visual.GratingStim(self.win, sf=0.5, size=12.5, mask='gauss', contrast=0.10)        
+        self.target = visual.GratingStim(self.win, sf=0.5, size=10.0, mask='gauss', contrast=0.10)        
         self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='circle', size=0.2)
         self.feedback = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)
 
@@ -164,8 +164,9 @@ class PriorLearningKeyboard(PriorLearning):
     def io_response(self):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
-        prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)        
-
+        prob = visual.GratingStim(self.win, sf=0.5, size=[2.0, 4.0], mask='gauss', contrast=1.0, ori=resp)
+        # prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)        
+        
         # global variable for recording response
         self.resp_flag = True
         self.increment = 0
@@ -253,7 +254,8 @@ class PriorLearningButtons(PriorLearning):
     def io_response(self):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
-        prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)
+        prob = visual.GratingStim(self.win, sf=0.5, size=[2.0, 4.0], mask='gauss', contrast=1.0, ori=resp)
+        # prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)
                 
         while not self.confirm_press():
             prob.draw()
@@ -281,7 +283,8 @@ class PriorLearningJoystick(PriorLearningButtons):
     def io_response(self):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
-        prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)       
+        prob = visual.GratingStim(self.win, sf=0.5, size=[2.0, 4.0], mask='gauss', contrast=1.0, ori=resp)
+        # prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, ori=resp, contrast=0.80)       
                 
         while not self.confirm_press():            
             prob.draw()
