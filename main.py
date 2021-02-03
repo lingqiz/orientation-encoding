@@ -4,7 +4,7 @@ from prior_learning import *
 # different class for choices of IO methods 
 
 n_trial = 200
-input_type = 'keyboard'
+input_type = 'buttons'
 if input_type == 'keyboard':
     exp = PriorLearningKeyboard(n_trial=n_trial)
 elif input_type == 'buttons':
@@ -25,16 +25,16 @@ exp.start()
 # learning block with novel stim distribution and feedback
 # block 1
 exp.run()
-# exp.pause()
+exp.pause()
 
 # learning block with novel stim distribution and feedback
 # block 2
 exp.run()
-# exp.pause()
+exp.pause()
 
 # learning block with novel stim distribution and feedback
 # block 3
-# exp.run()
+exp.run()
 
 # end and record the experiment
 exp.end()
