@@ -16,7 +16,7 @@ else:
 
 # 'uniform', 'cardinal' or 'oblique'
 # with feedback (True) or without (False)
-exp.mode = 'cardinal'
+exp.mode = 'oblique'
 exp.show_fb = True
 
 # start running the experiment
