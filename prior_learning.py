@@ -70,6 +70,7 @@ class PriorLearning:
         self.target = visual.GratingStim(self.win, sf=0.5, size=12.0, mask='gauss', contrast=0.10)        
         self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='circle', size=0.2)
         self.feedback = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)
+        self.prob = visual.GratingStim(self.win, sf=0.5, size=[2.5, 5.0], mask='gauss', contrast=1.0)
 
         return
 
@@ -164,7 +165,7 @@ class PriorLearningKeyboard(PriorLearning):
     def io_response(self):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
-        prob = visual.GratingStim(self.win, sf=0.5, size=[2.0, 4.0], mask='gauss', contrast=1.0, ori=resp)
+        self.prob.setOri(resp)
         
         # global variable for recording response
         self.resp_flag = True
@@ -201,9 +202,9 @@ class PriorLearningKeyboard(PriorLearning):
             if not self.increment == 0:                
                 resp += self.increment
                 resp %= 180
-                prob.setOri(resp)
+                self.prob.setOri(resp)
             
-            prob.draw()
+            self.prob.draw()
             self.fixation.draw()
             self.win.flip()
 
@@ -253,22 +254,22 @@ class PriorLearningButtons(PriorLearning):
     def io_response(self):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
-        prob = visual.GratingStim(self.win, sf=0.5, size=[2.0, 4.0], mask='gauss', contrast=1.0, ori=resp)        
+        self.prob.setOri(resp)
                 
         while not self.confirm_press():
-            prob.draw()
+            self.prob.draw()
             self.fixation.draw()
             self.win.flip()
 
             if self.joy.getButton(self.L1):
                 resp -= 1
                 resp %= 180
-                prob.setOri(resp)
+                self.prob.setOri(resp)
             
             if self.joy.getButton(self.R1):
                 resp += 1
                 resp %= 180
-                prob.setOri(resp)
+                self.prob.setOri(resp)
 
         return resp
 
@@ -281,10 +282,10 @@ class PriorLearningJoystick(PriorLearningButtons):
     def io_response(self):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
-        prob = visual.GratingStim(self.win, sf=0.5, size=[2.0, 4.0], mask='gauss', contrast=1.0, ori=resp)        
+        self.prob.setOri(resp)
                 
         while not self.confirm_press():            
-            prob.draw()
+            self.prob.draw()
             self.fixation.draw()
             self.win.flip()
 
@@ -292,7 +293,7 @@ class PriorLearningJoystick(PriorLearningButtons):
             y = self.joy.getY()
             if np.sqrt(x ** 2 + y ** 2) >= 1:
                 resp = (np.arctan(y / x) / np.pi * 180.0 - 90) % 180
-                prob.setOri(resp)
+                self.prob.setOri(resp)
 
         return resp
 
