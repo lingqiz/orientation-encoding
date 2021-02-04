@@ -10,11 +10,16 @@ title(strcat('Total FI:', num2str(result.totalFI)));
 xlim([0, 180]);
 ylim([0, 15]);
 xticks(0:45:180);
+xlabel('Orientation (deg)');
+ylabel('1/Kappa');
 
 % add reference lines
 xline(45, '--');
 xline(90, '--');
 xline(135, '--');
+
+% format
+grid off; box off;
 
 end
 

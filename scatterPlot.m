@@ -15,12 +15,18 @@ xlim([0, 180]);
 ylim([-25, 25]);
 
 xticks(0:45:180);
+xlabel('Orientation (deg)');
+
 yticks(-25:10:25);
+ylabel('Bias (deg)');
 
 % add reference lines
 xline(45, '--');
 xline(90, '--');
 xline(135, '--');
 yline(0, '--');
+
+% format
+grid off; box off;
 
 end

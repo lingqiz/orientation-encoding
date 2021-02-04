@@ -20,16 +20,22 @@ support = result.support / (2 * pi) * 180;
 indice = (support > 2) & (support < 178);
 
 plot(support(indice), norm_fisher(indice), 'k', 'LineWidth', 2); hold on;
-title('Norm FI');
 
+% axis labels and ticks
 xlim([0, 180]);
 xticks(0:45:180);
+xlabel('Orientation (deg)');
+
 ylim([0. 0.3]);
+ylabel('Normalized FI');
 
 % add reference lines
 xline(45, '--');
 xline(90, '--');
 xline(135, '--');
+
+% format
+grid off; box off;
 
 end
 
