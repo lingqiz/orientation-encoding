@@ -70,7 +70,7 @@ class PriorLearning:
         self.target = visual.GratingStim(self.win, sf=0.5, size=12.0, mask='gauss', contrast=0.10)        
         self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='circle', size=0.2)
         self.feedback = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)
-        self.prob = visual.GratingStim(self.win, sf=0.5, size=[2.5, 5.0], mask='gauss', contrast=1.0)
+        self.prob = visual.GratingStim(self.win, sf=0.5, size=[2.0, 5.0], mask='gauss', contrast=1.0)
 
         return
 
