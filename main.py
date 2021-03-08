@@ -25,11 +25,13 @@ exp.start()
 # learning block with novel stim distribution and feedback
 # block 1
 exp.run()
+exp.save_data()
 exp.pause()
 
 # learning block with novel stim distribution and feedback
 # block 2
 exp.run()
+exp.save_data()
 exp.pause()
 
 # learning block with novel stim distribution and feedback

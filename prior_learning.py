@@ -83,6 +83,7 @@ class PriorLearning:
 
         self.io_wait()
         self.record = DataRecord()
+        self.time_stmp = datetime.now().strftime("%d_%m_%Y_%H_%M_")
 
         return
     
@@ -128,13 +129,10 @@ class PriorLearning:
 
         return
 
-    def end(self):
+    def save_data(self):
         # write data as both .CSV and .NPY file
-        data_mtx = self.record.to_numpy()
-
-        time = datetime.now()
-        dt_string = time.strftime("%d_%m_%Y_%H_%M_")
-        file_name = dt_string + self.sub_val
+        data_mtx = self.record.to_numpy()        
+        file_name = self.time_stmp + self.sub_val
 
         np.savetxt(file_name + '.csv', data_mtx, delimiter=",")
         np.save(file_name + '.npy', data_mtx)
@@ -147,6 +145,10 @@ class PriorLearning:
         self.io_wait()
 
         return
+
+    def end(self):
+        self.save_data()
+        print('Successfully finish the experiment!')
 
     def io_wait(self):
         raise NotImplementedError("IO Method not implemented in the base class")
