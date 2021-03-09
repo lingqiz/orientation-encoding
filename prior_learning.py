@@ -74,6 +74,17 @@ class PriorLearning:
 
         return
 
+    @staticmethod
+    def color_gradient(resp, target):
+        error = abs(resp - target) % 90.0
+
+        levels = {0.5: (59, 202, 109), 2.5: (46, 127, 24), 5: (69, 115, 30), 10: (103, 94, 36),
+                20: (141, 71, 43), 40: (177, 52, 51), 60: (200, 37, 56), 90: (237, 41, 56)}
+
+        for key in levels:
+            if error <= key:
+                return levels[key]
+
     def start(self):        
         # show welcome message and instruction
         self.welcome.draw()
@@ -119,7 +130,11 @@ class PriorLearning:
 
             # feedback for 1s
             if self.show_fb:
+                # linear color gradient based on magnitude of the error
+                fd_color = self.color_gradient(response, targetOri)
+
                 self.feedback.setOri(response)
+                self.feedback.setColor(fd_color, 'rgb255')
 
                 self.target.draw()
                 self.feedback.draw()
