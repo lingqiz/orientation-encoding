@@ -47,6 +47,7 @@ class PriorLearning:
     def __init__(self, n_trial, mode='uniform', show_fb=False):
         # subject name/id
         self.sub_val = input("enter subject name/ID: ")
+        self.time_stmp = datetime.now().strftime("%d_%m_%Y_%H_%M_")
 
         # will be used for recording response
         self.resp_flag = True
@@ -82,8 +83,7 @@ class PriorLearning:
         self.win.flip()
 
         self.io_wait()
-        self.record = DataRecord()
-        self.time_stmp = datetime.now().strftime("%d_%m_%Y_%H_%M_")
+        self.record = DataRecord()        
 
         return
     
