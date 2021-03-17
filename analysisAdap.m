@@ -35,8 +35,8 @@ end
 %% Collect on the same plot
 dataPath = 'ExpData/Adap_1/*.csv';
 files = dir(dataPath);
-type = 'total';
-saveGif = false;
+type = 'fisher';
+saveGif = true;
 
 subIdx = 1;
 fig = figure();
@@ -97,4 +97,3 @@ if strcmp(type, 'total')
     xlabel('Session'); ylabel('Total FI');
     ylim([33, 38.5]); yticks(33:1:38);
 end
-
