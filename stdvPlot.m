@@ -1,9 +1,15 @@
-function stdvPlot(result)
+function stdvPlot(result, varargin)
+
+p = inputParser;
+p.addParameter('lineColor', zeros(1, 3));
+parse(p, varargin{:});
+
+lineColor = p.Results.lineColor;
 
 support = result.support / (2 * pi) * 180;
 stdv = result.stdv / (2 * pi) * 180;
 
-plot(support, stdv, 'k', 'LineWidth', 2); hold on;
+plot(support, stdv, 'k', 'LineWidth', 2, 'color', lineColor); hold on;
 title(strcat('Total FI:', num2str(result.totalFI)));
 
 % axis and axis ticks
