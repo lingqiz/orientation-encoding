@@ -68,8 +68,8 @@ class PriorLearning:
         self.pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Take a short break. Press "space" when you are ready to continue.')
 
         # initialize stimulus
-        self.target = visual.GratingStim(self.win, sf=0.5, size=15.0, mask='gauss', contrast=0.10)
-        self.aperture = visual.Circle(self.win, radius=1.5, lineColor=None, fillColor=[0, 0, 0])
+        self.target = visual.GratingStim(self.win, sf=0.40, size=15.0, mask='raisedCos', maskParams={'fringeWidth':0.1}, contrast=0.10)
+        self.aperture = visual.GratingStim(self.win, sf=0.0, size=3.0, mask='raisedCos', maskParams={'fringeWidth':0.5}, contrast=0.10)
         self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='circle', size=0.2)
         self.feedback = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)
         self.prob = visual.GratingStim(self.win, sf=0.5, size=[2.0, 5.0], mask='gauss', contrast=1.0)
@@ -110,8 +110,7 @@ class PriorLearning:
             # draw stimulus for 200 ms                                    
             targetOri = float(targets[idx])
             self.record.add_stimulus(targetOri)
-            
-            self.target.setContrast(0.1)
+                        
             self.target.setOri(targetOri)
             self.target.draw()
             self.aperture.draw()
@@ -138,9 +137,9 @@ class PriorLearning:
 
                 self.feedback.setOri(response)
                 self.feedback.setColor(fd_color, 'rgb255')
-
-                self.target.setContrast(0.5)
-                self.target.draw()                
+                
+                self.target.draw()
+                self.aperture.draw()               
                 self.feedback.draw()
                 self.fixation.draw()
                 self.win.flip()
