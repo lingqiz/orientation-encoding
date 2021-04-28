@@ -44,9 +44,9 @@ class DataRecord:
 
 class PriorLearning:
     '''base class for our prior learning experiment'''
-    def __init__(self, n_trial, mode='uniform', show_fb=False):
+    def __init__(self, sub_val, n_trial, mode='uniform', show_fb=False):
         # subject name/id
-        self.sub_val = input("enter subject name/ID: ")
+        self.sub_val = sub_val
         self.time_stmp = datetime.now().strftime("%d_%m_%Y_%H_%M_")
 
         # will be used for recording response
@@ -78,8 +78,13 @@ class PriorLearning:
 
     @staticmethod
     def color_gradient(resp, target):
-        error = abs(resp - target) % 90.0
+        error = resp - target
+        if error >= 90:
+            error -= 180
+        elif error <= -90:
+            error += 180 
 
+        error = abs(error)        
         levels = {0.5: (59, 202, 109), 2.5: (46, 127, 24), 5: (69, 115, 30), 10: (103, 94, 36),
                 20: (141, 71, 43), 40: (177, 52, 51), 60: (200, 37, 56), 90: (237, 41, 56)}
 
@@ -110,7 +115,7 @@ class PriorLearning:
             # draw stimulus for 200 ms                                    
             targetOri = float(targets[idx])
             self.record.add_stimulus(targetOri)
-                        
+
             self.target.setOri(targetOri)
             self.target.draw()
             self.aperture.draw()
