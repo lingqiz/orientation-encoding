@@ -3,16 +3,16 @@ try
     tbUse('plotlab');
     plotlabOBJ = plotlab();
     plotlabOBJ.applyRecipe(...
-        'figureWidthInches', 8, ...
-        'figureHeightInches', 6.5);
+        'figureWidthInches', 6, ...
+        'figureHeightInches', 6);
 catch EXP
     fprintf('plotlab not available, use default MATLAB style \n');
 end
 
 addpath('./CircStat/');
 addpath('./ExpData/');
-addpath('./cbrewer/');
 
+addpath('./cbrewer/');
 colormap = cbrewer('seq', 'Greys', 9);
 
 %% Load Data & Individual Subject
@@ -30,6 +30,55 @@ for file = files'
     blockLength = 600;
     
     plotAll(dataMtx, numBlock, blockLength, binSize);
+end
+
+%% Combine data from blocks
+dataPath = 'ExpData/Adap_1/*.csv';
+files = dir(dataPath);
+
+sLength = 600;
+nBlock = 6;
+nSubj  = 8;
+bLength = sLength / nBlock;
+
+dataBlocks = cell(1, nBlock);
+for idx = 1:nBlock
+    dataBlocks{idx} = [];
+end
+
+for file = files'
+    dataMtx  = readmatrix(fullfile(file.folder, file.name));
+    
+    for idx = 1:nBlock
+        dataBlock = dataBlocks{idx};
+        dataBlock = [dataBlock, dataMtx(:, ((idx - 1) * bLength + 1) : idx * bLength)];
+        dataBlocks{idx} = dataBlock;
+    end
+end
+
+%% Data analysis
+binSize = 16;
+type = 'bias';
+
+for idx = 1:nBlock
+    dataBlock = dataBlocks{idx};
+    result = analysisBlock(dataBlock, 'blockIndex', 1, 'blockLength',  bLength * nSubj, ...
+        'binSize', binSize, 'mirror', true, 'smooth', false);
+    
+    switch type
+        case 'bias'
+            scatterPlot(result, 'showData', false, 'lineColor', colormap(idx + 1, :));
+            ylim([-5, 5]);
+            hold on;
+            
+        case 'var'
+            stdvPlot(result, 'lineColor', colormap(idx + 1, :));
+            hold on;
+            
+        case 'fisher'
+            fisherPlot(result, 'smoothPara', 0.1, 'lineColor', colormap(idx + 1, :));
+            hold on;
+    end
 end
 
 %% Collect on the same plot
