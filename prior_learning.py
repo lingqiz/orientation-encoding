@@ -239,8 +239,8 @@ class PriorLearningKeyboard(PriorLearning):
 # IO with joystick button push
 class PriorLearningButtons(PriorLearning):
 
-    def __init__(self, n_trial, mode='uniform', show_fb=False, joy_id=0):
-        super(PriorLearningButtons, self).__init__(n_trial, mode, show_fb)
+    def __init__(self, sub_val, n_trial, mode='uniform', show_fb=False, joy_id=0):
+        super(PriorLearningButtons, self).__init__(sub_val, n_trial, mode, show_fb)
         self.L1 = 4
         self.L2 = 6
         self.R1 = 5
