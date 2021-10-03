@@ -135,21 +135,6 @@ class PriorLearning:
             self.record.add_response(response)
             self.record.add_react_time(clock.getTime())
 
-            # feedback for 1s
-            if self.show_fb:
-                # linear color gradient based on magnitude of the error
-                fd_color = self.color_gradient(response, targetOri)
-
-                self.feedback.setOri(response)
-                self.feedback.setColor(fd_color, 'rgb255')
-
-                self.target.draw()
-                self.aperture.draw()
-                self.feedback.draw()
-                self.fixation.draw()
-                self.win.flip()
-                core.wait(1.0)
-
         return
 
     def save_data(self):
