@@ -51,7 +51,7 @@ class DataRecord:
 class PriorLearning:
 
     # static variable for the surround conditions (SF, Ori)
-    cond = [(np.NaN, np.NaN), (0.4, 0), (0.4, 45), (0.4, 150)]
+    cond = [(np.NaN, np.NaN), (0.4, 0), (0.4, 45), (0.4, 90), (0.4, 150)]
 
     def __init__(self, sub_val, n_trial, mode='uniform', show_fb=False):
         # subject name/id
