@@ -79,7 +79,7 @@ class PriorLearning:
         # initialize stimulus
         self.target = visual.GratingStim(self.win, sf=0.40, size=12.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.10)
         self.surround = visual.GratingStim(self.win, sf=0.40, size=25.0, mask='raisedCos', contrast=0.10)
-        self.noise = visual.NoiseStim(self.win, size=25.0, noiseType='White', mask='circle', contrast=0.10)
+        self.noise = visual.NoiseStim(self.win, size=25.0, noiseType='Isotropic', noiseBaseSf=0.5, noiseBW=0.1, mask='raisedCos', contrast=0.10)
         self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='circle', size=0.2)
         self.feedback = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)
         self.prob = visual.GratingStim(self.win, sf=0.5, size=[2.0, 5.0], mask='gauss', contrast=1.0)
@@ -107,9 +107,9 @@ class PriorLearning:
             core.wait(1.0)
 
             # draw stimulus for 200 ms
+
             # surround orientation
             cond_idx = np.random.randint(0, len(self.cond))
-
             if np.isnan(self.cond[cond_idx][0]):
                 self.record.add_surround(np.NaN)
                 self.noise.draw()
