@@ -1,6 +1,7 @@
+from numpy.core.numeric import NaN
 from psychopy import core, visual
 from datetime import datetime
-from sampler import sample_orientation, sample_stimuli
+from sampler import sample_orientation
 import numpy as np
 
 # for keyboard IO
@@ -19,9 +20,13 @@ joystick.backend = window_backend
 # simple class for experiment data
 class DataRecord:
     def __init__(self):
+        self.surround = []
         self.stimulus = []
         self.response = []
         self.react_time = []
+
+    def add_surround(self, surround):
+        self.surround.append(surround)
 
     def add_stimulus(self, stim):
         self.stimulus.append(stim)
@@ -35,15 +40,19 @@ class DataRecord:
     def to_numpy(self):
         n_trial = len(self.stimulus)
 
-        data_mtx = np.zeros([3, n_trial])
-        data_mtx[0, :] = self.stimulus
-        data_mtx[1, :] = self.response
-        data_mtx[2, :] = self.react_time
+        data_mtx = np.zeros([4, n_trial])
+        data_mtx[0, :] = self.surround
+        data_mtx[1, :] = self.stimulus
+        data_mtx[2, :] = self.response
+        data_mtx[3, :] = self.react_time
 
         return data_mtx
 
 class PriorLearning:
-    '''base class for our prior learning experiment'''
+
+    # static variable for the surround conditions (SF, Ori)
+    cond = [(0, 0), (0.4, 0), (0.4, 45), (0.4, 150)]
+
     def __init__(self, sub_val, n_trial, mode='uniform', show_fb=False):
         # subject name/id
         self.sub_val = sub_val
@@ -68,29 +77,13 @@ class PriorLearning:
         self.pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Take a short break. Press "space" when you are ready to continue.')
 
         # initialize stimulus
-        self.target = visual.GratingStim(self.win, sf=0.40, size=10.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.10)
-        self.surround = visual.GratingStim(self.win, sf=0.40, size=20.0, mask='raisedCos', contrast=0.10)
+        self.target = visual.GratingStim(self.win, sf=0.40, size=12.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.10)
+        self.surround = visual.GratingStim(self.win, sf=0.40, size=25.0, mask='raisedCos', contrast=0.10)
         self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='circle', size=0.2)
         self.feedback = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)
         self.prob = visual.GratingStim(self.win, sf=0.5, size=[2.0, 5.0], mask='gauss', contrast=1.0)
 
         return
-
-    @staticmethod
-    def color_gradient(resp, target):
-        error = resp - target
-        if error >= 90:
-            error -= 180
-        elif error <= -90:
-            error += 180
-
-        error = abs(error)
-        levels = {0.5: (59, 202, 109), 2.5: (46, 127, 24), 5: (69, 115, 30), 10: (103, 94, 36),
-                20: (141, 71, 43), 40: (177, 52, 51), 60: (200, 37, 56), 90: (237, 41, 56)}
-
-        for key in levels:
-            if error <= key:
-                return levels[key]
 
     def start(self):
         # show welcome message and instruction
@@ -105,7 +98,7 @@ class PriorLearning:
         return
 
     def run(self):
-        targets = sample_stimuli(n_sample=self.n_trial, mode=self.mode)
+        # start experiment
         for idx in range(self.n_trial):
             # ISI for 1.0 s
             self.fixation.draw()
@@ -114,10 +107,17 @@ class PriorLearning:
 
             # draw stimulus for 200 ms
             # surround orientation
+            cond_idx = np.random.randint(0, len(self.cond))
+            self.surround.sf, self.surround.ori = self.cond[cond_idx]
             self.surround.draw()
 
+            if self.cond[cond_idx][0] == 0:
+                self.record.add_surround(NaN)
+            else:
+                self.record.add_surround(self.cond[cond_idx][1])
+
             # center orientation
-            targetOri = float(targets[idx])
+            targetOri = float(sample_orientation(n_sample=1))
             self.record.add_stimulus(targetOri)
             self.target.setOri(targetOri)
             self.target.draw()
