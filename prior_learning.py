@@ -6,7 +6,7 @@ import numpy as np
 # for keyboard IO
 try:
     import keyboard
-except Exception as exc:    
+except Exception as exc:
     print('Unable to import keyboard module, keyboard IO will not be available')
     print(exc)
 
@@ -22,10 +22,10 @@ class DataRecord:
         self.stimulus = []
         self.response = []
         self.react_time = []
-    
+
     def add_stimulus(self, stim):
         self.stimulus.append(stim)
-    
+
     def add_response(self, resp):
         self.response.append(resp)
 
@@ -58,7 +58,7 @@ class PriorLearning:
         self.mode = mode
         self.show_fb = show_fb
         self.line_len = 3.0
-                
+
         # initialize window, message
         # monitor = 'testMonitor' or 'rm_413'
         self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, monitor='rm_413', units='deg', winType=window_backend)
@@ -82,9 +82,9 @@ class PriorLearning:
         if error >= 90:
             error -= 180
         elif error <= -90:
-            error += 180 
+            error += 180
 
-        error = abs(error)        
+        error = abs(error)
         levels = {0.5: (59, 202, 109), 2.5: (46, 127, 24), 5: (69, 115, 30), 10: (103, 94, 36),
                 20: (141, 71, 43), 40: (177, 52, 51), 60: (200, 37, 56), 90: (237, 41, 56)}
 
@@ -92,7 +92,7 @@ class PriorLearning:
             if error <= key:
                 return levels[key]
 
-    def start(self):        
+    def start(self):
         # show welcome message and instruction
         self.welcome.draw()
         self.inst1.draw()
@@ -100,10 +100,10 @@ class PriorLearning:
         self.win.flip()
 
         self.io_wait()
-        self.record = DataRecord()        
+        self.record = DataRecord()
 
         return
-    
+
     def run(self):
         targets = sample_stimuli(n_sample=self.n_trial, mode=self.mode)
         for idx in range(self.n_trial):
@@ -111,8 +111,8 @@ class PriorLearning:
             self.fixation.draw()
             self.win.flip()
             core.wait(1.0)
-            
-            # draw stimulus for 200 ms                                    
+
+            # draw stimulus for 200 ms
             targetOri = float(targets[idx])
             self.record.add_stimulus(targetOri)
 
@@ -124,8 +124,8 @@ class PriorLearning:
             core.wait(0.2)
 
             # blank screen for 2.0s
-            self.fixation.draw()           
-            self.win.flip()            
+            self.fixation.draw()
+            self.win.flip()
             core.wait(2.0)
 
             # record response
@@ -142,9 +142,9 @@ class PriorLearning:
 
                 self.feedback.setOri(response)
                 self.feedback.setColor(fd_color, 'rgb255')
-                
+
                 self.target.draw()
-                self.aperture.draw()               
+                self.aperture.draw()
                 self.feedback.draw()
                 self.fixation.draw()
                 self.win.flip()
@@ -154,15 +154,15 @@ class PriorLearning:
 
     def save_data(self):
         # write data as both .CSV and .NPY file
-        data_mtx = self.record.to_numpy()        
+        data_mtx = self.record.to_numpy()
         file_name = self.time_stmp + self.sub_val
 
         np.savetxt(file_name + '.csv', data_mtx, delimiter=",")
         np.save(file_name + '.npy', data_mtx)
 
         return
-    
-    def pause(self):        
+
+    def pause(self):
         self.pause_msg.draw()
         self.win.flip()
         self.io_wait()
@@ -175,23 +175,23 @@ class PriorLearning:
 
     def io_wait(self):
         raise NotImplementedError("IO Method not implemented in the base class")
-    
+
     def io_response(self):
         raise NotImplementedError("IO Method not implemented in the base class")
 
 # Implement IO method with keyboard
 class PriorLearningKeyboard(PriorLearning):
-    
+
     def io_wait(self):
         '''override io_wait'''
         keyboard.wait('space')
         return
-    
+
     def io_response(self):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
         self.prob.setOri(resp)
-        
+
         # global variable for recording response
         self.resp_flag = True
         self.increment = 0
@@ -210,7 +210,7 @@ class PriorLearningKeyboard(PriorLearning):
             self.resp_flag = False
 
         def aboard_callback(event):
-            self.resp_flag = False            
+            self.resp_flag = False
             self.win.close()
             core.quit()
 
@@ -220,15 +220,15 @@ class PriorLearningKeyboard(PriorLearning):
             keyboard.on_press_key(key, callback)
 
         for key in ['left', 'right']:
-            keyboard.on_release_key(key, release_callback)                
+            keyboard.on_release_key(key, release_callback)
 
         # wait/record for response
-        while self.resp_flag:            
-            if not self.increment == 0:                
+        while self.resp_flag:
+            if not self.increment == 0:
                 resp += self.increment
                 resp %= 180
                 self.prob.setOri(resp)
-            
+
             self.prob.draw()
             self.fixation.draw()
             self.win.flip()
@@ -261,7 +261,7 @@ class PriorLearningButtons(PriorLearning):
             self.inst1.draw()
             self.inst2.draw()
             self.win.flip()
-        
+
         self.record = DataRecord()
 
     def pause(self):
@@ -274,13 +274,13 @@ class PriorLearningButtons(PriorLearning):
     # override start and pause so io_wait is not required anymore
     def io_wait(self):
         '''override io_wait'''
-        return        
+        return
 
     def io_response(self):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
         self.prob.setOri(resp)
-                
+
         while not self.confirm_press():
             self.prob.draw()
             self.fixation.draw()
@@ -290,7 +290,7 @@ class PriorLearningButtons(PriorLearning):
                 resp -= 1
                 resp %= 180
                 self.prob.setOri(resp)
-            
+
             if self.joy.getButton(self.R1):
                 resp += 1
                 resp %= 180
@@ -301,15 +301,15 @@ class PriorLearningButtons(PriorLearning):
     def confirm_press(self):
         return self.joy.getButton(self.L2) or \
                 self.joy.getButton(self.R2)
-    
+
 # Response with Joystick Axis
 class PriorLearningJoystick(PriorLearningButtons):
     def io_response(self):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
         self.prob.setOri(resp)
-                
-        while not self.confirm_press():            
+
+        while not self.confirm_press():
             self.prob.draw()
             self.fixation.draw()
             self.win.flip()
