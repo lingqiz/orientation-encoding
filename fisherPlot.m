@@ -19,7 +19,7 @@ total_fisher = trapz(support, fisher);
 norm_fisher  = fisher ./ total_fisher;
 
 support = result.support / (2 * pi) * 180;
-indice = (support > 2) & (support < 178);
+indice = (support > 2.5) & (support < 177.5);
 
 plot(support(indice), norm_fisher(indice), 'k', 'LineWidth', 2, 'color', lineColor); hold on;
 
