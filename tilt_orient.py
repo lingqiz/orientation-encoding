@@ -104,7 +104,7 @@ class PriorLearning:
         n_sample = int(self.n_trial // len(self.cond))
         for cond_idx in range(len(self.cond)):
             samples = sample_stimuli(n_sample, mode='uniform')
-            stim_list.append(list(zip([cond_idx] * n_sample, samples)))
+            stim_list += list(zip([cond_idx] * n_sample, samples))
 
         # start experiment
         for idx in range(self.n_trial):
