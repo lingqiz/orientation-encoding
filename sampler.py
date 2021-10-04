@@ -18,7 +18,7 @@ def sample_orientation(n_sample, uniform=True):
     prob  = prob / np.trapz(prob)
     cprob = np.cumsum(prob)
 
-    return np.interp(seed, cprob, theta)    
+    return np.interp(seed, cprob, theta)
 
 def sample_stimuli(n_sample, mode='uniform'):
     # using stratified sampling over [0, 1] to ensure uniformity
@@ -37,24 +37,24 @@ def sample_stimuli(n_sample, mode='uniform'):
         prob = 2 - 1.25 * np.abs(np.cos(2 * theta / 180 * np.pi))
     else:
         raise ValueError('sample mode is invalid')
-        
+
     prob  = prob / np.trapz(prob)
     cprob = np.cumsum(prob)
-    
+
     np.random.shuffle(samples)
     return np.interp(samples, cprob, theta)
-        
+
 # test the sampler
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
-    
+
     # uniform sample
     n_sample = 200
     # sample = sample_orientation(n_sample)
     sample = sample_stimuli(n_sample, mode='uniform')
     plt.hist(sample, bins=20)
     plt.show()
-    
+
     # sample from natural orientation distribution
     # sample = sample_orientation(n_sample, uniform=False)
     sample = sample_stimuli(n_sample, mode='cardinal')

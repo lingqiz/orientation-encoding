@@ -1,6 +1,6 @@
 from psychopy import core, visual
 from datetime import datetime
-from sampler import sample_orientation
+from sampler import sample_orientation, sample_stimuli
 from numpy.core.numeric import NaN
 import numpy as np
 
@@ -51,7 +51,7 @@ class DataRecord:
 class PriorLearning:
 
     # static variable for the surround conditions (SF, Ori)
-    cond = [(NaN, NaN), (0.4, 0), (0.4, 45), (0.4, 90), (0.4, 150)]
+    cond = [(NaN, NaN), (0.4, 45), (0.4, 90), (0.4, 150)]
 
     def __init__(self, sub_val, n_trial, mode='uniform', show_fb=False):
         # subject name/id
@@ -99,6 +99,13 @@ class PriorLearning:
         return
 
     def run(self):
+        # create a of conditions and stimulus
+        stim_list = []
+        n_sample = int(self.n_trial // len(self.cond))
+        for cond_idx in range(len(self.cond)):
+            samples = sample_stimuli(n_sample, mode='uniform')
+            stim_list.append(list(zip([cond_idx] * n_sample, samples)))
+
         # start experiment
         for idx in range(self.n_trial):
             # ISI for 1.0 s
@@ -107,9 +114,8 @@ class PriorLearning:
             core.wait(1.0)
 
             # draw stimulus for 200 ms
-
             # surround orientation
-            cond_idx = np.random.randint(0, len(self.cond))
+            cond_idx, stim_ori = stim_list[idx]
             if np.isnan(self.cond[cond_idx][0]):
                 self.record.add_surround(NaN)
                 self.noise.draw()
@@ -119,9 +125,8 @@ class PriorLearning:
                 self.surround.draw()
 
             # center orientation
-            targetOri = float(sample_orientation(n_sample=1))
-            self.record.add_stimulus(targetOri)
-            self.target.setOri(targetOri)
+            self.record.add_stimulus(stim_ori)
+            self.target.setOri(stim_ori)
             self.target.draw()
 
             # draw fixation
