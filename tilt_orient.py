@@ -138,7 +138,7 @@ class PriorLearning:
             # draw fixation
             self.fixation.draw()
             self.win.flip()
-            core.wait(0.2)
+            core.wait(0.25)
 
             # blank screen for 2.0s
             self.fixation.draw()
