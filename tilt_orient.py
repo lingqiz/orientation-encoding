@@ -78,9 +78,12 @@ class PriorLearning:
         self.pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Take a short break. Press "space" when you are ready to continue.')
 
         # initialize stimulus
-        self.target = visual.GratingStim(self.win, sf=0.40, size=10.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.10)
-        self.surround = visual.GratingStim(self.win, sf=0.40, size=20.0, mask='raisedCos', contrast=0.10)
-        self.noise = visual.GratingStim(self.win, sf=0.0, size=20.0, mask='raisedCos', contrast=0.10)
+        self.target = visual.GratingStim(self.win, sf=0.50, size=10.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.10)
+        self.surround = visual.GratingStim(self.win, sf=0.50, size=18.0, mask='raisedCos', contrast=0.10)
+        self.noise = visual.NoiseStim(self.win, units='pix', mask='raisedCos', size=1024, contrast=0.10, noiseClip=3.0,
+                                    noiseType='Filtered', texRes=1024, noiseElementSize=4, noiseFractalPower=0,
+                                    noiseFilterLower=8.0/1024.0, noiseFilterUpper=12.0/1024.0, noiseFilterOrder=3.0)
+
         self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='circle', size=0.2)
         self.feedback = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)
         self.prob = visual.GratingStim(self.win, sf=0.5, size=[2.0, 5.0], mask='gauss', contrast=1.0)
@@ -120,6 +123,7 @@ class PriorLearning:
             cond_idx, stim_ori = stim_list[idx]
             if np.isnan(self.cond[cond_idx][0]):
                 self.record.add_surround(NaN)
+                self.noise.updateNoise()
                 self.noise.draw()
             else:
                 self.record.add_surround(self.cond[cond_idx][1])
