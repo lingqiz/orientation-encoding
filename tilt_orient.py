@@ -1,6 +1,7 @@
 from psychopy import core, visual
 from datetime import datetime
 from sampler import sample_orientation, sample_stimuli
+from random import shuffle
 from numpy.core.numeric import NaN
 import numpy as np
 
@@ -105,6 +106,7 @@ class PriorLearning:
         for cond_idx in range(len(self.cond)):
             samples = sample_stimuli(n_sample, mode='uniform')
             stim_list += list(zip([cond_idx] * n_sample, samples))
+        shuffle(stim_list)
 
         # start experiment
         for idx in range(self.n_trial):
