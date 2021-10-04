@@ -1,4 +1,4 @@
-from prior_learning import *
+from tilt_orient import *
 import sys
 
 # create the experiment with n_trial for each block
