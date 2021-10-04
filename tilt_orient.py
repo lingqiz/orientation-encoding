@@ -1,7 +1,7 @@
-from numpy.core.numeric import NaN
 from psychopy import core, visual
 from datetime import datetime
 from sampler import sample_orientation
+from numpy.core.numeric import NaN
 import numpy as np
 
 # for keyboard IO
@@ -51,7 +51,7 @@ class DataRecord:
 class PriorLearning:
 
     # static variable for the surround conditions (SF, Ori)
-    cond = [(np.NaN, np.NaN), (0.4, 0), (0.4, 45), (0.4, 90), (0.4, 150)]
+    cond = [(NaN, NaN), (0.4, 0), (0.4, 45), (0.4, 90), (0.4, 150)]
 
     def __init__(self, sub_val, n_trial, mode='uniform', show_fb=False):
         # subject name/id
@@ -111,7 +111,7 @@ class PriorLearning:
             # surround orientation
             cond_idx = np.random.randint(0, len(self.cond))
             if np.isnan(self.cond[cond_idx][0]):
-                self.record.add_surround(np.NaN)
+                self.record.add_surround(NaN)
                 self.noise.draw()
             else:
                 self.record.add_surround(self.cond[cond_idx][1])
