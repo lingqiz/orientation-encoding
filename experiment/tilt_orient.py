@@ -1,6 +1,6 @@
 from psychopy import core, visual
 from datetime import datetime
-from sampler import sample_orientation, sample_stimuli
+from .sampler import sample_orientation, sample_stimuli
 from random import shuffle
 from numpy.core.numeric import NaN
 import numpy as np
