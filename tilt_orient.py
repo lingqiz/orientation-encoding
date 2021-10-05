@@ -55,7 +55,7 @@ class PriorLearning:
     # static variable for the surround conditions (SF, Ori)
     COND = [(NaN, NaN), (0.5, 45), (0.5, 90), (0.5, 120), (0.5, 150)]
 
-    def __init__(self, sub_val, n_trial, mode='uniform', show_fb=False, record=False):
+    def __init__(self, sub_val, n_trial, mode='uniform', show_fb=False, record_sc=False):
         # subject name/id
         self.sub_val = sub_val
         self.time_stmp = datetime.now().strftime("%d_%m_%Y_%H_%M_")
@@ -69,7 +69,7 @@ class PriorLearning:
         self.mode = mode
         self.show_fb = show_fb
         self.line_len = 3.0
-        self.record = record
+        self.record_sc = record_sc
 
         # initialize window, message
         # monitor = 'testMonitor' or 'rm_413'
@@ -141,7 +141,7 @@ class PriorLearning:
             self.fixation.draw()
             self.win.flip()
 
-            if self.record:
+            if self.record_sc:
                 self.win.getMovieFrame()
 
             # stim presentation for 250 ms
@@ -153,7 +153,7 @@ class PriorLearning:
             core.wait(2.0)
 
             # record response
-            if not self.record:
+            if not self.record_sc:
                 clock = core.Clock()
                 response = self.io_response()
 
@@ -165,7 +165,7 @@ class PriorLearning:
     def save_data(self):
         file_name = self.time_stmp + self.sub_val
 
-        if self.record:
+        if self.record_sc:
             self.win.saveMovieFrames(os.path.join('.', 'record', file_name + '.tif'))
 
         else:
