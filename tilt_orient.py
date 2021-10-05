@@ -4,6 +4,7 @@ from sampler import sample_orientation, sample_stimuli
 from random import shuffle
 from numpy.core.numeric import NaN
 import numpy as np
+import os
 
 # for keyboard IO
 try:
@@ -165,7 +166,8 @@ class PriorLearning:
         file_name = self.time_stmp + self.sub_val
 
         if self.record:
-            self.win.saveMovieFrames(file_name + '.tif')
+            self.win.saveMovieFrames(os.path.join('.', 'record', file_name + '.tif'))
+
         else:
             # write data as both .CSV and .NPY file
             data_mtx = self.record.to_numpy()
