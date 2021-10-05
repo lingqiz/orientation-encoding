@@ -9,11 +9,11 @@ catch EXP
     fprintf('plotlab not available, use default MATLAB style \n');
 end
 
+%% Load data
 addpath('./analysis/');
 addpath('./analysis/circstat/');
 addpath('./TiltData/');
 
-%% Load data
 fileName = '03_10_2021_20_11_tilt_1.csv';
 dataMtx_1 = readmatrix(fileName);
 
