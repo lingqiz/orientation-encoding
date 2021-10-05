@@ -162,15 +162,16 @@ class PriorLearning:
         return
 
     def save_data(self):
-        # write data as both .CSV and .NPY file
-        data_mtx = self.record.to_numpy()
         file_name = self.time_stmp + self.sub_val
-
-        np.savetxt(file_name + '.csv', data_mtx, delimiter=",")
-        np.save(file_name + '.npy', data_mtx)
 
         if self.record:
             self.win.saveMovieFrames(file_name + '.tif')
+        else:
+            # write data as both .CSV and .NPY file
+            data_mtx = self.record.to_numpy()
+
+            np.savetxt(file_name + '.csv', data_mtx, delimiter=",")
+            np.save(file_name + '.npy', data_mtx)
 
         return
 
