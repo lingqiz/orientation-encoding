@@ -52,9 +52,9 @@ class DataRecord:
 class PriorLearning:
 
     # static variable for the surround conditions (SF, Ori)
-    cond = [(NaN, NaN), (0.5, 45), (0.5, 90), (0.5, 120), (0.5, 150)]
+    COND = [(NaN, NaN), (0.5, 45), (0.5, 90), (0.5, 120), (0.5, 150)]
 
-    def __init__(self, sub_val, n_trial, mode='uniform', show_fb=False):
+    def __init__(self, sub_val, n_trial, mode='uniform', show_fb=False, record=False):
         # subject name/id
         self.sub_val = sub_val
         self.time_stmp = datetime.now().strftime("%d_%m_%Y_%H_%M_")
@@ -68,6 +68,7 @@ class PriorLearning:
         self.mode = mode
         self.show_fb = show_fb
         self.line_len = 3.0
+        self.record = record
 
         # initialize window, message
         # monitor = 'testMonitor' or 'rm_413'
@@ -105,8 +106,8 @@ class PriorLearning:
     def run(self):
         # create a of conditions and stimulus
         stim_list = []
-        n_sample = int(self.n_trial // len(self.cond))
-        for cond_idx in range(len(self.cond)):
+        n_sample = int(self.n_trial // len(self.COND))
+        for cond_idx in range(len(self.COND)):
             samples = sample_stimuli(n_sample, mode='uniform')
             stim_list += list(zip([cond_idx] * n_sample, samples))
         shuffle(stim_list)
@@ -121,13 +122,13 @@ class PriorLearning:
             # draw stimulus for 200 ms
             # surround orientation
             cond_idx, stim_ori = stim_list[idx]
-            if np.isnan(self.cond[cond_idx][0]):
+            if np.isnan(self.COND[cond_idx][0]):
                 self.record.add_surround(NaN)
                 self.noise.updateNoise()
                 self.noise.draw()
             else:
-                self.record.add_surround(self.cond[cond_idx][1])
-                self.surround.sf, self.surround.ori = self.cond[cond_idx]
+                self.record.add_surround(self.COND[cond_idx][1])
+                self.surround.sf, self.surround.ori = self.COND[cond_idx]
                 self.surround.draw()
 
             # center orientation
@@ -138,6 +139,11 @@ class PriorLearning:
             # draw fixation
             self.fixation.draw()
             self.win.flip()
+
+            if self.record:
+                self.win.getMovieFrame()
+
+            # stim presentation for 250 ms
             core.wait(0.25)
 
             # blank screen for 2.0s
@@ -146,11 +152,12 @@ class PriorLearning:
             core.wait(2.0)
 
             # record response
-            clock = core.Clock()
-            response = self.io_response()
+            if not self.record:
+                clock = core.Clock()
+                response = self.io_response()
 
-            self.record.add_response(response)
-            self.record.add_react_time(clock.getTime())
+                self.record.add_response(response)
+                self.record.add_react_time(clock.getTime())
 
         return
 
@@ -161,6 +168,9 @@ class PriorLearning:
 
         np.savetxt(file_name + '.csv', data_mtx, delimiter=",")
         np.save(file_name + '.npy', data_mtx)
+
+        if self.record:
+            self.win.saveMovieFrames(file_name + '.tif')
 
         return
 
