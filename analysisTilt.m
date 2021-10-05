@@ -9,7 +9,8 @@ catch EXP
     fprintf('plotlab not available, use default MATLAB style \n');
 end
 
-addpath('./CircStat/');
+addpath('./analysis/');
+addpath('./analysis/circstat/');
 addpath('./TiltData/');
 
 %% Load data

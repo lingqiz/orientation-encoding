@@ -166,7 +166,7 @@ class PriorLearning:
         file_name = self.time_stmp + self.sub_val
 
         if self.record_sc:
-            self.win.saveMovieFrames(os.path.join('.', 'record', file_name + '.tif'))
+            self.win.saveMovieFrames(os.path.join('.', 'Record', file_name + '.tif'))
 
         else:
             # write data as both .CSV and .NPY file

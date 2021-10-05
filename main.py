@@ -1,4 +1,4 @@
-from tilt_orient import *
+from experiment.tilt_orient import *
 import sys
 
 # create the experiment with n_trial for each block
