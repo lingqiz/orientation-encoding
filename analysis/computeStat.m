@@ -3,12 +3,12 @@ function result = computeStat(target, response, varargin)
 % parameter for the analysis
 p = inputParser;
 p.addParameter('binSize', 10, @(x)(isnumeric(x) && numel(x) == 1));
-p.addParameter('mirror', false, @islogical);
+p.addParameter('period', false, @islogical);
 p.addParameter('smooth', false, @islogical);
 parse(p, varargin{:});
 
 binSize = p.Results.binSize;
-mirror  = p.Results.mirror;
+period  = p.Results.period;
 
 % convert to [0, 2 pi] range
 target = target / 180 * (2 * pi);
@@ -20,7 +20,7 @@ bias_raw = wrapToPi(response - target);
 % data augmentation
 % copy data from 0-90 deg to 90-180 deg and vice versa
 % assume pattern with a period of 90 deg
-if mirror
+if period
     target_lh   = target(target <= pi) + pi;
     response_lh = response(target <= pi) + pi;
     

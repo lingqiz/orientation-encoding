@@ -23,12 +23,12 @@ plot(support, average, 'k', 'LineWidth', 2, 'color', lineColor); hold on;
 
 % axis and axis ticks
 xlim([0, 180]);
-ylim([-25, 25]);
+ylim([-15, 15]);
 
 xticks(0:45:180);
 xlabel('Orientation (deg)');
 
-yticks(-25:10:25);
+yticks(-15:5:15);
 ylabel('Bias (deg)');
 
 % add reference lines

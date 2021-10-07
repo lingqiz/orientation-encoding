@@ -9,16 +9,23 @@ catch EXP
     fprintf('plotlab not available, use default MATLAB style \n');
 end
 
-%% Load data
-mtx_1 = readmatrix(fullfile('TiltData', '03_10_2021_20_11_tilt_1.csv'));
-mtx_2 = readmatrix(fullfile('TiltData', '04_10_2021_08_26_tilt_2.csv'));
-
-dataMtx = [mtx_1, mtx_2];
-
-%% Load data
+%% Set path
 addpath('./analysis/');
 addpath('./analysis/circstat/');
 
+%% Load data
+% first pilot
+mtx_1 = readmatrix(fullfile('TiltData', '03_10_2021_20_11_tilt_1.csv'));
+mtx_2 = readmatrix(fullfile('TiltData', '04_10_2021_08_26_tilt_2.csv'));
+dataMtx = [mtx_1, mtx_2];
+
+% first debug
+% dataMtx = readmatrix(fullfile('TiltData', '07_10_2021_14_16_debug_1.csv'));
+
+% second debug
+% dataMtx = readmatrix(fullfile('TiltData', '07_10_2021_15_41_debug_2.csv'));
+
+%% Load data
 dataMtx = [];
 
 files = dir('./TiltData/*_tilt_final.csv');
@@ -34,11 +41,10 @@ fisher = figure();
 
 binSize = 15;
 numBlock = 1;
-mirror = false; 
 
 baseline = dataMtx(2:end, isnan(dataMtx(1, :)));
 result = analysisBlock(baseline, 'blockIndex', 1, 'blockLength', ...
-    size(baseline, 2), 'binSize', binSize, 'mirror', false, 'smooth', true);
+    size(baseline, 2), 'binSize', binSize, 'period', false, 'smooth', true);
 
 % plot data and stats
 figure(data);
@@ -58,7 +64,7 @@ cond = cond(~isnan(cond));
 for surround = cond
     condData = dataMtx(2:end, dataMtx(1, :) == surround);
     result = analysisBlock(condData, 'blockIndex', 1, 'blockLength', ...
-        size(condData, 2), 'binSize', binSize, 'mirror', mirror, 'smooth', true);
+        size(condData, 2), 'binSize', binSize, 'period', false, 'smooth', true);
     
     data = figure();
     stdv = figure();

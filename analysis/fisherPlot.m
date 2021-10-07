@@ -28,7 +28,7 @@ xlim([0, 180]);
 xticks(0:45:180);
 xlabel('Orientation (deg)');
 
-ylim([0.05 0.35]);
+ylim([0.0 0.35]);
 ylabel('Normalized FI');
 
 % add reference lines
