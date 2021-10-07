@@ -116,9 +116,13 @@ class PriorLearning:
         # start experiment
         for idx in range(self.n_trial):
             # ISI for 1.0 s
-            self.fixation.draw()
-            self.win.flip()
-            core.wait(1.0)
+            for _ in range(2):
+                self.fixation.draw()
+                self.win.flip()
+                core.wait(0.25)
+
+                self.win.flip()
+                core.wait(0.25)
 
             # draw stimulus for 200 ms
             # surround orientation
