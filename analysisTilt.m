@@ -19,11 +19,10 @@ mtx_1 = readmatrix(fullfile('TiltData', '03_10_2021_20_11_tilt_1.csv'));
 mtx_2 = readmatrix(fullfile('TiltData', '04_10_2021_08_26_tilt_2.csv'));
 dataMtx = [mtx_1, mtx_2];
 
-% first debug
+% debug data
 % dataMtx = readmatrix(fullfile('TiltData', '07_10_2021_14_16_debug_1.csv'));
-
-% second debug
 % dataMtx = readmatrix(fullfile('TiltData', '07_10_2021_15_41_debug_2.csv'));
+% dataMtx = readmatrix(fullfile('TiltData', '07_10_2021_17_31_debug_3.csv'));
 
 %% Load data
 dataMtx = [];
