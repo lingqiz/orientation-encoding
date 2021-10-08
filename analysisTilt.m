@@ -22,8 +22,12 @@ dataMtx = [mtx_1, mtx_2];
 % debug data
 idx = 3;
 path = {'07_10_2021_14_16_debug_1.csv', '07_10_2021_15_41_debug_2.csv', ...
-    '07_10_2021_17_31_debug_3.csv'};
+    '07_10_2021_17_31_debug_3.csv', '08_10_2021_09_59_debug_4.csv'};
+
 dataMtx = readmatrix(fullfile('TiltData', path{idx}));
+
+dataMtx = [readmatrix(fullfile('TiltData', path{3})), ...
+            readmatrix(fullfile('TiltData', path{4}))];
 
 %% Load data
 dataMtx = [];
