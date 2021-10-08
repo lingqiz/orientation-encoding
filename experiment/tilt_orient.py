@@ -3,8 +3,7 @@ from datetime import datetime
 from .sampler import sample_orientation, sample_stimuli
 from random import shuffle
 from numpy.core.numeric import NaN
-import numpy as np
-import os
+import os, numpy as np
 
 # for keyboard IO
 try:
