@@ -140,7 +140,8 @@ class PriorLearning:
             
             clock.reset()
             while clock.getTime() <= 1.5:
-                crst = 0.1 * np.cos(2.0 * np.pi * 2.0 * clock.getTime()) + 0.1
+                # 2 hz contrast modulation
+                crst = 0.1 * np.cos(4.0 * np.pi * clock.getTime() + np.pi) + 0.1
                 # draw stim
                 surround.contrast = crst
                 surround.draw()
