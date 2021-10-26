@@ -7,8 +7,10 @@ if not len(sys.argv) == 2:
     raise ValueError('Incorrect number of input arguments')
 
 sub_val = str(sys.argv[1])
+
+# two blocks, about half an hour each
 n_trial = 150
-n_block = 4
+n_block = 2
 input_type = 'buttons'
 if input_type == 'keyboard':
     exp = PriorLearningKeyboard(sub_val=sub_val, n_trial=n_trial)
@@ -21,6 +23,7 @@ else:
 
 # start running the experiment
 exp.mode = 'uniform'
+exp.record_resp = True
 exp.start()
 
 for block in range(n_block):

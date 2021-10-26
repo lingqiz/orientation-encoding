@@ -38,21 +38,23 @@ class DataRecord:
     def add_react_time(self, time):
         self.react_time.append(time)
 
-    def to_numpy(self):
+    def to_numpy(self, record_resp):
         n_trial = len(self.stimulus)
-
         data_mtx = np.zeros([4, n_trial])
+
         data_mtx[0, :] = self.surround
         data_mtx[1, :] = self.stimulus
-        data_mtx[2, :] = self.response
-        data_mtx[3, :] = self.react_time
+
+        if record_resp:
+            data_mtx[2, :] = self.response
+            data_mtx[3, :] = self.react_time
 
         return data_mtx
 
 class PriorLearning:
 
     # static variable for the surround conditions (SF, Ori)
-    COND = [(NaN, NaN), (0.5, 30), (0.5, 45), (0.5, 90), (0.5, 135), (0.5, 150)]
+    COND = [(NaN, NaN), (0.5, 30), (0.5, 150)]
 
     def __init__(self, sub_val, n_trial, mode='uniform', show_fb=False, record_resp=True, record_sc=False):
         # subject name/id
@@ -138,7 +140,7 @@ class PriorLearning:
             # center orientation
             self.record.add_stimulus(stim_ori)
             self.target.setOri(stim_ori)
-            
+
             clock.reset()
             while clock.getTime() <= 1.5:
                 # 2 hz contrast modulation
@@ -153,20 +155,20 @@ class PriorLearning:
                 # draw fixation dot
                 self.fixation.draw()
                 self.win.flip()
-            
+
             if self.record_sc:
                 self.win.getMovieFrame()
-            
+
             # blank screen for 4.5s
             # add attention task within
             clock.reset()
             while clock.getTime() < 4.5:
                 self.fixation.draw()
-                self.win.flip()            
+                self.win.flip()
 
-            # record response            
-            if self.record_resp and (not self.record_sc):            
-                clock = core.Clock()
+            # record response
+            if self.record_resp and (not self.record_sc):
+                clock.reset()
                 response = self.io_response()
 
                 self.record.add_response(response)
@@ -182,7 +184,7 @@ class PriorLearning:
 
         else:
             # write data as both .CSV and .NPY file
-            data_mtx = self.record.to_numpy()
+            data_mtx = self.record.to_numpy(self.record_resp)
 
             np.savetxt(file_name + '.csv', data_mtx, delimiter=",")
             np.save(file_name + '.npy', data_mtx)
