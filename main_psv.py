@@ -11,7 +11,7 @@ sub_val = str(sys.argv[1])
 # two blocks, about half an hour each
 n_trial = 150
 n_block = 2
-exp = PriorLearningButtons(sub_val=sub_val, n_trial=n_trial)
+exp = PriorLearningKeyboard(sub_val=sub_val, n_trial=n_trial)
 
 # start running the experiment
 # passive viewing condition
