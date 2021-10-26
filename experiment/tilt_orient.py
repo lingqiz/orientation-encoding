@@ -56,7 +56,7 @@ class PriorLearning:
     # static variable for the surround conditions (SF, Ori)
     COND = [(NaN, NaN), (0.5, 30), (0.5, 150)]
 
-    def __init__(self, sub_val, n_trial, mode='uniform', show_fb=False, record_resp=True, record_sc=False):
+    def __init__(self, sub_val, n_trial, mode='uniform', show_fb=False, record_resp=True, atten_task=False, record_sc=False):
         # subject name/id
         self.sub_val = sub_val
         self.time_stmp = datetime.now().strftime("%d_%m_%Y_%H_%M_")
@@ -71,6 +71,7 @@ class PriorLearning:
         self.show_fb = show_fb
         self.line_len = 3.0
         self.record_resp = record_resp
+        self.atten_task = atten_task
         self.record_sc = record_sc
 
         # initialize window, message
@@ -144,7 +145,7 @@ class PriorLearning:
             clock.reset()
             while clock.getTime() <= 1.5:
                 # 2 hz contrast modulation
-                crst = 0.1 * np.cos(4.0 * np.pi * clock.getTime() + np.pi) + 0.1
+                crst = 0.05 * np.cos(4.0 * np.pi * clock.getTime() + np.pi) + 0.05
                 # draw stim
                 surround.contrast = crst
                 surround.draw()

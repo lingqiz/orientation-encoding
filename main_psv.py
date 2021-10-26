@@ -11,19 +11,13 @@ sub_val = str(sys.argv[1])
 # two blocks, about half an hour each
 n_trial = 150
 n_block = 2
-input_type = 'buttons'
-if input_type == 'keyboard':
-    exp = PriorLearningKeyboard(sub_val=sub_val, n_trial=n_trial)
-elif input_type == 'buttons':
-    exp = PriorLearningButtons(sub_val=sub_val, n_trial=n_trial)
-elif input_type == 'joystick':
-    exp = PriorLearningJoystick(sub_val=sub_val, n_trial=n_trial)
-else:
-    raise ValueError('invalid input method')
+exp = PriorLearningButtons(sub_val=sub_val, n_trial=n_trial)
 
 # start running the experiment
+# passive viewing condition
 exp.mode = 'uniform'
-exp.record_resp = True
+exp.record_resp = False
+exp.atten_task = True
 
 exp.start()
 for block in range(n_block):
