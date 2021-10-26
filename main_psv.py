@@ -19,6 +19,9 @@ exp.mode = 'uniform'
 exp.record_resp = False
 exp.atten_task = True
 
+exp.stim_dur = 1.5
+exp.delay = 4.5
+
 exp.start()
 for block in range(n_block):
     exp.run()

@@ -74,6 +74,9 @@ class PriorLearning:
         self.atten_task = atten_task
         self.record_sc = record_sc
 
+        self.stim_dur = 1.5
+        self.delay = 4.5
+
         # initialize window, message
         # monitor = 'testMonitor' or 'rm_413'
         self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, monitor='rm_413', units='deg', winType=window_backend)
@@ -143,7 +146,7 @@ class PriorLearning:
             self.target.setOri(stim_ori)
 
             clock.reset()
-            while clock.getTime() <= 1.5:
+            while clock.getTime() <= self.stim_dur:
                 # 2 hz contrast modulation
                 crst = 0.05 * np.cos(4.0 * np.pi * clock.getTime() + np.pi) + 0.05
                 # draw stim
@@ -160,10 +163,9 @@ class PriorLearning:
             if self.record_sc:
                 self.win.getMovieFrame()
 
-            # blank screen for 4.5s
-            # add attention task within
+            # blank screen for delay duration
             clock.reset()
-            while clock.getTime() < 4.5:
+            while clock.getTime() <= self.delay:
                 self.fixation.draw()
                 self.win.flip()
 
