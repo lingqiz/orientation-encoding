@@ -113,39 +113,44 @@ class PriorLearning:
         shuffle(stim_list)
 
         # start experiment
+        # start a clock
+        clock = core.Clock()
         for idx in range(self.n_trial):
             # ISI for 1.0 s
             self.fixation.draw()
             self.win.flip()
             core.wait(1.0)
 
-            # draw stimulus for 200 ms
+            # draw stimulus for 250 ms
             # surround orientation
+            surround = None
             cond_idx, stim_ori = stim_list[idx]
             if np.isnan(self.COND[cond_idx][0]):
                 self.record.add_surround(NaN)
                 self.noise.updateNoise()
-                self.noise.draw()
+                surround = self.noise
             else:
                 self.record.add_surround(self.COND[cond_idx][1])
                 self.surround.sf, self.surround.ori = self.COND[cond_idx]
-                self.surround.draw()
+                surround = self.surround
 
             # center orientation
             self.record.add_stimulus(stim_ori)
             self.target.setOri(stim_ori)
-            self.target.draw()
+            
+            clock.reset()
+            while clock.getTime() < 0.25:
+                # draw stim
+                surround.draw()
+                self.target.draw()
 
-            # draw fixation
-            self.fixation.draw()
-            self.win.flip()
-
+                # draw fixation dot
+                self.fixation.draw()
+                self.win.flip()
+            
             if self.record_sc:
                 self.win.getMovieFrame()
-
-            # stim presentation for 250 ms
-            core.wait(0.25)
-
+            
             # blank screen for 2.0s
             self.fixation.draw()
             self.win.flip()
