@@ -139,9 +139,13 @@ class PriorLearning:
             self.target.setOri(stim_ori)
             
             clock.reset()
-            while clock.getTime() < 0.25:
+            while clock.getTime() <= 1.5:
+                crst = 0.1 * np.cos(2.0 * np.pi * 2.0 * clock.getTime()) + 0.1
                 # draw stim
+                surround.contrast = crst
                 surround.draw()
+
+                self.target.contrast = crst
                 self.target.draw()
 
                 # draw fixation dot
@@ -151,13 +155,16 @@ class PriorLearning:
             if self.record_sc:
                 self.win.getMovieFrame()
             
-            # blank screen for 2.0s
-            self.fixation.draw()
-            self.win.flip()
-            core.wait(2.0)
+            # blank screen for 4.5s
+            # add attention task within
+            clock.reset()
+            while clock.getTime() < 4.5:
+                self.fixation.draw()
+                self.win.flip()            
 
             # record response
-            if not self.record_sc:
+            response = False
+            if response and (not self.record_sc):            
                 clock = core.Clock()
                 response = self.io_response()
 
