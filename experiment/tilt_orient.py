@@ -53,6 +53,10 @@ class DataRecord:
 
 class PriorLearning:
 
+    DEFAULT_DUR = 1.5
+    DEFAULT_DELAY = 4.5
+    DEFAULT_LEN = 3.0
+
     # static variable for the surround conditions (SF, Ori)
     COND = [(NaN, NaN), (0.5, 30), (0.5, 150)]
 
@@ -68,14 +72,14 @@ class PriorLearning:
         # parameter for the experiment
         self.n_trial = n_trial
         self.mode = mode
-        self.show_fb = show_fb
-        self.line_len = 3.0
+        self.show_fb = show_fb        
         self.record_resp = record_resp
         self.atten_task = atten_task
         self.record_sc = record_sc
 
-        self.stim_dur = 1.5
-        self.delay = 4.5
+        self.line_len = self.DEFAULT_LEN
+        self.stim_dur = self.DEFAULT_DUR
+        self.delay = self.DEFAULT_DELAY
 
         # initialize window, message
         # monitor = 'testMonitor' or 'rm_413'
@@ -127,8 +131,7 @@ class PriorLearning:
             self.fixation.draw()
             self.win.flip()
             core.wait(1.0)
-
-            # draw stimulus for 250 ms
+            
             # surround orientation
             surround = None
             cond_idx, stim_ori = stim_list[idx]
@@ -145,6 +148,7 @@ class PriorLearning:
             self.record.add_stimulus(stim_ori)
             self.target.setOri(stim_ori)
 
+            # draw stimulus for a fixed duration
             clock.reset()
             while clock.getTime() <= self.stim_dur:
                 # 2 hz contrast modulation
