@@ -10,7 +10,7 @@ sub_val = str(sys.argv[1])
 
 # two blocks, about half an hour each
 n_trial = 150
-n_block = 2
+n_block = 4
 input_type = 'buttons'
 if input_type == 'keyboard':
     exp = PriorLearningKeyboard(sub_val=sub_val, n_trial=n_trial)
