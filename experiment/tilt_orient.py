@@ -3,7 +3,7 @@ from datetime import datetime
 from .sampler import sample_orientation, sample_stimuli
 from random import shuffle
 from numpy.core.numeric import NaN
-import os, numpy as np
+import os, threading, numpy as np
 
 # for keyboard IO
 try:
@@ -50,6 +50,32 @@ class DataRecord:
             data_mtx[3, :] = self.react_time
 
         return data_mtx
+
+# separate thread for attention task
+class AttentThread(threading.Thread):
+    def __init__(self, exp):
+        threading.Thread.__init__(self)
+        self.exp = exp
+    
+    def run(self):
+        # function for the attention task
+        clock = core.Clock()
+        while self.exp.exp_run:
+            if np.random.rand() < 0.05:
+                # flip the color of fixation dot
+                self.exp.fixation.color = (1.0, 0.0, 0.0)
+
+                # wait for reaction
+                clock.reset()
+                keyboard.wait('A')
+                
+                # record RT
+                self.exp.atten_rt.append(clock.getTime())
+                self.exp.fixation.color = (0.5, 0.5, 0.5)                
+
+            clock.reset()
+            while clock.getTime() <= 1.0:
+                pass
 
 class OrientEncode:
 
@@ -123,15 +149,18 @@ class OrientEncode:
             stim_list += list(zip([cond_idx] * n_sample, samples))
         shuffle(stim_list)
 
+        # init the attention task for passive viewing condition
+        if self.atten_task:
+            self.exp_run = True
+            self.atten_rt = []
+            self.atten_thread = AttentThread(self)
+            self.atten_thread.start()
+
         # start experiment
         # start a clock
         clock = core.Clock()
         for idx in range(self.n_trial):
-            # ISI for 1.0 s
-            self.fixation.draw()
-            self.win.flip()
-            core.wait(1.0)
-            
+            # determine stim condition 
             # surround orientation
             surround = None
             cond_idx, stim_ori = stim_list[idx]
@@ -143,7 +172,6 @@ class OrientEncode:
                 self.record.add_surround(self.COND[cond_idx][1])
                 self.surround.sf, self.surround.ori = self.COND[cond_idx]
                 surround = self.surround
-
             # center orientation
             self.record.add_stimulus(stim_ori)
             self.target.setOri(stim_ori)
@@ -181,8 +209,11 @@ class OrientEncode:
                 self.record.add_response(response)
                 self.record.add_react_time(clock.getTime())
 
-        return
+        self.exp_run = False
+        self.atten_thread.join()
 
+        return
+        
     def save_data(self):
         file_name = self.time_stmp + self.sub_val
 
