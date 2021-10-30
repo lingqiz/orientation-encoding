@@ -63,6 +63,7 @@ class AttentThread(threading.Thread):
         while self.exp.exp_run:
             if np.random.rand() < 0.05:
                 # flip the color of fixation dot
+                gt = self.global_clock.getTime()
                 self.exp.fixation.color = (1.0, 0.0, 0.0)
 
                 # wait for reaction
@@ -70,7 +71,8 @@ class AttentThread(threading.Thread):
                 keyboard.wait('A')
                 
                 # record RT
-                self.exp.atten_rt.append(clock.getTime())
+                rt = clock.getTime()
+                self.exp.atten_rt.append((gt, rt))
                 self.exp.fixation.color = (0.5, 0.5, 0.5)                
 
             clock.reset()
@@ -157,7 +159,10 @@ class OrientEncode:
             self.atten_thread.start()
 
         # start experiment
-        # start a clock
+        # clock for global timing
+        self.global_clock = core.Clock()
+
+        # clock for trial timing
         clock = core.Clock()
         for idx in range(self.n_trial):
             # determine stim condition 
@@ -223,9 +228,11 @@ class OrientEncode:
         else:
             # write data as both .CSV and .NPY file
             data_mtx = self.record.to_numpy(self.record_resp)
+            np.savetxt(file_name + '.csv', data_mtx, delimiter=",")            
 
-            np.savetxt(file_name + '.csv', data_mtx, delimiter=",")
-            np.save(file_name + '.npy', data_mtx)
+            if self.atten_task:
+                rt_mtx = np.array(self.atten_rt)
+                np.savetxt(file_name + '_rt' + '.csv', rt_mtx, delimiter=",")
 
         return
 
