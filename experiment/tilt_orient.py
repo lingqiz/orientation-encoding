@@ -83,6 +83,7 @@ class OrientEncode:
 
     DEFAULT_DUR = 1.5
     DEFAULT_DELAY = 4.5
+    DEFAULT_ISI = 1.0
     DEFAULT_LEN = 3.0
 
     # static variable for the surround conditions (SF, Ori)
@@ -108,6 +109,7 @@ class OrientEncode:
         self.line_len = self.DEFAULT_LEN
         self.stim_dur = self.DEFAULT_DUR
         self.delay = self.DEFAULT_DELAY
+        self.isi = self.DEFAULT_ISI
 
         # initialize window, message
         # monitor = 'testMonitor' or 'rm_413'
@@ -168,7 +170,7 @@ class OrientEncode:
         for idx in range(self.n_trial):
             # ISI for 1s
             clock.reset()
-            while clock.getTime() <= 1.0:
+            while clock.getTime() <= self.isi:
                 self.fixation.draw()
                 self.win.flip()
 
