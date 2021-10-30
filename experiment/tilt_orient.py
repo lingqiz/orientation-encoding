@@ -51,7 +51,7 @@ class DataRecord:
 
         return data_mtx
 
-class PriorLearning:
+class OrientEncode:
 
     DEFAULT_DUR = 1.5
     DEFAULT_DELAY = 4.5
@@ -216,7 +216,7 @@ class PriorLearning:
         raise NotImplementedError("IO Method not implemented in the base class")
 
 # Implement IO method with keyboard
-class PriorLearningKeyboard(PriorLearning):
+class OrientEncodeKeyboard(OrientEncode):
 
     def io_wait(self):
         '''override io_wait'''
@@ -284,10 +284,10 @@ class PriorLearningKeyboard(PriorLearning):
         return resp
 
 # IO with joystick button push
-class PriorLearningButtons(PriorLearning):
+class OrientEncodeButtons(OrientEncode):
 
     def __init__(self, sub_val, n_trial, mode='uniform', show_fb=False, joy_id=0):
-        super(PriorLearningButtons, self).__init__(sub_val, n_trial, mode, show_fb)
+        super(OrientEncodeButtons, self).__init__(sub_val, n_trial, mode, show_fb)
         self.L1 = 4
         self.L2 = 6
         self.R1 = 5
@@ -350,7 +350,7 @@ class PriorLearningButtons(PriorLearning):
                 self.joy.getButton(self.R2)
 
 # Response with Joystick Axis
-class PriorLearningJoystick(PriorLearningButtons):
+class OrientEncodeJoystick(OrientEncodeButtons):
     def io_response(self):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))

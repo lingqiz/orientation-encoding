@@ -13,11 +13,11 @@ n_trial = 150
 n_block = 4
 input_type = 'buttons'
 if input_type == 'keyboard':
-    exp = PriorLearningKeyboard(sub_val=sub_val, n_trial=n_trial)
+    exp = OrientEncodeKeyboard(sub_val=sub_val, n_trial=n_trial)
 elif input_type == 'buttons':
-    exp = PriorLearningButtons(sub_val=sub_val, n_trial=n_trial)
+    exp = OrientEncodeButtons(sub_val=sub_val, n_trial=n_trial)
 elif input_type == 'joystick':
-    exp = PriorLearningJoystick(sub_val=sub_val, n_trial=n_trial)
+    exp = OrientEncodeJoystick(sub_val=sub_val, n_trial=n_trial)
 else:
     raise ValueError('invalid input method')
 
