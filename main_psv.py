@@ -19,6 +19,11 @@ exp.mode = 'uniform'
 exp.record_resp = False
 exp.atten_task = True
 
+# change the message for passive viewing
+exp.welcome.text = 'Press "space" to contiune.'
+exp.inst1.text = 'You will see a sequence of flashed gabor stimulus.'
+exp.inst2.text = 'Try to maintain fixation at the center dot.'
+
 exp.stim_dur = 1.5
 exp.delay = 4.5
 

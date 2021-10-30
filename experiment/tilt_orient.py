@@ -96,7 +96,7 @@ class PriorLearning:
                                     noiseType='Filtered', texRes=1024, noiseElementSize=4, noiseFractalPower=0,
                                     noiseFilterLower=7.5/1024.0, noiseFilterUpper=12.5/1024.0, noiseFilterOrder=3.0)
 
-        self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='circle', size=0.2)
+        self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='raisedCos', size=0.25)
         self.feedback = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)
         self.prob = visual.GratingStim(self.win, sf=0.5, size=[2.0, 5.0], mask='gauss', contrast=1.0)
 
@@ -220,7 +220,18 @@ class PriorLearningKeyboard(PriorLearning):
 
     def io_wait(self):
         '''override io_wait'''
-        keyboard.wait('space')
+        self.resp_flag = True
+        def confirm_callback(event):
+            self.resp_flag= False
+
+        # register callback, wait for key press
+        keyboard.on_release_key('space', confirm_callback)
+        while self.resp_flag:
+            self.welcome.draw()
+            self.inst1.draw()
+            self.inst2.draw()
+            self.win.flip()
+
         return
 
     def io_response(self):
