@@ -61,9 +61,9 @@ class AttentThread(threading.Thread):
         # function for the attention task
         clock = core.Clock()
         while self.exp.exp_run:
-            if np.random.rand() < 0.05:
+            if np.random.rand() < 0.05:                
                 # flip the color of fixation dot
-                gt = self.global_clock.getTime()
+                gt = self.exp.global_clock.getTime()
                 self.exp.fixation.color = (1.0, 0.0, 0.0)
 
                 # wait for reaction
@@ -151,20 +151,27 @@ class OrientEncode:
             stim_list += list(zip([cond_idx] * n_sample, samples))
         shuffle(stim_list)
 
-        # init the attention task for passive viewing condition
-        if self.atten_task:
-            self.exp_run = True
-            self.atten_rt = []
-            self.atten_thread = AttentThread(self)
-            self.atten_thread.start()
-
         # start experiment
         # clock for global timing
         self.global_clock = core.Clock()
 
-        # clock for trial timing
+        # init the attention task for passive viewing condition
+        if self.atten_task:
+            self.exp_run = True
+            self.atten_rt = []
+
+            self.atten_thread = AttentThread(self)
+            self.atten_thread.start()
+
+        # clock for trial timing             
         clock = core.Clock()
         for idx in range(self.n_trial):
+            # ISI for 1s
+            clock.reset()
+            while clock.getTime() <= 1.0:
+                self.fixation.draw()
+                self.win.flip()
+
             # determine stim condition 
             # surround orientation
             surround = None

@@ -8,7 +8,7 @@ if not len(sys.argv) == 2:
 
 sub_val = str(sys.argv[1])
 
-n_trial = 100
+n_trial = 60
 exp = OrientEncodeKeyboard(sub_val=sub_val, n_trial=n_trial)
 
 # start running the experiment
