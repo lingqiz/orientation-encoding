@@ -51,34 +51,6 @@ class DataRecord:
 
         return data_mtx
 
-# separate thread for attention task
-class AttentThread(threading.Thread):
-    def __init__(self, exp):
-        threading.Thread.__init__(self)
-        self.exp = exp
-    
-    def run(self):
-        # function for the attention task
-        clock = core.Clock()
-        while self.exp.exp_run:
-            if np.random.rand() < 0.05:                
-                # flip the color of fixation dot
-                gt = self.exp.global_clock.getTime()
-                self.exp.fixation.color = (1.0, 0.0, 0.0)
-
-                # wait for reaction
-                clock.reset()
-                keyboard.wait('A')
-                
-                # record RT
-                rt = clock.getTime()
-                self.exp.atten_rt.append((gt, rt))
-                self.exp.fixation.color = (0.5, 0.5, 0.5)                
-
-            clock.reset()
-            while clock.getTime() <= 1.0:
-                pass
-
 class OrientEncode:
 
     DEFAULT_DUR = 1.5
@@ -156,15 +128,7 @@ class OrientEncode:
         # start experiment
         # clock for global timing
         self.global_clock = core.Clock()
-
-        # init the attention task for passive viewing condition
-        if self.atten_task:
-            self.exp_run = True
-            self.atten_rt = []
-
-            self.atten_thread = AttentThread(self)
-            self.atten_thread.start()
-
+        
         # clock for trial timing             
         clock = core.Clock()
         for idx in range(self.n_trial):
