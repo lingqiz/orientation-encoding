@@ -23,8 +23,9 @@ exp.inst1.text = 'You will see a sequence of flashed gabor stimulus.'
 exp.inst2.text = 'Try to maintain fixation at the center dot.'
 
 # exp condition
+# 5s trial duration
 exp.stim_dur = 1.5
-exp.delay = 4.5
+exp.delay = 3.5
 
 # run experiment
 exp.start()
