@@ -82,14 +82,13 @@ class AttentThread(threading.Thread):
 class OrientEncode:
 
     DEFAULT_DUR = 1.5
-    DEFAULT_DELAY = 4.5
-    DEFAULT_ISI = 1.0
+    DEFAULT_DELAY = 4.5    
     DEFAULT_LEN = 3.0
 
     # static variable for the surround conditions (SF, Ori)
     COND = [(NaN, NaN), (0.5, 30), (0.5, 150)]
 
-    def __init__(self, sub_val, n_trial, mode='uniform', show_fb=False, record_resp=True, atten_task=False, record_sc=False):
+    def __init__(self, sub_val, n_trial, mode='uniform', atten_task=False):
         # subject name/id
         self.sub_val = sub_val
         self.time_stmp = datetime.now().strftime("%d_%m_%Y_%H_%M_")
@@ -100,16 +99,12 @@ class OrientEncode:
 
         # parameter for the experiment
         self.n_trial = n_trial
-        self.mode = mode
-        self.show_fb = show_fb        
-        self.record_resp = record_resp
-        self.atten_task = atten_task
-        self.record_sc = record_sc
+        self.mode = mode        
+        self.atten_task = atten_task        
 
         self.line_len = self.DEFAULT_LEN
         self.stim_dur = self.DEFAULT_DUR
-        self.delay = self.DEFAULT_DELAY
-        self.isi = self.DEFAULT_ISI
+        self.delay = self.DEFAULT_DELAY        
 
         # initialize window, message
         # monitor = 'testMonitor' or 'rm_413'
@@ -167,13 +162,7 @@ class OrientEncode:
 
         # clock for trial timing             
         clock = core.Clock()
-        for idx in range(self.n_trial):
-            # ISI for 1s
-            clock.reset()
-            while clock.getTime() <= self.isi:
-                self.fixation.draw()
-                self.win.flip()
-
+        for idx in range(self.n_trial):            
             # determine stim condition 
             # surround orientation
             surround = None
@@ -205,26 +194,18 @@ class OrientEncode:
                 # draw fixation dot
                 self.fixation.draw()
                 self.win.flip()
-
-            if self.record_sc:
-                self.win.getMovieFrame()
-
+            
             # blank screen for delay duration
             clock.reset()
             while clock.getTime() <= self.delay:
                 self.fixation.draw()
                 self.win.flip()
 
-            # record response
-            if self.record_resp and (not self.record_sc):
-                clock.reset()
-                response = self.io_response()
-
-                self.record.add_response(response)
-                self.record.add_react_time(clock.getTime())
-
-        self.exp_run = False
-        self.atten_thread.join()
+        self.session_time = self.global_clock.getTime()
+        
+        if self.atten_task:
+            self.exp_run = False
+            self.atten_thread.join()
 
         return
         

@@ -8,14 +8,13 @@ if not len(sys.argv) == 2:
 
 sub_val = str(sys.argv[1])
 
-n_trial = 120
+n_trial = 36
 exp = OrientEncodeKeyboard(sub_val=sub_val, n_trial=n_trial)
 
 # start running the experiment
 # passive viewing condition
 exp.mode = 'uniform'
-exp.record_resp = False
-exp.atten_task = True
+exp.atten_task = False
 
 # change the message for passive viewing
 exp.welcome.text = 'Press "space" to contiune.'
@@ -30,4 +29,8 @@ exp.delay = 3.5
 # run experiment
 exp.start()
 exp.run()
+
+print('session length: %.4f' % (exp.session_time))
+
+# save data
 exp.end()
