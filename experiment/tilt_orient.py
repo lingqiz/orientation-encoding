@@ -38,16 +38,12 @@ class DataRecord:
     def add_react_time(self, time):
         self.react_time.append(time)
 
-    def to_numpy(self, record_resp):
+    def to_numpy(self):
         n_trial = len(self.stimulus)
-        data_mtx = np.zeros([4, n_trial])
+        data_mtx = np.zeros([2, n_trial])
 
         data_mtx[0, :] = self.surround
         data_mtx[1, :] = self.stimulus
-
-        if record_resp:
-            data_mtx[2, :] = self.response
-            data_mtx[3, :] = self.react_time
 
         return data_mtx
 
@@ -127,6 +123,24 @@ class OrientEncode:
 
         return
 
+    def _set_stim(self, idx):
+        # surround orientation
+        self.next_surround = None
+        cond_idx, stim_ori = self.stim_list[idx]
+        if np.isnan(self.COND[cond_idx][0]):
+            self.record.add_surround(NaN)
+            self.noise.updateNoise()
+            self.next_surround = self.noise
+        else:
+            self.record.add_surround(self.COND[cond_idx][1])
+            self.surround.sf, self.surround.ori = self.COND[cond_idx]
+            self.next_surround = self.surround
+        # center orientation
+        self.record.add_stimulus(stim_ori)
+        self.target.setOri(stim_ori)
+
+        return
+
     def start(self):
         # show welcome message and instruction
         self.welcome.draw()
@@ -137,9 +151,6 @@ class OrientEncode:
         self.io_wait()
         self.record = DataRecord()
 
-        return
-
-    def run(self):
         # create a of conditions and stimulus
         stim_list = []
         n_sample = int(self.n_trial // len(self.COND))
@@ -147,10 +158,18 @@ class OrientEncode:
             samples = sample_stimuli(n_sample, mode='uniform')
             stim_list += list(zip([cond_idx] * n_sample, samples))
         shuffle(stim_list)
+        self.stim_list = stim_list
 
+        # set up for the first trial
+        self._set_stim(idx=0)
+
+        return
+
+    def run(self):        
         # start experiment
-        # clock for global timing
+        # clock for global and trial timing
         self.global_clock = core.Clock()
+        self.global_ctd = core.Clock()
 
         # init the attention task for passive viewing condition
         if self.atten_task:
@@ -158,35 +177,18 @@ class OrientEncode:
             self.atten_rt = []
 
             self.atten_thread = AttentThread(self)
-            self.atten_thread.start()
-
-        # clock for trial timing             
-        clock = core.Clock()
+            self.atten_thread.start()             
+        
         for idx in range(self.n_trial):            
-            # determine stim condition 
-            # surround orientation
-            surround = None
-            cond_idx, stim_ori = stim_list[idx]
-            if np.isnan(self.COND[cond_idx][0]):
-                self.record.add_surround(NaN)
-                self.noise.updateNoise()
-                surround = self.noise
-            else:
-                self.record.add_surround(self.COND[cond_idx][1])
-                self.surround.sf, self.surround.ori = self.COND[cond_idx]
-                surround = self.surround
-            # center orientation
-            self.record.add_stimulus(stim_ori)
-            self.target.setOri(stim_ori)
-
             # draw stimulus for a fixed duration
-            clock.reset()
-            while clock.getTime() <= self.stim_dur:
+            self.global_ctd.add(self.stim_dur)
+            while self.global_ctd.getTime() <= 0:
                 # 2 hz contrast modulation
-                crst = 0.05 * np.cos(4.0 * np.pi * clock.getTime() + np.pi) + 0.05
+                t = self.global_ctd.getTime() + self.stim_dur
+                crst = 0.05 * np.cos(4.0 * np.pi * t + np.pi) + 0.05
                 # draw stim
-                surround.contrast = crst
-                surround.draw()
+                self.next_surround.contrast = crst
+                self.next_surround.draw()
 
                 self.target.contrast = crst
                 self.target.draw()
@@ -196,8 +198,14 @@ class OrientEncode:
                 self.win.flip()
             
             # blank screen for delay duration
-            clock.reset()
-            while clock.getTime() <= self.delay:
+            # also set up the next stim 
+            self.global_ctd.add(self.delay)
+
+            # setup stim condition for next trial
+            if idx < self.n_trial - 1:
+                self._set_stim(idx=idx + 1)
+                
+            while self.global_ctd.getTime() <= 0:
                 self.fixation.draw()
                 self.win.flip()
 
@@ -211,18 +219,14 @@ class OrientEncode:
         
     def save_data(self):
         file_name = self.time_stmp + self.sub_val
+        
+        # write data as both .CSV and .NPY file
+        data_mtx = self.record.to_numpy()
+        np.savetxt(file_name + '.csv', data_mtx, delimiter=",")            
 
-        if self.record_sc:
-            self.win.saveMovieFrames(os.path.join('.', 'Record', file_name + '.tif'))
-
-        else:
-            # write data as both .CSV and .NPY file
-            data_mtx = self.record.to_numpy(self.record_resp)
-            np.savetxt(file_name + '.csv', data_mtx, delimiter=",")            
-
-            if self.atten_task:
-                rt_mtx = np.array(self.atten_rt)
-                np.savetxt(file_name + '_rt' + '.csv', rt_mtx, delimiter=",")
+        if self.atten_task:
+            rt_mtx = np.array(self.atten_rt)
+            np.savetxt(file_name + '_rt' + '.csv', rt_mtx, delimiter=",")
 
         return
 
