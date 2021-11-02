@@ -14,12 +14,7 @@ exp = OrientEncodeKeyboard(sub_val=sub_val, n_trial=n_trial)
 # start running the experiment
 # passive viewing condition
 exp.mode = 'uniform'
-exp.atten_task = False
-
-# change the message for passive viewing
-exp.welcome.text = 'Press "space" to contiune.'
-exp.inst1.text = 'You will see a sequence of flashed gabor stimulus.'
-exp.inst2.text = 'Try to maintain fixation at the center dot.'
+exp.atten_task = True
 
 # exp condition
 # 5s trial duration
@@ -33,4 +28,5 @@ exp.run()
 print('session length: %.4f' % (exp.session_time))
 
 # save data
+exp.pause()
 exp.end()

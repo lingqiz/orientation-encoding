@@ -52,12 +52,22 @@ class AttentThread(threading.Thread):
     def __init__(self, exp):
         threading.Thread.__init__(self)
         self.exp = exp
+        self.init_delay = 2.0
+        self.min_gap = 2.0
+        self.onset_prob = 0.05
+        self.onset_itvl = 1.0
     
     def run(self):
-        # function for the attention task
+        # function for the attention task        
         clock = core.Clock()
+
+        # initial delay start for 3s
+        clock.reset()
+        while clock.getTime() <= self.init_delay:
+            pass
+
         while self.exp.exp_run:
-            if np.random.rand() < 0.05:                
+            if np.random.rand() < self.onset_prob:                
                 # flip the color of fixation dot
                 gt = self.exp.global_clock.getTime()
                 self.exp.fixation.color = (1.0, 0.0, 0.0)
@@ -69,16 +79,22 @@ class AttentThread(threading.Thread):
                 # record RT
                 rt = clock.getTime()
                 self.exp.atten_rt.append((gt, rt))
-                self.exp.fixation.color = (0.5, 0.5, 0.5)                
+                self.exp.fixation.color = (0.5, 0.5, 0.5)
+
+                # min gap between attention task
+                clock.reset()
+                while clock.getTime() <= self.min_gap:
+                    pass
 
             clock.reset()
-            while clock.getTime() <= 1.0:
+            while clock.getTime() <= self.onset_itvl:
                 pass
 
 class OrientEncode:
 
     DEFAULT_DUR = 1.5
-    DEFAULT_DELAY = 4.5    
+    DEFAULT_DELAY = 4.5
+    DEFAULT_BLANK = 12.5
     DEFAULT_LEN = 3.0
 
     # static variable for the surround conditions (SF, Ori)
@@ -100,15 +116,12 @@ class OrientEncode:
 
         self.line_len = self.DEFAULT_LEN
         self.stim_dur = self.DEFAULT_DUR
-        self.delay = self.DEFAULT_DELAY        
+        self.delay = self.DEFAULT_DELAY
+        self.blank = self.DEFAULT_BLANK
 
         # initialize window, message
         # monitor = 'testMonitor' or 'rm_413'
         self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, monitor='rm_413', units='deg', winType=window_backend)
-        self.welcome = visual.TextStim(self.win, pos=[0,-5], text='Thanks for your time. Press "space" to continue.')
-        self.inst1 = visual.TextStim(self.win, pos=[0,+5], text='You will first see a quickly flashed gabor stimulus.')
-        self.inst2 = visual.TextStim(self.win, pos=[0,0], text='After the stimulus, adjust the prob using L1 and R1 to match its orientation.')
-        self.pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Take a short break. Press "space" when you are ready to continue.')
 
         # initialize stimulus
         self.target = visual.GratingStim(self.win, sf=0.50, size=10.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.10)
@@ -120,6 +133,9 @@ class OrientEncode:
         self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='raisedCos', size=0.25)
         self.feedback = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)
         self.prob = visual.GratingStim(self.win, sf=0.5, size=[2.0, 5.0], mask='gauss', contrast=1.0)
+
+        # data recorder
+        self.record = DataRecord()
 
         return
 
@@ -141,17 +157,15 @@ class OrientEncode:
 
         return
 
-    def start(self):
-        # show welcome message and instruction
-        self.welcome.draw()
-        self.inst1.draw()
-        self.inst2.draw()
+    def _draw_blank(self):
+        self.fixation.draw()
         self.win.flip()
 
-        self.io_wait()
-        self.record = DataRecord()
-
+        return 
+ 
+    def start(self):        
         # create a of conditions and stimulus
+        # read from pre-fixed condition in the actual experiment
         stim_list = []
         n_sample = int(self.n_trial // len(self.COND))
         for cond_idx in range(len(self.COND)):
@@ -163,6 +177,9 @@ class OrientEncode:
         # set up for the first trial
         self._set_stim(idx=0)
 
+        # wait for scanner signal
+        self.io_wait(wait_key='T')
+
         return
 
     def run(self):        
@@ -171,15 +188,20 @@ class OrientEncode:
         self.global_clock = core.Clock()
         self.global_ctd = core.Clock()
 
+        # initial blank period
+        self.global_ctd.add(self.blank)
         # init the attention task for passive viewing condition
         if self.atten_task:
             self.exp_run = True
             self.atten_rt = []
 
             self.atten_thread = AttentThread(self)
-            self.atten_thread.start()             
+            self.atten_thread.start()
+
+        while self.global_ctd.getTime () <= 0:
+            self._draw_blank()
         
-        for idx in range(self.n_trial):            
+        for idx in range(self.n_trial + 1):            
             # draw stimulus for a fixed duration
             self.global_ctd.add(self.stim_dur)
             while self.global_ctd.getTime() <= 0:
@@ -202,12 +224,16 @@ class OrientEncode:
             self.global_ctd.add(self.delay)
 
             # setup stim condition for next trial
-            if idx < self.n_trial - 1:
-                self._set_stim(idx=idx + 1)
+            if idx < self.n_trial:
+                self._set_stim(idx=idx)
                 
             while self.global_ctd.getTime() <= 0:
-                self.fixation.draw()
-                self.win.flip()
+                self._draw_blank()
+
+        # end blank period
+        self.global_ctd.add(self.blank)
+        while self.global_ctd.getTime () <= 0:
+            self._draw_blank()
 
         self.session_time = self.global_clock.getTime()
         
@@ -231,10 +257,8 @@ class OrientEncode:
         return
 
     def pause(self):
-        self.pause_msg.draw()
-        self.win.flip()
-        self.io_wait()
-
+        self.save_data()
+        self.io_wait(wait_key='space')
         return
 
     def end(self):
@@ -250,18 +274,15 @@ class OrientEncode:
 # Implement IO method with keyboard
 class OrientEncodeKeyboard(OrientEncode):
 
-    def io_wait(self):
+    def io_wait(self, wait_key='space'):
         '''override io_wait'''
         self.resp_flag = True
         def confirm_callback(event):
             self.resp_flag= False
 
         # register callback, wait for key press
-        keyboard.on_release_key('space', confirm_callback)
-        while self.resp_flag:
-            self.welcome.draw()
-            self.inst1.draw()
-            self.inst2.draw()
+        keyboard.on_release_key(wait_key, confirm_callback)
+        while self.resp_flag:            
             self.win.flip()
 
         return
