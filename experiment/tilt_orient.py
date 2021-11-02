@@ -52,10 +52,10 @@ class AttentThread(threading.Thread):
     def __init__(self, exp):
         threading.Thread.__init__(self)
         self.exp = exp
-        self.init_delay = 2.0
-        self.min_gap = 2.0
-        self.onset_prob = 0.05
-        self.onset_itvl = 1.0
+        self.init_delay = 2.5
+        self.min_gap = 5.0
+        self.onset_prob = 0.01
+        self.onset_itvl = 0.2
     
     def run(self):
         # function for the attention task        
@@ -100,7 +100,7 @@ class OrientEncode:
     # static variable for the surround conditions (SF, Ori)
     COND = [(NaN, NaN), (0.5, 30), (0.5, 150)]
 
-    def __init__(self, sub_val, n_trial, mode='uniform', atten_task=False):
+    def __init__(self, sub_val, n_trial, acqst_id=0, mode='uniform', atten_task=False):
         # subject name/id
         self.sub_val = sub_val
         self.time_stmp = datetime.now().strftime("%d_%m_%Y_%H_%M_")
@@ -110,6 +110,7 @@ class OrientEncode:
         self.increment = 0
 
         # parameter for the experiment
+        self.acqst_id = acqst_id
         self.n_trial = n_trial
         self.mode = mode        
         self.atten_task = atten_task        
@@ -121,7 +122,7 @@ class OrientEncode:
 
         # initialize window, message
         # monitor = 'testMonitor' or 'rm_413'
-        self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, monitor='rm_413', units='deg', winType=window_backend)
+        self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, screen=1, monitor='rm_413', units='deg', winType=window_backend)
 
         # initialize stimulus
         self.target = visual.GratingStim(self.win, sf=0.50, size=10.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.10)
@@ -163,15 +164,16 @@ class OrientEncode:
 
         return 
  
-    def start(self):        
+    def start(self, stim_list=[]):        
         # create a of conditions and stimulus
         # read from pre-fixed condition in the actual experiment
-        stim_list = []
-        n_sample = int(self.n_trial // len(self.COND))
-        for cond_idx in range(len(self.COND)):
-            samples = sample_stimuli(n_sample, mode='uniform')
-            stim_list += list(zip([cond_idx] * n_sample, samples))
-        shuffle(stim_list)
+        if len(stim_list) == 0:
+            n_sample = int(self.n_trial // len(self.COND))
+            for cond_idx in range(len(self.COND)):
+                samples = sample_stimuli(n_sample, mode='uniform')
+                stim_list += list(zip([cond_idx] * n_sample, samples))
+            shuffle(stim_list)
+        
         self.stim_list = stim_list
 
         # set up for the first trial

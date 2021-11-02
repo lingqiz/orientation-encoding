@@ -9,7 +9,8 @@ if not len(sys.argv) == 2:
 sub_val = str(sys.argv[1])
 
 n_trial = 36
-exp = OrientEncodeKeyboard(sub_val=sub_val, n_trial=n_trial)
+acqst_id = 0
+exp = OrientEncodeKeyboard(sub_val, n_trial, acqst_id)
 
 # start running the experiment
 # passive viewing condition
