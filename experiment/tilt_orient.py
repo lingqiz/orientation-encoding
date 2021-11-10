@@ -175,7 +175,7 @@ class OrientEncode:
         # center orientation
         self.show_center = True if stim_idx < self.SEQ_LEN else False
         self.record.add_stimulus(stim_ori)
-        self.target.setOri(stim_ori)        
+        self.target.ori = stim_ori        
 
         return  
 
@@ -223,10 +223,9 @@ class OrientEncode:
                 # draw stim
                 self.next_surround.contrast = crst
                 self.next_surround.draw()
-                
-                if self.show_center:
-                    self.target.contrast = crst
-                    self.target.draw()
+                                
+                self.target.contrast = crst if self.show_center else 0.0
+                self.target.draw()
 
                 # draw fixation dot
                 self.fixation.draw()
