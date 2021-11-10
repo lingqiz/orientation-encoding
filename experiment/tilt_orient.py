@@ -93,14 +93,18 @@ class AttentThread(threading.Thread):
 class OrientEncode:
 
     DEFAULT_DUR = 1.5
-    DEFAULT_DELAY = 4.5
+    DEFAULT_DELAY = 3.5
     DEFAULT_BLANK = 12.5
     DEFAULT_LEN = 3.0
+
+    SEQ_LEN = 19
+    STIM_SEQ_PATH = os.path.join('.', 'experiment', 'stim_seq.txt')
+    STIM_VAL = np.linspace(5, 175, 18)
 
     # static variable for the surround conditions (SF, Ori)
     COND = [(NaN, NaN), (0.5, 30), (0.5, 150)]
 
-    def __init__(self, sub_val, n_trial, acqst_id=0, mode='uniform', atten_task=False):
+    def __init__(self, sub_val, n_trial, condi_id, acqst_id, mode='uniform', atten_task=False):
         # subject name/id
         self.sub_val = sub_val
         self.time_stmp = datetime.now().strftime("%d_%m_%Y_%H_%M_")
@@ -110,15 +114,24 @@ class OrientEncode:
         self.increment = 0
 
         # parameter for the experiment
+        self.condi_id = condi_id
         self.acqst_id = acqst_id
         self.n_trial = n_trial
         self.mode = mode        
-        self.atten_task = atten_task        
+        self.atten_task = atten_task
+        self.show_center = True   
 
         self.line_len = self.DEFAULT_LEN
         self.stim_dur = self.DEFAULT_DUR
         self.delay = self.DEFAULT_DELAY
         self.blank = self.DEFAULT_BLANK
+
+        # read in stim sequence
+        with open(self.STIM_SEQ_PATH, 'r') as seq_file:
+            stim_seq = seq_file.read().replace('\n', ' ').split()
+            stim_seq = list(map(int, stim_seq))
+
+        self.stim_seq = np.array(stim_seq).reshape((-1, self.SEQ_LEN * 2))        
 
         # initialize window, message
         # monitor = 'testMonitor' or 'rm_413'
@@ -143,7 +156,13 @@ class OrientEncode:
     def _set_stim(self, idx):
         # surround orientation
         self.next_surround = None
-        cond_idx, stim_ori = self.stim_list[idx]
+        cond_idx = self.condi_id
+
+        # center orientation
+        # index self.SEQ_LEN is the null condition
+        stim_idx = self.stim_seq[self.acqst_id, idx]
+        stim_ori = self.STIM_VAL[stim_idx - 1] if stim_idx < self.SEQ_LEN else -1
+
         if np.isnan(self.COND[cond_idx][0]):
             self.record.add_surround(NaN)
             self.noise.updateNoise()
@@ -152,11 +171,13 @@ class OrientEncode:
             self.record.add_surround(self.COND[cond_idx][1])
             self.surround.sf, self.surround.ori = self.COND[cond_idx]
             self.next_surround = self.surround
-        # center orientation
-        self.record.add_stimulus(stim_ori)
-        self.target.setOri(stim_ori)
 
-        return
+        # center orientation
+        self.show_center = True if stim_idx < self.SEQ_LEN else False
+        self.record.add_stimulus(stim_ori)
+        self.target.setOri(stim_ori)        
+
+        return  
 
     def _draw_blank(self):
         self.fixation.draw()
@@ -164,18 +185,7 @@ class OrientEncode:
 
         return 
  
-    def start(self, stim_list=[]):        
-        # create a of conditions and stimulus
-        # read from pre-fixed condition in the actual experiment
-        if len(stim_list) == 0:
-            n_sample = int(self.n_trial // len(self.COND))
-            for cond_idx in range(len(self.COND)):
-                samples = sample_stimuli(n_sample, mode='uniform')
-                stim_list += list(zip([cond_idx] * n_sample, samples))
-            shuffle(stim_list)
-        
-        self.stim_list = stim_list
-
+    def start(self):        
         # set up for the first trial
         self._set_stim(idx=0)
 
@@ -213,9 +223,10 @@ class OrientEncode:
                 # draw stim
                 self.next_surround.contrast = crst
                 self.next_surround.draw()
-
-                self.target.contrast = crst
-                self.target.draw()
+                
+                if self.show_center:
+                    self.target.contrast = crst
+                    self.target.draw()
 
                 # draw fixation dot
                 self.fixation.draw()
