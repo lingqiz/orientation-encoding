@@ -1,7 +1,7 @@
 from experiment.tilt_orient import *
 
 # create the experiment with n_trial for each block
-sub_val = str(input('Enter Subject ID:'))
+sub_val = str(input('Enter Unique Subject ID:'))
 condi_id = int(input('Enter Condition ID (0-2):'))
 acqst_id = int(input('Enter Acquisition ID (0-9):'))
 
