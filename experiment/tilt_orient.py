@@ -1,6 +1,6 @@
 from psychopy import core, visual
 from datetime import datetime
-from .sampler import sample_orientation, sample_stimuli
+from .sampler import sample_orientation
 from random import shuffle
 from numpy.core.numeric import NaN
 import os, threading, numpy as np
@@ -9,8 +9,9 @@ import os, threading, numpy as np
 try:
     import keyboard
 except Exception as exc:
-    print('Unable to import keyboard module, keyboard IO will not be available')
     print(exc)
+    print('Unable to import keyboard module, \
+            keyboard IO will not be available')    
 
 # for joystick IO
 # 'glfw' or 'pyglet' for backend
@@ -256,12 +257,12 @@ class OrientEncode:
         return
         
     def save_data(self):         
-        file_name = '_'.join([self.sub_val, self.condi_id, self.acqst_id])
+        file_name = '_'.join([self.sub_val, 
+                            'C' + str(self.condi_id),
+                            'S' + str(self.acqst_id),
+                            self.time_stmp])
         
-        # write data as both .CSV and .NPY file
-        data_mtx = self.record.to_numpy()
-        np.savetxt(file_name + '.csv', data_mtx, delimiter=",")            
-
+        # write the RT for the attention task
         if self.atten_task:
             rt_mtx = np.array(self.atten_rt)
             np.savetxt(file_name + '_RT' + '.csv', rt_mtx, delimiter=",")
