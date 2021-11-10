@@ -302,7 +302,8 @@ class OrientEncode:
         # write the RT for the attention task
         if self.atten_task:
             rt_mtx = np.array(self.atten_rt)
-            np.savetxt(file_name + '_RT' + '.csv', rt_mtx, delimiter=",")
+            file_path = os.path.join(self.data_dir, file_name)
+            np.savetxt(file_path + '_RT' + '.csv', rt_mtx, delimiter=",")
 
         # write subject record
         self._save_json()
