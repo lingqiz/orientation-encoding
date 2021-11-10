@@ -3,7 +3,7 @@ from datetime import datetime
 from .sampler import sample_orientation
 from random import shuffle
 from numpy.core.numeric import NaN
-import os, threading, numpy as np
+import os, threading, json, numpy as np
 
 # for keyboard IO
 try:
@@ -99,24 +99,44 @@ class OrientEncode:
     DEFAULT_LEN = 3.0
 
     SEQ_LEN = 19
+    SEN_NUM = 10
     STIM_SEQ_PATH = os.path.join('.', 'experiment', 'stim_seq.txt')
     STIM_VAL = np.linspace(5, 175, 18)
 
     # static variable for the surround conditions (SF, Ori)
     COND = [(NaN, NaN), (0.5, 30), (0.5, 150)]
 
-    def __init__(self, sub_val, n_trial, condi_id, acqst_id, mode='uniform', atten_task=False):
+    def __init__(self, sub_val, n_trial, mode='uniform', atten_task=False):
         # subject name/id
         self.sub_val = sub_val
         self.time_stmp = datetime.now().strftime("%d_%m_%Y_%H_%M_")
+
+        # create condition sequence / record file for each subject
+        self.data_dir = os.path.join('.', 'Neural', self.sub_val)
+        self.record_path = os.path.join(self.data_dir, self.sub_val + '.json')
+
+        if os.path.exists(self.record_path):
+            with open(self.record_path, 'r') as file_handle:
+                self.sub_record = json.load(file_handle)
+        else:        
+            os.mkdir(self.data_dir)
+
+            cond_seq = list(range(3)) * self.SEN_NUM
+            np.random.shuffle(cond_seq)
+
+            self.sub_record = {
+                'Cond_Seq' : cond_seq,
+                'Cond_Ctr' : 0,
+                0 : 0, 1 : 0, 2 : 0}
+
+            self._save_json()
+            print('create subject file at ' + self.record_path)
 
         # will be used for recording response
         self.resp_flag = True
         self.increment = 0
 
         # parameter for the experiment
-        self.condi_id = condi_id
-        self.acqst_id = acqst_id
         self.n_trial = n_trial
         self.mode = mode        
         self.atten_task = atten_task
@@ -132,7 +152,7 @@ class OrientEncode:
             stim_seq = seq_file.read().replace('\n', ' ').split()
             stim_seq = list(map(int, stim_seq))
 
-        self.stim_seq = np.array(stim_seq).reshape((-1, self.SEQ_LEN * 2))        
+        self.stim_seq = np.array(stim_seq).reshape((self.SEN_NUM, self.SEQ_LEN * 2))        
 
         # initialize window, message
         # monitor = 'testMonitor' or 'rm_413'
@@ -153,6 +173,11 @@ class OrientEncode:
         self.record = DataRecord()
 
         return
+
+    def _save_json(self):
+        with open(self.record_path, 'w+') as record:
+            record.write(json.dumps(self.sub_record, indent=2))
+        return 
 
     def _set_stim(self, idx):
         # surround orientation
@@ -186,7 +211,19 @@ class OrientEncode:
 
         return 
  
-    def start(self):        
+    def start(self):
+        # determine condition and sequence
+        counter = self.sub_record['Cond_Ctr']
+        self.condi_id = self.sub_record['Cond_Seq'][counter]
+        self.acqst_id = self.sub_record[str(self.condi_id)]
+
+        print('Acquisition %d / %d' % (counter + 1, len(self.sub_record['Cond_Seq'])))
+        print('Cond_ID %d, Seq_ID %d' % (self.condi_id, self.acqst_id))
+
+        # update condition and sequence
+        self.sub_record['Cond_Ctr'] += 1
+        self.sub_record[str(self.condi_id)] += 1
+
         # set up for the first trial
         self._set_stim(idx=0)
 
@@ -266,6 +303,9 @@ class OrientEncode:
         if self.atten_task:
             rt_mtx = np.array(self.atten_rt)
             np.savetxt(file_name + '_RT' + '.csv', rt_mtx, delimiter=",")
+
+        # write subject record
+        self._save_json()
 
         return
 
