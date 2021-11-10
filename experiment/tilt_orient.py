@@ -127,7 +127,7 @@ class OrientEncode:
             self.sub_record = {
                 'Cond_Seq' : cond_seq,
                 'Cond_Ctr' : 0,
-                0 : 0, 1 : 0, 2 : 0}
+                '0' : 0, '1' : 0, '2' : 0}
 
             self._save_json()
             print('create subject file at ' + self.record_path)
