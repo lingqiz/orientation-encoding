@@ -1,7 +1,6 @@
 from psychopy import core, visual
 from datetime import datetime
 from .sampler import sample_orientation
-from random import shuffle
 from numpy.core.numeric import NaN
 import os, threading, json, numpy as np
 
