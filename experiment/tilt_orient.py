@@ -255,8 +255,8 @@ class OrientEncode:
 
         return
         
-    def save_data(self):
-        file_name = self.time_stmp + self.sub_val
+    def save_data(self):         
+        file_name = '_'.join([self.sub_val, self.condi_id, self.acqst_id])
         
         # write data as both .CSV and .NPY file
         data_mtx = self.record.to_numpy()
@@ -264,7 +264,7 @@ class OrientEncode:
 
         if self.atten_task:
             rt_mtx = np.array(self.atten_rt)
-            np.savetxt(file_name + '_rt' + '.csv', rt_mtx, delimiter=",")
+            np.savetxt(file_name + '_RT' + '.csv', rt_mtx, delimiter=",")
 
         return
 
