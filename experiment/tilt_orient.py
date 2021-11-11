@@ -1,16 +1,16 @@
 from psychopy import core, visual
 from datetime import datetime
-from .sampler import sample_orientation, sample_stimuli
-from random import shuffle
+from .sampler import sample_orientation
 from numpy.core.numeric import NaN
-import os, threading, numpy as np
+import os, threading, json, numpy as np
 
 # for keyboard IO
 try:
     import keyboard
 except Exception as exc:
-    print('Unable to import keyboard module, keyboard IO will not be available')
     print(exc)
+    print('Unable to import keyboard module, \
+            keyboard IO will not be available')    
 
 # for joystick IO
 # 'glfw' or 'pyglet' for backend
@@ -93,32 +93,65 @@ class AttentThread(threading.Thread):
 class OrientEncode:
 
     DEFAULT_DUR = 1.5
-    DEFAULT_DELAY = 4.5
+    DEFAULT_DELAY = 3.5
     DEFAULT_BLANK = 12.5
     DEFAULT_LEN = 3.0
+
+    SEQ_LEN = 19
+    SEN_NUM = 10
+    STIM_SEQ_PATH = os.path.join('.', 'experiment', 'stim_seq.txt')
+    STIM_VAL = np.linspace(5, 175, 18)
 
     # static variable for the surround conditions (SF, Ori)
     COND = [(NaN, NaN), (0.5, 30), (0.5, 150)]
 
-    def __init__(self, sub_val, n_trial, acqst_id=0, mode='uniform', atten_task=False):
+    def __init__(self, sub_val, n_trial, mode='uniform', atten_task=False):
         # subject name/id
         self.sub_val = sub_val
         self.time_stmp = datetime.now().strftime("%d_%m_%Y_%H_%M_")
+
+        # create condition sequence / record file for each subject
+        self.data_dir = os.path.join('.', 'Neural', self.sub_val)
+        self.record_path = os.path.join(self.data_dir, self.sub_val + '.json')
+
+        if os.path.exists(self.record_path):
+            with open(self.record_path, 'r') as file_handle:
+                self.sub_record = json.load(file_handle)
+        else:        
+            os.mkdir(self.data_dir)
+
+            cond_seq = list(range(3)) * self.SEN_NUM
+            np.random.shuffle(cond_seq)
+
+            self.sub_record = {
+                'Cond_Seq' : cond_seq,
+                'Cond_Ctr' : 0,
+                '0' : 0, '1' : 0, '2' : 0}
+
+            self._save_json()
+            print('create subject file at ' + self.record_path)
 
         # will be used for recording response
         self.resp_flag = True
         self.increment = 0
 
         # parameter for the experiment
-        self.acqst_id = acqst_id
         self.n_trial = n_trial
         self.mode = mode        
-        self.atten_task = atten_task        
+        self.atten_task = atten_task
+        self.show_center = True   
 
         self.line_len = self.DEFAULT_LEN
         self.stim_dur = self.DEFAULT_DUR
         self.delay = self.DEFAULT_DELAY
         self.blank = self.DEFAULT_BLANK
+
+        # read in stim sequence
+        with open(self.STIM_SEQ_PATH, 'r') as seq_file:
+            stim_seq = seq_file.read().replace('\n', ' ').split()
+            stim_seq = list(map(int, stim_seq))
+
+        self.stim_seq = np.array(stim_seq).reshape((self.SEN_NUM, self.SEQ_LEN * 2))        
 
         # initialize window, message
         # monitor = 'testMonitor' or 'rm_413'
@@ -140,10 +173,21 @@ class OrientEncode:
 
         return
 
+    def _save_json(self):
+        with open(self.record_path, 'w+') as record:
+            record.write(json.dumps(self.sub_record, indent=2))
+        return 
+
     def _set_stim(self, idx):
         # surround orientation
         self.next_surround = None
-        cond_idx, stim_ori = self.stim_list[idx]
+        cond_idx = self.condi_id
+
+        # center orientation
+        # index self.SEQ_LEN is the null condition
+        stim_idx = self.stim_seq[self.acqst_id, idx]
+        stim_ori = self.STIM_VAL[stim_idx - 1] if stim_idx < self.SEQ_LEN else -1
+
         if np.isnan(self.COND[cond_idx][0]):
             self.record.add_surround(NaN)
             self.noise.updateNoise()
@@ -152,11 +196,13 @@ class OrientEncode:
             self.record.add_surround(self.COND[cond_idx][1])
             self.surround.sf, self.surround.ori = self.COND[cond_idx]
             self.next_surround = self.surround
-        # center orientation
-        self.record.add_stimulus(stim_ori)
-        self.target.setOri(stim_ori)
 
-        return
+        # center orientation
+        self.show_center = True if stim_idx < self.SEQ_LEN else False
+        self.record.add_stimulus(stim_ori)
+        self.target.ori = stim_ori        
+
+        return  
 
     def _draw_blank(self):
         self.fixation.draw()
@@ -164,17 +210,18 @@ class OrientEncode:
 
         return 
  
-    def start(self, stim_list=[]):        
-        # create a of conditions and stimulus
-        # read from pre-fixed condition in the actual experiment
-        if len(stim_list) == 0:
-            n_sample = int(self.n_trial // len(self.COND))
-            for cond_idx in range(len(self.COND)):
-                samples = sample_stimuli(n_sample, mode='uniform')
-                stim_list += list(zip([cond_idx] * n_sample, samples))
-            shuffle(stim_list)
-        
-        self.stim_list = stim_list
+    def start(self):
+        # determine condition and sequence
+        counter = self.sub_record['Cond_Ctr']
+        self.condi_id = self.sub_record['Cond_Seq'][counter]
+        self.acqst_id = self.sub_record[str(self.condi_id)]
+
+        print('Acquisition %d / %d' % (counter + 1, len(self.sub_record['Cond_Seq'])))
+        print('Cond_ID %d, Seq_ID %d' % (self.condi_id, self.acqst_id))
+
+        # update condition and sequence
+        self.sub_record['Cond_Ctr'] += 1
+        self.sub_record[str(self.condi_id)] += 1
 
         # set up for the first trial
         self._set_stim(idx=0)
@@ -213,8 +260,8 @@ class OrientEncode:
                 # draw stim
                 self.next_surround.contrast = crst
                 self.next_surround.draw()
-
-                self.target.contrast = crst
+                                
+                self.target.contrast = crst if self.show_center else 0.0
                 self.target.draw()
 
                 # draw fixation dot
@@ -245,16 +292,20 @@ class OrientEncode:
 
         return
         
-    def save_data(self):
-        file_name = self.time_stmp + self.sub_val
+    def save_data(self):         
+        file_name = '_'.join([self.sub_val, 
+                            'C' + str(self.condi_id),
+                            'S' + str(self.acqst_id),
+                            self.time_stmp])
         
-        # write data as both .CSV and .NPY file
-        data_mtx = self.record.to_numpy()
-        np.savetxt(file_name + '.csv', data_mtx, delimiter=",")            
-
+        # write the RT for the attention task
         if self.atten_task:
             rt_mtx = np.array(self.atten_rt)
-            np.savetxt(file_name + '_rt' + '.csv', rt_mtx, delimiter=",")
+            file_path = os.path.join(self.data_dir, file_name)
+            np.savetxt(file_path + '_RT' + '.csv', rt_mtx, delimiter=",")
+
+        # write subject record
+        self._save_json()
 
         return
 

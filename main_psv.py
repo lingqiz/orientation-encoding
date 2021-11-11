@@ -1,16 +1,10 @@
 from experiment.tilt_orient import *
-import sys
 
 # create the experiment with n_trial for each block
-# different class for choices of IO methods
-if not len(sys.argv) == 2:
-    raise ValueError('Incorrect number of input arguments')
+sub_val = str(input('Enter Unique Subject ID:'))
 
-sub_val = str(sys.argv[1])
-
-n_trial = 36
-acqst_id = 0
-exp = OrientEncodeKeyboard(sub_val, n_trial, acqst_id)
+N_TRIAL = 38
+exp = OrientEncodeKeyboard(sub_val, N_TRIAL)
 
 # start running the experiment
 # passive viewing condition
@@ -29,5 +23,4 @@ exp.run()
 print('session length: %.4f' % (exp.session_time))
 
 # save data
-exp.pause()
 exp.end()

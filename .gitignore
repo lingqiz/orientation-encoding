@@ -1,2 +1,5 @@
 /analysis/cbrewer
 /analysis/circstat
+__pycache__
+.vscode
+_Data
