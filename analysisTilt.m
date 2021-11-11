@@ -14,14 +14,18 @@ addpath('./analysis/');
 addpath('./analysis/circstat/');
 
 %% Load data
+subID = {'LQZ', 'JM'};
+index = [1, 2];
 dataMtx = [];
 
-files = dir('./Behavior/LQZ/*.csv');
-for file = files'
-    data = readmatrix(fullfile(file.folder, file.name));
-    dataMtx = [dataMtx, data];
+for idx = index
+    path = fullfile('.', 'Behavior', subID{idx}, '*.csv');
+    files = dir(path);
+    for file = files'
+        data = readmatrix(fullfile(file.folder, file.name));
+        dataMtx = [dataMtx, data];
+    end
 end
-
 %% Plot baseline data
 stdvPlot = false;
 data = figure();
@@ -31,7 +35,7 @@ if stdvPlot
     stdv = figure();
 end
 
-binSize = 10;
+binSize = 12;
 numBlock = 1;
 
 baseline = dataMtx(2:end, isnan(dataMtx(1, :)));
