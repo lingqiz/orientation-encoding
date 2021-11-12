@@ -35,7 +35,7 @@ if stdvPlot
     stdv = figure();
 end
 
-binSize = 10;
+binSize = 12;
 numBlock = 1;
 
 baseline = dataMtx(2:end, isnan(dataMtx(1, :)));
