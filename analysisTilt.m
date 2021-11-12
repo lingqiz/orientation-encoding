@@ -14,8 +14,8 @@ addpath('./analysis/');
 addpath('./analysis/circstat/');
 
 %% Load data
-subID = {'LQZ', 'JM'};
-index = [1, 2];
+subID = {'LQZ', 'JM', 'BMC'};
+index = [1, 2, 3];
 dataMtx = [];
 
 for idx = index
@@ -35,7 +35,7 @@ if stdvPlot
     stdv = figure();
 end
 
-binSize = 12;
+binSize = 10;
 numBlock = 1;
 
 baseline = dataMtx(2:end, isnan(dataMtx(1, :)));
@@ -48,7 +48,7 @@ scatterPlot(result);
 
 % fisherPlot applies addtional smoothing before calculating the FI
 figure(fisher);
-fisherPlot(result, 'smoothPara', 0.075);
+fisherPlot(result, 'smoothPara', 0.05);
 
 if stdvPlot
     figure(stdv);
