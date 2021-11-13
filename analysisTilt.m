@@ -27,11 +27,11 @@ for idx = index
     end
 end
 %% Plot baseline data
-stdvPlot = false;
+plotStdv = false;
 data = figure();
 fisher = figure();
 
-if stdvPlot
+if plotStdv
     stdv = figure();
 end
 
@@ -50,7 +50,7 @@ scatterPlot(result);
 figure(fisher);
 [support, base_fisher] = fisherPlot(result, 'smoothPara', 0.05);
 
-if stdvPlot
+if plotStdv
     figure(stdv);
     stdvPlot(result);
 end
@@ -67,7 +67,7 @@ for surround = cond
     data = figure();
     fisher = figure();
     
-    if stdvPlot
+    if plotStdv
         stdv = figure();
     end
     
@@ -80,7 +80,7 @@ for surround = cond
     fisherPlot(result, 'smoothPara', 0.05);
     xline(surround, '--r', 'LineWidth', 2);
     
-    if stdvPlot
+    if plotStdv
         figure(stdv); hold on;
         stdvPlot(result);
         xline(surround, '--r', 'LineWidth', 2);
