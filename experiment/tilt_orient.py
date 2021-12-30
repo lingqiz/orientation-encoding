@@ -56,6 +56,7 @@ class AttentThread(threading.Thread):
         self.min_gap = 5.0
         self.onset_prob = 0.01
         self.onset_itvl = 0.2
+        self.wait_flag = False
     
     def run(self):
         # function for the attention task        
@@ -73,8 +74,9 @@ class AttentThread(threading.Thread):
                 self.exp.fixation.color = (1.0, 0.0, 0.0)
 
                 # wait for reaction
+                # for fMRI button box, use B and Y
                 clock.reset()
-                keyboard.wait('A')
+                self.key_wait(['B', 'Y'])
                 
                 # record RT
                 rt = clock.getTime()
@@ -89,6 +91,21 @@ class AttentThread(threading.Thread):
             clock.reset()
             while clock.getTime() <= self.onset_itvl:
                 pass
+
+    def key_wait(self, keys):
+        # wait on multiple keys
+        # B and Y for scanner two button box
+        self.wait_flag = True
+        def confirm_callback(event):            
+            self.wait_flag= False
+
+        # register callback
+        for key in keys:
+            keyboard.on_release_key(key, confirm_callback)
+
+        # wait for key press
+        while self.wait_flag and self.exp.exp_run:            
+            pass
 
 class OrientEncode:
 
