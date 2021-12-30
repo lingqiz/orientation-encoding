@@ -2,7 +2,7 @@ from psychopy import core, visual
 from datetime import datetime
 from .sampler import sample_orientation
 from numpy.core.numeric import NaN
-import os, threading, json, numpy as np
+import os, threading, json, time, numpy as np
 
 # for keyboard IO
 try:
@@ -104,8 +104,11 @@ class AttentThread(threading.Thread):
             keyboard.on_release_key(key, confirm_callback)
 
         # wait for key press
-        while self.wait_flag and self.exp.exp_run:            
-            pass
+        while self.wait_flag and self.exp.exp_run:
+            time.sleep(0.01)
+
+        keyboard.unhook_all()
+        return
 
 class OrientEncode:
 
@@ -355,6 +358,7 @@ class OrientEncodeKeyboard(OrientEncode):
         while self.resp_flag:            
             self.win.flip()
 
+        keyboard.unhook_all()
         return
 
     def io_response(self):
