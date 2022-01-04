@@ -120,7 +120,10 @@ class OrientEncode:
     SEQ_LEN = 19
     SEN_NUM = 10
     STIM_SEQ_PATH = os.path.join('.', 'experiment', 'stim_seq.txt')
-    STIM_VAL = np.linspace(5, 175, 18)
+
+    # HARD CODE stim index -> stim orientation
+    STIM_VAL = np.array([55, 105, 15, 155, 85, 135, 145, 95, 165,
+            45, 25, 35, 65, 115, 5, 125, 75, 175]).astype(np.double)
 
     # static variable for the surround conditions (SF, Ori)
     COND = [(NaN, NaN), (0.5, 30), (0.5, 150)]
