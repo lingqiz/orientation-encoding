@@ -178,7 +178,7 @@ class OrientEncode:
 
         # initialize window, message
         # monitor = 'testMonitor' or 'rm_413'
-        self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, screen=1, monitor='rm_413', units='deg', winType=window_backend)
+        self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, screen=1, monitor='sc_3t', units='deg', winType=window_backend)
 
         # initialize stimulus
         self.target = visual.GratingStim(self.win, sf=0.50, size=10.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.10)
