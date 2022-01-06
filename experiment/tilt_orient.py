@@ -177,7 +177,7 @@ class OrientEncode:
         self.stim_seq = np.array(stim_seq).reshape((self.SEN_NUM, self.SEQ_LEN * 2))        
 
         # initialize window, message
-        # monitor = 'testMonitor' or 'rm_413'
+        # monitor = 'rm_413' for psychophysics and 'sc_3t' for imaging session
         self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, screen=1, monitor='sc_3t', units='deg', winType=window_backend)
 
         # initialize stimulus
