@@ -10,7 +10,7 @@ try:
 except Exception as exc:
     print(exc)
     print('Unable to import keyboard module, \
-            keyboard IO will not be available')    
+            keyboard IO will not be available')
 
 # for joystick IO
 # 'glfw' or 'pyglet' for backend
@@ -57,9 +57,9 @@ class AttentThread(threading.Thread):
         self.onset_prob = 0.01
         self.onset_itvl = 0.2
         self.wait_flag = False
-    
+
     def run(self):
-        # function for the attention task        
+        # function for the attention task
         clock = core.Clock()
 
         # initial delay start for 3s
@@ -68,7 +68,7 @@ class AttentThread(threading.Thread):
             pass
 
         while self.exp.exp_run:
-            if np.random.rand() < self.onset_prob:                
+            if np.random.rand() < self.onset_prob:
                 # flip the color of fixation dot
                 gt = self.exp.global_clock.getTime()
                 self.exp.fixation.color = (1.0, 0.0, 0.0)
@@ -77,7 +77,7 @@ class AttentThread(threading.Thread):
                 # for fMRI button box, use B and Y
                 clock.reset()
                 self.key_wait(['B', 'Y'])
-                
+
                 # record RT
                 rt = clock.getTime()
                 self.exp.atten_rt.append((gt, rt))
@@ -96,7 +96,7 @@ class AttentThread(threading.Thread):
         # wait on multiple keys
         # B and Y for scanner two button box
         self.wait_flag = True
-        def confirm_callback(event):            
+        def confirm_callback(event):
             self.wait_flag= False
 
         # register callback
@@ -140,7 +140,7 @@ class OrientEncode:
         if os.path.exists(self.record_path):
             with open(self.record_path, 'r') as file_handle:
                 self.sub_record = json.load(file_handle)
-        else:        
+        else:
             os.mkdir(self.data_dir)
 
             cond_seq = list(range(3)) * self.SEN_NUM
@@ -160,9 +160,9 @@ class OrientEncode:
 
         # parameter for the experiment
         self.n_trial = n_trial
-        self.mode = mode        
+        self.mode = mode
         self.atten_task = atten_task
-        self.show_center = True   
+        self.show_center = True
 
         self.line_len = self.DEFAULT_LEN
         self.stim_dur = self.DEFAULT_DUR
@@ -174,7 +174,7 @@ class OrientEncode:
             stim_seq = seq_file.read().replace('\n', ' ').split()
             stim_seq = list(map(int, stim_seq))
 
-        self.stim_seq = np.array(stim_seq).reshape((self.SEN_NUM, self.SEQ_LEN * 2))        
+        self.stim_seq = np.array(stim_seq).reshape((self.SEN_NUM, self.SEQ_LEN * 2))
 
         # initialize window, message
         # monitor = 'rm_413' for psychophysics and 'sc_3t' for imaging session
@@ -199,7 +199,7 @@ class OrientEncode:
     def _save_json(self):
         with open(self.record_path, 'w+') as record:
             record.write(json.dumps(self.sub_record, indent=2))
-        return 
+        return
 
     def _set_stim(self, idx):
         # surround orientation
@@ -223,16 +223,16 @@ class OrientEncode:
         # center orientation
         self.show_center = True if stim_idx < self.SEQ_LEN else False
         self.record.add_stimulus(stim_ori)
-        self.target.ori = stim_ori        
+        self.target.ori = stim_ori
 
-        return  
+        return
 
     def _draw_blank(self):
         self.fixation.draw()
         self.win.flip()
 
-        return 
- 
+        return
+
     def start(self):
         # determine condition and sequence
         counter = self.sub_record['Cond_Ctr']
@@ -254,7 +254,7 @@ class OrientEncode:
 
         return
 
-    def run(self):        
+    def run(self):
         # start experiment
         # clock for global and trial timing
         self.global_clock = core.Clock()
@@ -272,8 +272,8 @@ class OrientEncode:
 
         while self.global_ctd.getTime () <= 0:
             self._draw_blank()
-        
-        for idx in range(self.n_trial + 1):            
+
+        for idx in range(self.n_trial + 1):
             # draw stimulus for a fixed duration
             self.global_ctd.add(self.stim_dur)
             while self.global_ctd.getTime() <= 0:
@@ -283,22 +283,22 @@ class OrientEncode:
                 # draw stim
                 self.next_surround.contrast = crst
                 self.next_surround.draw()
-                                
+
                 self.target.contrast = crst if self.show_center else 0.0
                 self.target.draw()
 
                 # draw fixation dot
                 self.fixation.draw()
                 self.win.flip()
-            
+
             # blank screen for delay duration
-            # also set up the next stim 
+            # also set up the next stim
             self.global_ctd.add(self.delay)
 
             # setup stim condition for next trial
             if idx < self.n_trial:
                 self._set_stim(idx=idx)
-                
+
             while self.global_ctd.getTime() <= 0:
                 self._draw_blank()
 
@@ -308,19 +308,19 @@ class OrientEncode:
             self._draw_blank()
 
         self.session_time = self.global_clock.getTime()
-        
+
         if self.atten_task:
             self.exp_run = False
             self.atten_thread.join()
 
         return
-        
-    def save_data(self):         
-        file_name = '_'.join([self.sub_val, 
+
+    def save_data(self):
+        file_name = '_'.join([self.sub_val,
                             'C' + str(self.condi_id),
                             'S' + str(self.acqst_id),
                             self.time_stmp])
-        
+
         # write the RT for the attention task
         if self.atten_task:
             rt_mtx = np.array(self.atten_rt)
@@ -358,7 +358,7 @@ class OrientEncodeKeyboard(OrientEncode):
 
         # register callback, wait for key press
         keyboard.on_release_key(wait_key, confirm_callback)
-        while self.resp_flag:            
+        while self.resp_flag:
             self.win.flip()
 
         keyboard.unhook_all()
