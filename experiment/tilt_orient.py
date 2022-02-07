@@ -89,7 +89,7 @@ class AttentThread(threading.Thread):
                     pass
 
             clock.reset()
-            while clock.getTime() <= self.onset_itvl:
+            while clock.getTime() <= self.onset_itvl and self.exp.exp_run:
                 pass
 
     def key_wait(self, keys):
