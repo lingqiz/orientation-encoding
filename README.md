@@ -3,5 +3,7 @@ Code for running the experiment and data analysis pipeline for orientation encod
 
 ### Instruction
 Each subject should be assigned a unique `subject_ID`.  
-- fMRI session: `python3 main_psv.py subject_ID`.
-- behavioral session: (behavior branch) `python3 main.py subject_ID`.
+- fMRI session: `python3 main_psv.py subject_ID`.  
+The code automatically tracks the acquisition number.
+- behavioral session: (switch to the behavior branch)  
+`python3 main.py subject_ID`.
