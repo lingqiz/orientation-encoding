@@ -85,7 +85,7 @@ class AttentThread(threading.Thread):
 
                 # min gap between attention task
                 clock.reset()
-                while clock.getTime() <= self.min_gap and self.exp.exp_run::
+                while clock.getTime() <= self.min_gap and self.exp.exp_run:
                     pass
 
             clock.reset()
