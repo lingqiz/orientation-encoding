@@ -88,6 +88,7 @@ class AttentThread(threading.Thread):
                 while self._delay_check(clock, self.min_gap):                
                     pass
 
+            # check flip dot condition every 200 ms (onset_itvl) 
             clock.reset()
             while self._delay_check(clock, self.onset_itvl):            
                 pass
