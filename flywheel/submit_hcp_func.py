@@ -1,9 +1,9 @@
 import flywheel
 import datetime
+from .local_utils import *
 
 # flywheel API key
-with open('flywheel.key') as fl:
-    flywheel_API = fl.readlines()
+flywheel_API = load_key()
 
 # Initialize gear stuff
 now = datetime.datetime.now().strftime("%y/%m/%d_%H:%M")

@@ -1,9 +1,9 @@
 import flywheel
 import datetime
+from .local_utils import *
 
 # flywheel API key
-with open('flywheel.key') as fl:
-    flywheel_API = fl.readlines()[0]
+flywheel_API = load_key()
 
 # Initialize gear stuff, get the project and subjects
 fw = flywheel.Client(flywheel_API)
@@ -29,7 +29,6 @@ struct = [ana for ana in analyses if ana.label.startswith('hcp-struct')]
 sessions_that_have_struct = []
 for s in struct:
     sessions_that_have_struct.append(s.parent.id)
-
 
 # Loop through subjects and get sessions
 for subject in subjects:
