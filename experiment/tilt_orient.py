@@ -147,9 +147,14 @@ class OrientEncode:
         else:
             os.mkdir(self.data_dir)
 
-            cond_seq = list(range(3)) * self.SEN_NUM
-            np.random.shuffle(cond_seq)
-
+            # create a list of random triplet for SEN_NUM times
+            cond_seq = []
+            for _ in range(self.SEN_NUM):
+                triplet = list(range(3))
+                np.random.shuffle(triplet)
+                cond_seq.extend(triplet)
+            
+            # create subject record and save initial json file
             self.sub_record = {
                 'Cond_Seq' : cond_seq,
                 'Cond_Ctr' : 0,
