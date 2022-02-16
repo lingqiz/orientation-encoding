@@ -1,6 +1,6 @@
 import flywheel
 import datetime
-from .local_utils import *
+from local_utils import *
 
 # flywheel API key
 flywheel_API = load_key()

@@ -1,5 +1,5 @@
 import flywheel, datetime, sys
-from .local_utils import *
+from local_utils import *
 
 # flywheel API key
 flywheel_API = load_key()
@@ -59,17 +59,17 @@ for sub_label in all_data.keys():
             func_data.append(ana)
 
     # Run the gear if confrimed by the user
-    if get_response():
+    if get_response('pRF'):
         submit_icafix(gear, sub_label, 'pRF', analysis_label,
                 prf_ses, func_data, struct_data, time_stamp)
 
     # Run icafix for stim run
     label = 'NeuralCoding'
     n_session = 3
-    func_data = []
     for idx in range(n_session):
         ses_label = 'NeuralCoding0%s' % (idx + 1)
         stim_ses = all_data[sub_label][ses_label]
+        func_data = []
 
         print('\nFinding acquisitions for %s' % ses_label)
         analyses = stim_ses.analyses
@@ -79,6 +79,6 @@ for sub_label in all_data.keys():
                 func_data.append(ana)
                 print(ana.label)
 
-        if get_response():
+        if get_response(ses_label):
             submit_icafix(gear, sub_label, ses_label, analysis_label,
                     stim_ses, func_data, struct_data, time_stamp)

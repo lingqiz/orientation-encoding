@@ -1,4 +1,5 @@
 # a collection of helper functions
+# for flywheel gear submission
 
 def load_key():
     """
@@ -7,11 +8,11 @@ def load_key():
     with open('flywheel.key') as fl:
         return fl.readlines()[0]
 
-def get_response():
+def get_response(ses_label):
     """
     Get a response from the user
     """
-    response = input('Submit Gear? [Y/N]')
+    response = input('Submit Gear %s? [Y/N] ' % ses_label)
     if response.lower() == 'y':
         return True
     else:
