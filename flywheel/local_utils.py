@@ -25,7 +25,7 @@ def submit_icafix(gear, sub_label, ses_label, analysis_label,
     """
     # Set gear config
     config = {'FIXClassifier': 'HCP_hp2000', 'HighPassFilter': 2000,
-    'PreserveOnError': True, 'RegName': 'FS', 'Subject': sub_label}
+    'PreserveOnError': False, 'RegName': 'FS', 'Subject': sub_label}
 
     # Input parameters for submit pRF gear
     inputs = {'StructZip': struct_data, 'FuncZip': func_data[0].files[6]}
