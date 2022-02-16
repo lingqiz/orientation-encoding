@@ -63,7 +63,7 @@ for sub_label in all_data.keys():
         submit_icafix(gear, sub_label, 'pRF', analysis_label,
                 prf_ses, func_data, struct_data, time_stamp)
 
-    # Run icafix for stim run
+    # Run gear for NeuralCoding session
     label = 'NeuralCoding'
     n_session = 3
     for idx in range(n_session):
@@ -79,6 +79,7 @@ for sub_label in all_data.keys():
                 func_data.append(ana)
                 print(ana.label)
 
+        # Run the gear if confrimed by the user
         if get_response(ses_label):
             submit_icafix(gear, sub_label, ses_label, analysis_label,
-                    stim_ses, func_data, struct_data, time_stamp)
+                        stim_ses, func_data, struct_data, time_stamp)
