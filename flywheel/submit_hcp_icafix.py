@@ -65,9 +65,9 @@ for sub_label in all_data.keys():
         data_pair = (func_data[:split_idx], func_data[split_idx:])
 
         # run the gear
-        for data in data_pair:
+        for idx, data in enumerate(data_pair):
             submit_icafix(gear, sub_label, 'pRF', analysis_label,
-                        prf_ses, data, struct_data, time_stamp)
+                    prf_ses, data, struct_data, time_stamp, idx)
 
     # Run gear for NeuralCoding session
     label = 'NeuralCoding'

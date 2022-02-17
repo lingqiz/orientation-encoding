@@ -19,7 +19,7 @@ def get_response(ses_label):
         return False
 
 def submit_icafix(gear, sub_label, ses_label, analysis_label,
-    session, func_data, struct_data, time_stamp, hpc=False):
+        session, func_data, struct_data, time_stamp, run_idx):
     """
     Submit the ICAFIX gear to the flywheel
     """
@@ -33,10 +33,6 @@ def submit_icafix(gear, sub_label, ses_label, analysis_label,
         inputs['FuncZip%s' % (idx + 1)] = func_data[idx].files[6]
 
     # Run icafix for pRF
-    print('\nSubmitting %s for %s' % (ses_label, sub_label))
-    new_label = analysis_label + ' [%s_pRF]' % sub_label + ' ' + time_stamp
-    if hpc:
-        gear.run(analysis_label=new_label, config=config,
-        inputs=inputs, destination=session, tags=['vm-n1-highmem-8_disk-1500G_swap-60G'])
-    else:
-        gear.run(analysis_label=new_label, config=config, inputs=inputs, destination=session)
+    print('\nSubmitting %s for %s, pt_%s' % (ses_label, sub_label, run_idx))
+    label = analysis_label + ' [%s_pRF]' % sub_label + ' ' + 'pt_%s' % run_idx + time_stamp
+    gear.run(analysis_label=label, config=config, inputs=inputs, destination=session)
