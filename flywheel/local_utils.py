@@ -34,5 +34,5 @@ def submit_icafix(gear, sub_label, ses_label, analysis_label,
 
     # Run icafix for pRF
     print('\nSubmitting %s for %s, pt_%s' % (ses_label, sub_label, run_idx))
-    label = analysis_label + ' [%s_pRF]' % sub_label + ' ' + 'pt_%s_' % run_idx + time_stamp
+    label = analysis_label + ' [%s_pRF]' % sub_label + ' ' + 'pt%s_' % run_idx + time_stamp
     gear.run(analysis_label=label, config=config, inputs=inputs, destination=session)
