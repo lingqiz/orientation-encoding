@@ -87,5 +87,11 @@ for sub_label in all_data.keys():
 
         # Run the gear if confrimed by the user
         if get_response(ses_label):
-            submit_icafix(gear, sub_label, ses_label, analysis_label,
-                        stim_ses, func_data, struct_data, time_stamp)
+            # split the run into two parts
+            split_idx = len(func_data) // 2
+            data_pair = (func_data[:split_idx], func_data[split_idx:])
+
+            # run the gear
+            for idx, data in enumerate(data_pair):
+                submit_icafix(gear, sub_label, ses_label, analysis_label,
+                            stim_ses, data, struct_data, time_stamp, idx)
