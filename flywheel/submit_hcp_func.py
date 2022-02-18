@@ -84,7 +84,7 @@ for subject in subjects:
                     config = {'AnatomyRegDOF': 6, 'BiasCorrection': 'SEBased', 'MotionCorrection': 'MCFLIRT',
                             'RegName': 'FS', 'fMRIName': acquisition.label}
 
-                    new_analysis_label = analysis_label + ' ' + acquisition.label + ' ' + now
+                    new_analysis_label = analysis_label + ' ' + 'run-%s' % acq_number
 
                     # Submit the gear
                     print('Submitting %s' % acquisition.label)
