@@ -19,7 +19,7 @@ def get_response(ses_label):
         return False
 
 def submit_icafix(gear, sub_label, ses_label, analysis_label,
-    session, func_data, struct_data, time_stamp, run_idx=0):
+    session, func_data, struct_data, time_stamp, run_idx='all'):
     """
     Submit the ICAFIX gear to the flywheel
     """
@@ -32,7 +32,7 @@ def submit_icafix(gear, sub_label, ses_label, analysis_label,
     for idx in range(1, len(func_data)):
         inputs['FuncZip%s' % (idx + 1)] = func_data[idx].files[6]
 
-    # Run icafix for pRF
+    # Run icafix gear on the data
     print('\nSubmitting %s for %s, pt_%s' % (ses_label, sub_label, run_idx))
-    label = analysis_label + ' [%s_%s] pt%s ' % (ses_label, sub_label, run_idx) + time_stamp
-    gear.run(analysis_label=label, config=config, inputs=inputs, destination=session)
+    label = analysis_label + ' [%s_%s] pt-%s ' % (ses_label, sub_label, run_idx) + time_stamp
+    gear.run(analysis_label=label, config=config, inputs=inputs, destination=session, tags=['large'])

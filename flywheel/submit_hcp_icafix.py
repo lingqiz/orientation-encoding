@@ -10,7 +10,7 @@ fw = flywheel.Client(flywheel_API)
 project = fw.projects.find_first('label=orientation_encoding')
 
 # Get the gear and analysis label
-gear = fw.lookup('gears/hcp-icafix/0.2.0')
+gear = fw.lookup('gears/hcp-icafix/0.1.7')
 analysis_label = 'hcp-icafix %s' % gear.gear.version
 
 # Only run on specified subjects
@@ -58,16 +58,10 @@ for sub_label in all_data.keys():
         if ana.label.startswith('hcp-func'):
             func_data.append(ana)
 
-    # Run the gear if confrimed by the user
+    # Run the gear on pRF session if confrimed by the user
     if get_response('pRF'):
-        # split the run into two parts
-        split_idx = len(func_data) // 2
-        data_pair = (func_data[:split_idx], func_data[split_idx:])
-
-        # run the gear
-        for idx, data in enumerate(data_pair):
-            submit_icafix(gear, sub_label, 'pRF', analysis_label,
-                    prf_ses, data, struct_data, time_stamp, idx)
+        submit_icafix(gear, sub_label, 'pRF', analysis_label,
+                prf_ses, func_data, struct_data, time_stamp)
 
     # Run gear for NeuralCoding session
     label = 'NeuralCoding'
