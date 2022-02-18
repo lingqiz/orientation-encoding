@@ -19,7 +19,7 @@ def get_response(ses_label):
         return False
 
 def submit_icafix(gear, sub_label, ses_label, analysis_label,
-        session, func_data, struct_data, time_stamp, run_idx):
+    session, func_data, struct_data, time_stamp, run_idx=0):
     """
     Submit the ICAFIX gear to the flywheel
     """
