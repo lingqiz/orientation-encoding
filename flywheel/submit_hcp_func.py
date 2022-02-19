@@ -82,7 +82,7 @@ for subject in subjects:
                             'StructZip': struct_result, 'fMRIScout': scout_image, 'fMRITimeSeries': fmri_acq}
 
                     config = {'AnatomyRegDOF': 6, 'BiasCorrection': 'SEBased', 'MotionCorrection': 'MCFLIRT',
-                            'RegName': 'FS', 'fMRIName': acquisition.label}
+                            'RegName': 'FS', 'fMRIName': 'func-%s' % acq_number}
 
                     new_analysis_label = analysis_label + ' ' + acquisition.label + ' ' + now
 
