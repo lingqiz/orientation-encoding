@@ -1,13 +1,9 @@
 import flywheel, datetime, sys
 from local_utils import *
 
-# flywheel API key
-flywheel_API = load_key()
-
-# Initialize
-time_stamp = datetime.datetime.now().strftime("%y/%m/%d_%H:%M")
-fw = flywheel.Client(flywheel_API)
-project = fw.projects.find_first('label=orientation_encoding')
+# Initialize flywheel client
+label = 'label=orientation_encoding'
+fw, project, time_stamp = flywheel_init(label)
 
 # Get the gear and analysis label
 gear = fw.lookup('gears/hcp-icafix/0.1.7')
@@ -19,20 +15,7 @@ sub_list = sys.argv
 sub_list.pop(0)
 
 # Iterate and record all sessions, sort by subject
-all_data = {}
-for session in project.sessions.iter():
-
-    # Because we want information off the sessions's analyses, we need to reload
-    # The container to make sure we have all the metadata.
-    session = session.reload()
-    sub_label = session.subject.label
-    ses_label = session.label
-
-    # store the sessions
-    if sub_label not in all_data.keys():
-        all_data[sub_label] = {}
-
-    all_data[sub_label][ses_label] = session
+all_data = get_all_data(project)
 
 # Run ICAFIX gear on subject, separate by session
 for sub_label in all_data.keys():
@@ -41,7 +24,6 @@ for sub_label in all_data.keys():
         continue
 
     print('\nRunning icafix gear for subject: %s' % sub_label)
-
     # Run gear for pRF session
     # Get analysis for the pRF session
     prf_ses = all_data[sub_label]['pRF']

@@ -1,5 +1,6 @@
 # a collection of helper functions
 # for flywheel gear submission
+import flywheel, datetime
 
 def load_key():
     """
@@ -17,6 +18,40 @@ def get_response(ses_label):
         return True
     else:
         return False
+
+def flywheel_init(projet_label):
+    """
+    Initialize the flywheel client
+    """
+    flywheel_API = load_key()
+    fw = flywheel.Client(flywheel_API)
+
+    project = fw.projects.find_first(projet_label)
+    time_stamp = datetime.datetime.now().strftime("%y/%m/%d_%H:%M")
+
+    return fw, project, time_stamp
+
+def get_all_data(project):
+    """
+    Iterate and record all sessions from
+    a project, sort by subject name
+    """
+    all_data = {}
+    for session in project.sessions.iter():
+
+        # Because we want information off the sessions's analyses, we need to reload
+        # The container to make sure we have all the metadata.
+        session = session.reload()
+        sub_label = session.subject.label
+        ses_label = session.label
+
+        # store the sessions
+        if sub_label not in all_data.keys():
+            all_data[sub_label] = {}
+
+        all_data[sub_label][ses_label] = session
+
+    return all_data
 
 def submit_icafix(gear, sub_label, ses_label, analysis_label,
     session, func_data, struct_data, time_stamp, run_idx='all'):
