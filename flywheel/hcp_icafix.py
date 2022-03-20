@@ -42,8 +42,8 @@ for sub_label in all_data.keys():
 
     # Run the gear on pRF session if confrimed by the user
     if get_response('pRF'):
-        submit_icafix(gear, sub_label, 'pRF', analysis_label,
-                prf_ses, func_data, struct_data, time_stamp)
+        submit_icafix(gear, sub_label, 'pRF', analysis_label, prf_ses,
+                func_data, struct_data, time_stamp, tags='extra-large')
 
     # Run gear for NeuralCoding session
     label = 'NeuralCoding'
