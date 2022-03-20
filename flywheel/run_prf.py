@@ -6,7 +6,7 @@ label = 'label=orientation_encoding'
 fw, project, time_stamp = flywheel_init(label)
 
 # Get the gear and set analysis label
-gear = fw.lookup('gears/forwardmodel/0.12.7')
+gear = fw.lookup('gears/forwardmodel/0.4.8')
 analysis_label = 'ForwardModel_pRF %s' % gear.gear.version
 
 # Get input variables
@@ -58,11 +58,11 @@ for sub_label in all_data.keys():
     mag_factor = 0.9125
     modelOpts = '(pixelsPerDegree),5.1751,(polyDeg),5,(screenMagnification),%.5f' % mag_factor
 
-    config = {'averageAcquisitions':1, 'modelClass':'prfTimeShift',
-            'modelOpts':modelOpts, 'tr':0.8, 'trimDummyStimTRs':0}
+    config = {'averageAcquisitions':'1', 'modelClass':'prfTimeShift',
+              'modelOpts':modelOpts, 'tr':'0.8', 'trimDummyStimTRs':'0'}
 
     # Submit the gear
-    if get_response('forward model pRF : %s' % sub_label):
+    if get_response('forward model pRF'):
         print('\nSubmitting forward model for %s' % sub_label)
-        gear.run(analysis_label=analysis_label, inputs=inputs,
-            config=config, destination=prf_ses, tags=['large'])
+        gear.run(analysis_label=analysis_label, config=config,
+            inputs=inputs, destination=prf_ses, tags=['large'])
