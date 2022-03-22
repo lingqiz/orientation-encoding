@@ -40,18 +40,18 @@ for sub_label in all_data.keys():
 
     # Get the ICAFIX data and struct data
     for ana in analyses:
-        # get the result for hcp_struct
+        # Get the result for hcp_struct
         if ana.label.startswith('hcp-struct'):
             struct_data = ana.get_file(sub_label + '_hcpstruct.zip')
 
-        # get all function runs
+        # Get all function runs
         if ana.label.startswith('hcp-icafix'):
             print(ana.label)
             func_data.append(ana.files[func_index])
 
     # Submit the forward model gear
     # Input parameters for submit forward model gear
-    inputs = {'funcZip01':func_data[0], 'funcZip02':func_data[1], 
+    inputs = {'funcZip01':func_data[0], 'funcZip02':func_data[1],
               'maskFile':va_mask, 'stimFile':prf_stim, 'structZip':struct_data}
 
     # Gear config
@@ -59,7 +59,7 @@ for sub_label in all_data.keys():
     mag_factor = 0.9125
     modelOpts = '(pixelsPerDegree),5.1751,(polyDeg),5,(screenMagnification),%.5f' % mag_factor
 
-    config = {'averageAcquisitions':'1', 'convertToPercentChange':'1', 'tr':'0.8', 
+    config = {'averageAcquisitions':'1', 'convertToPercentChange':'0', 'tr':'0.8',
               'modelClass':'prfTimeShift', 'modelOpts':modelOpts, 'trimDummyStimTRs':'0'}
 
     # Submit the gear
