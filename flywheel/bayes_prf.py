@@ -33,11 +33,11 @@ for sub_label in all_data.keys():
 
     for ana in analyses:
         # Get the result for hcp_struct
-        if ana.label.starts_with('hcp-struct'):
+        if ana.label.startswith('hcp-struct'):
             struct_data = ana.get_file(sub_label + '_hcpstruct.zip')
 
         # Get the result from forward model
-        if ana.label.starts_with('ForwardModel'):
+        if ana.label.startswith('ForwardModel'):
             print(ana.label)
             pRF_model = ana.files[file_index]
 
