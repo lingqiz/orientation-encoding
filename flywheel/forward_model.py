@@ -6,7 +6,7 @@ label = 'label=orientation_encoding'
 fw, project, time_stamp = flywheel_init(label)
 
 # Get the gear and set analysis label
-gear = fw.lookup('gears/forwardmodel/0.4.8')
+gear = fw.lookup('gears/forwardmodel/0.12.7')
 analysis_label = 'ForwardModel_pRF %s' % gear.gear.version
 
 # Get input variables
@@ -35,7 +35,7 @@ for sub_label in all_data.keys():
 
     # Index for the icafix zip file
     func_index = 2
-    func_data = None
+    func_data = []
     struct_data = None
 
     # Get the ICAFIX data and struct data
@@ -46,20 +46,21 @@ for sub_label in all_data.keys():
 
         # get all function runs
         if ana.label.startswith('hcp-icafix'):
-            func_data = ana.files[func_index]
+            print(ana.label)
+            func_data.append(ana.files[func_index])
 
     # Submit the forward model gear
     # Input parameters for submit forward model gear
-    inputs = {'funcZip01':func_data, 'maskFile':va_mask,
-            'stimFile':prf_stim, 'structZip':struct_data}
+    inputs = {'funcZip01':func_data[0], 'funcZip02':func_data[1], 
+              'maskFile':va_mask, 'stimFile':prf_stim, 'structZip':struct_data}
 
     # Gear config
     # Need to change the screen magnification factor and/or HRF parameters
     mag_factor = 0.9125
     modelOpts = '(pixelsPerDegree),5.1751,(polyDeg),5,(screenMagnification),%.5f' % mag_factor
 
-    config = {'averageAcquisitions':'1', 'modelClass':'prfTimeShift',
-              'modelOpts':modelOpts, 'tr':'0.8', 'trimDummyStimTRs':'0'}
+    config = {'averageAcquisitions':'1', 'convertToPercentChange':'1', 'tr':'0.8', 
+              'modelClass':'prfTimeShift', 'modelOpts':modelOpts, 'trimDummyStimTRs':'0'}
 
     # Submit the gear
     if get_response('forward model pRF'):
