@@ -9,5 +9,5 @@ The code automatically tracks the acquisition number.
 `python3 main.py subject_ID`.
 
 ### Dependencies
-- [PsychoPy]
-- [cifti-matlab]
+- [PsychoPy](https://www.psychopy.org/)
+- [cifti-matlab](https://github.com/Washington-University/cifti-matlab)
