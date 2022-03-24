@@ -15,15 +15,14 @@ motion_rg = fullfile(data_base, 'Movement_Regressors.txt');
 motion_dt = fullfile(data_base, 'Movement_Regressors_dt.txt');
 
 % Load data
-data = cifti_read(data_file);
+cifti_data = cifti_read(data_file);
 motion_rg = load(motion_rg);
 motion_dt = load(motion_dt);
 
 %% Preprocessing
-ts = data.cdata';
+ts = cifti_data.cdata';
 
 % nuisance variables
-t_index = 1:420;
 rgs = [motion_rg, motion_dt];
 [~, score, latent] = pca(rgs);
 
@@ -31,6 +30,19 @@ latent = latent / sum(latent);
 cum_lt = cumsum(latent);
 
 cutoff = floor(interp1(cum_lt, 1:length(cum_lt), 1-1e-5));
+score = score(:, 1:cutoff);
+
+% setup nuisance regressors
+rgs = [score, ones(size(ts, 1), 1)];
 
 % nuisance regression
-% theta = (rgs' * rgs) \ (rgs' * ts);
+theta = (rgs' * rgs) \ (rgs' * ts);
+ts_hat = rgs * theta;
+
+% save the residule as new time series
+residule = ts - ts_hat;
+
+%% Save output
+cifti_data.cdata = residule';
+data_file = fullfile(data_base, strcat(ses_name, '_Atlas.clean.dtseries.nii'));
+cifti_write(cifti_data, 'sqrt.dscalar.nii');
