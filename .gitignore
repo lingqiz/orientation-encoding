@@ -1,5 +1,6 @@
 /analysis/cbrewer
 /analysis/circstat
+/proprocess/cifti-matlab
 /docs
 __pycache__
 .vscode
