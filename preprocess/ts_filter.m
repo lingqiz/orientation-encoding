@@ -11,26 +11,23 @@ data_base = fullfile(base_dir, ...
             sub_name, 'MNINonLinear', 'Results', ses_name);
         
 data_file = fullfile(data_base, strcat(ses_name, '_Atlas.dtseries.nii'));
-motion_rg = fullfile(data_base, 'Movement_Regressors.txt');
-motion_dt = fullfile(data_base, 'Movement_Regressors_dt.txt');
+motion_rg = fullfile(data_base, 'Movement_Regressors_dt.txt');
 
 % Load data
 cifti_data = cifti_read(data_file);
 motion_rg = load(motion_rg);
-motion_dt = load(motion_dt);
 
 %% Preprocessing
 ts = cifti_data.cdata';
 
 % setup nuisance variables
 % decorrelation using PCA
-rgs = [motion_rg, motion_dt];
-[~, score, latent] = pca(rgs);
+[~, score, latent] = pca(motion_rg);
 
 latent = latent / sum(latent);
 cum_lt = cumsum(latent);
 
-cutoff = floor(interp1(cum_lt, 1:length(cum_lt), 1-1e-5));
+cutoff = ceil(interp1(cum_lt, 1:length(cum_lt), 1-1e-6));
 score = score(:, 1:cutoff);
 
 % setup nuisance regressors
