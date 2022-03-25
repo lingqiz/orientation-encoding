@@ -22,7 +22,8 @@ motion_dt = load(motion_dt);
 %% Preprocessing
 ts = cifti_data.cdata';
 
-% nuisance variables
+% setup nuisance variables
+% decorrelation using PCA
 rgs = [motion_rg, motion_dt];
 [~, score, latent] = pca(rgs);
 
@@ -35,7 +36,7 @@ score = score(:, 1:cutoff);
 % setup nuisance regressors
 rgs = [score, ones(size(ts, 1), 1)];
 
-% nuisance regression
+% nuisance regression (normal equation)
 theta = (rgs' * rgs) \ (rgs' * ts);
 ts_hat = rgs * theta;
 
@@ -45,4 +46,4 @@ residule = ts - ts_hat;
 %% Save output
 cifti_data.cdata = residule';
 data_file = fullfile(data_base, strcat(ses_name, '_Atlas.clean.dtseries.nii'));
-cifti_write(cifti_data, 'sqrt.dscalar.nii');
+cifti_write(cifti_data, data_file);
