@@ -38,8 +38,8 @@ for idx = ses_idx
     % save the residule as new time series
     residule = ts - ts_hat;
     
-    % save output as .clean.dtseries
+    % save output as icafix output name
     cifti_data.cdata = residule';
-    data_file = fullfile(base_dir, strcat(ses_name, '_Atlas.clean.dtseries.nii'));
+    data_file = fullfile(base_dir, strcat(ses_name, '_Atlas_hp2000_clean.dtseries.nii'));
     cifti_write(cifti_data, data_file);
 end
