@@ -21,11 +21,13 @@ for dir in dir_name:
 
 # Move data files to corresponding folders
 # This step comes after the MATLAB script
+name_list = ''
 n_session = 6
 file_base = '_Atlas_hp2000_clean.dtseries.nii'
 for idx in range(n_session):
     ses_name = 'func-0%d' % (idx + 1)
     ses_dir = os.path.join(base_dir, ses_name)
+    name_list += ses_name + ' '
 
     if not os.path.exists(ses_dir):
         os.system("mkdir %s" % ses_dir)
@@ -36,20 +38,21 @@ for idx in range(n_session):
         source_path = os.path.join(base, file_name)
         os.system("mv %s %s" % (source_path, ses_dir))
 
+# Create config file
+config_str = CONFIG_TMPLATE % (name_list, sub_name)
+config_fn = '%s__hcpicafix_config.json' % sub_name
+
+os.chdir(os.path.join(base, 'Filtered', sub_name))
+if not os.path.exists(config_fn):
+    with open(config_fn, 'w') as f:
+        f.write(config_str)
+
 # Create a zip file
 os.chdir(os.path.join(base, 'Filtered'))
 if not os.path.exists('%s.zip' % sub_name):
     os.system("zip -r %s %s" % (sub_name, sub_name))
 
-# Rename to full file name
-full_name = sub_name + '_ICAFIX_multi_'
-for idx in range(n_session):
-    ses_name = 'func-0%d' % (idx + 1)
-    full_name += (ses_name + '_')
-full_name += 'hcpicafix.zip'
-
-os.system("mv %s %s" % (sub_name + '.zip', full_name))
-zip_path = os.path.join(base, 'Filtered', full_name)
+zip_path = os.path.join(base, 'Filtered', '%s.zip' % sub_name)
 
 # Create analysis and submit to Flywheel
 os.chdir(flywheel_path)
@@ -64,6 +67,7 @@ for sub_label in all_data.keys():
     if sub_label != sub_name:
         continue
 
+    # Add analysis and file to pRF session
     prf_ses = all_data[sub_label]['pRF']
     ts_filter = prf_ses.add_analysis(label='TS Filter')
     ts_filter.upload_output(zip_path)

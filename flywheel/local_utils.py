@@ -2,6 +2,18 @@
 # for flywheel gear submission
 import flywheel, datetime
 
+CONFIG_TMPLATE = \
+"""{
+  "config": {
+    "fMRINameList": "%s",
+    "PreserveOnError": false,
+    "HighPassFilter": 2000,
+    "RegName": "FS",
+    "FIXClassifier": "HCP_hp2000",
+    "Subject": "%s"
+  }
+}"""
+
 def load_key():
     """
     Load the flywheel API key from a file
