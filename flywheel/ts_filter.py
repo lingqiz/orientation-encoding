@@ -9,7 +9,7 @@ sub_name = 'HERO_LZ'
 acq_type = 'pRF'
 home = os.path.expanduser('~')
 base = os.path.join(home, 'Data', 'fMRI',
-                        sub_name, acq_type)
+                    sub_name, acq_type)
 base_dir = base
 
 # Create file hierarchy
@@ -48,11 +48,10 @@ if not os.path.exists(config_fn):
         f.write(config_str)
 
 # Create a zip file
+zip_path = os.path.join(base, 'Filtered', '%s.zip' % sub_name)
 os.chdir(os.path.join(base, 'Filtered'))
 if not os.path.exists('%s.zip' % sub_name):
     os.system("zip -r %s %s" % (sub_name, sub_name))
-
-zip_path = os.path.join(base, 'Filtered', '%s.zip' % sub_name)
 
 # Create analysis and submit to Flywheel
 os.chdir(flywheel_path)
