@@ -85,12 +85,12 @@ class AttentThread(threading.Thread):
 
                 # min gap between attention task
                 clock.reset()
-                while self._delay_check(clock, self.min_gap):                
+                while self._delay_check(clock, self.min_gap):
                     pass
 
-            # check flip dot condition every 200 ms (onset_itvl) 
+            # check flip dot condition every 200 ms (onset_itvl)
             clock.reset()
-            while self._delay_check(clock, self.onset_itvl):            
+            while self._delay_check(clock, self.onset_itvl):
                 pass
 
     def _key_wait(self, keys):
@@ -153,7 +153,7 @@ class OrientEncode:
                 triplet = list(range(3))
                 np.random.shuffle(triplet)
                 cond_seq.extend(triplet)
-            
+
             # create subject record and save initial json file
             self.sub_record = {
                 'Cond_Seq' : cond_seq,
@@ -264,6 +264,12 @@ class OrientEncode:
         return
 
     def run(self):
+        '''
+        Experiment parameters:
+            12.5s * 2 blank (beginning and end)
+            (1+19+19) trial * (1.5s stim + 3.5s delay)
+            220s total, 220/0.8 = 275 TRs
+        '''
         # start experiment
         # clock for global and trial timing
         self.global_clock = core.Clock()
