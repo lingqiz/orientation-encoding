@@ -36,6 +36,7 @@ for sub_label in all_data.keys():
     # Index for the icafix zip file
     func_index = 2
     func_data = []
+    ts_filter = None
     struct_data = None
 
     # Get the ICAFIX data and struct data
@@ -49,10 +50,22 @@ for sub_label in all_data.keys():
             print(ana.label)
             func_data.append(ana.files[func_index])
 
+        # Get the result for TS Filter
+        if ana.label.startswith('TS Filter'):
+            print(ana.label)
+            ts_filter = ana.files[0]
+
     # Submit the forward model gear
-    # Input parameters for submit forward model gear
-    inputs = {'funcZip01':func_data[0], 'funcZip02':func_data[1],
-              'maskFile':va_mask, 'stimFile':prf_stim, 'structZip':struct_data}
+    # Set up input parameters for submit forward model gear
+    icafix = False
+    # Use ICAFIX output as input
+    if icafix:
+        inputs = {'funcZip01':func_data[0], 'funcZip02':func_data[1],
+                'maskFile':va_mask, 'stimFile':prf_stim, 'structZip':struct_data}
+    # Use simple filtered output as input
+    else:
+        inputs = {'funcZip01':ts_filter, 'maskFile':va_mask,
+                'stimFile':prf_stim, 'structZip':struct_data}
 
     # Gear config
     # Need to change the screen magnification factor and/or HRF parameters
