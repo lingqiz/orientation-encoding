@@ -1,4 +1,8 @@
 import os
+from local_utils import *
+
+# Current (flywheel) directory
+flywheel_path = os.getcwd()
 
 # Setup variables
 sub_name = 'HERO_LZ'
@@ -36,3 +40,22 @@ for idx in range(n_session):
 os.chdir(os.path.join(base, 'Filtered'))
 if not os.path.exists('%s.zip' % sub_name):
     os.system("zip -r %s %s" % (sub_name, sub_name))
+
+zip_path = os.path.join(base, 'Filtered', '%s.zip' % sub_name)
+
+# Create analysis and submit to Flywheel
+os.chdir(flywheel_path)
+label = 'label=orientation_encoding'
+fw, project, time_stamp = flywheel_init(label)
+
+# Iterate and record all sessions, sort by subject
+all_data = get_all_data(project)
+
+# Update load result to 'TS Filter' analysis
+for sub_label in all_data.keys():
+    if sub_label != sub_name:
+        continue
+
+    prf_ses = all_data[sub_label]['pRF']
+    ts_filter = prf_ses.add_analysis(label='TS Filter')
+    ts_filter.upload_output(zip_path)
