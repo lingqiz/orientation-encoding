@@ -27,7 +27,7 @@ file_base = '_Atlas_hp2000_clean.dtseries.nii'
 for idx in range(n_session):
     ses_name = 'func-0%d' % (idx + 1)
     ses_dir = os.path.join(base_dir, ses_name)
-    name_list += ses_name + ' '
+    name_list += '_' + ses_name
 
     if not os.path.exists(ses_dir):
         os.system("mkdir %s" % ses_dir)
@@ -38,14 +38,10 @@ for idx in range(n_session):
         source_path = os.path.join(base, file_name)
         os.system("mv %s %s" % (source_path, ses_dir))
 
-# Create config file
-config_str = CONFIG_TMPLATE % (name_list, sub_name)
-config_fn = '%s__hcpicafix_config.json' % sub_name
-
-os.chdir(os.path.join(base, 'Filtered', sub_name))
-if not os.path.exists(config_fn):
-    with open(config_fn, 'w') as f:
-        f.write(config_str)
+# Create icafix folder to match the format of icafix output
+folder_name = 'ICAFIX_multi' + name_list
+if not os.path.exists(os.path.join(base_dir, folder_name)):
+    os.system("mkdir %s" % os.path.join(base_dir, folder_name))
 
 # Create a zip file
 zip_path = os.path.join(base, 'Filtered', '%s.zip' % sub_name)
