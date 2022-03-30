@@ -41,7 +41,15 @@ os.chdir(os.path.join(base, 'Filtered'))
 if not os.path.exists('%s.zip' % sub_name):
     os.system("zip -r %s %s" % (sub_name, sub_name))
 
-zip_path = os.path.join(base, 'Filtered', '%s.zip' % sub_name)
+# Rename to full file name
+full_name = sub_name + '_ICAFIX_multi_'
+for idx in range(n_session):
+    ses_name = 'func-0%d' % (idx + 1)
+    full_name += (ses_name + '_')
+full_name += 'hcpicafix.zip'
+
+os.system("mv %s %s" % (sub_name + '.zip', full_name))
+zip_path = os.path.join(base, 'Filtered', full_name)
 
 # Create analysis and submit to Flywheel
 os.chdir(flywheel_path)
