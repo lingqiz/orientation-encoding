@@ -5,7 +5,8 @@ from local_utils import *
 flywheel_path = os.getcwd()
 
 # Setup variables
-# Command line arguments: sub_name, acq_type, n_session
+# Command line arguments:
+# sub_name, acq_type, n_session
 input_args = sys.argv
 input_args.pop(0)
 

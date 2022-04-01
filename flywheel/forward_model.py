@@ -60,17 +60,20 @@ for sub_label in all_data.keys():
     icafix = False
     # Use ICAFIX output as input
     if icafix:
+        gain = '300'
         inputs = {'funcZip01':func_data[0], 'funcZip02':func_data[1],
                 'maskFile':va_mask, 'stimFile':prf_stim, 'structZip':struct_data}
     # Use simple filtered output as input
     else:
+        gain = '1'
         inputs = {'funcZip01':ts_filter, 'maskFile':va_mask,
                 'stimFile':prf_stim, 'structZip':struct_data}
 
     # Gear config
     # Need to change the screen magnification factor and/or HRF parameters
     mag_factor = 0.9125
-    modelOpts = '(pixelsPerDegree),5.1751,(polyDeg),5,(screenMagnification),%.5f' % mag_factor
+    modelOpts = '(pixelsPerDegree),5.1751,(polyDeg),5,(typicalGain),%s,' \
+                '(screenMagnification),%.5f' % (gain, mag_factor)
 
     config = {'averageAcquisitions':'1', 'convertToPercentChange':'0', 'tr':'0.8',
               'modelClass':'prfTimeShift', 'modelOpts':modelOpts, 'trimDummyStimTRs':'0'}
