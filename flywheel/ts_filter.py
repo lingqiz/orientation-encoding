@@ -1,12 +1,16 @@
-import os
+import os, sys
 from local_utils import *
 
 # Current (flywheel) directory
 flywheel_path = os.getcwd()
 
 # Setup variables
-sub_name = 'HERO_LZ'
-acq_type = 'pRF'
+# Command line arguments: sub_name, acq_type, n_session
+input_args = sys.argv
+input_args.pop(0)
+
+sub_name = input_args[0]
+acq_type = input_args[1]
 home = os.path.expanduser('~')
 base = os.path.join(home, 'Data', 'fMRI',
                     sub_name, acq_type)
@@ -22,7 +26,7 @@ for dir in dir_name:
 # Move data files to corresponding folders
 # This step comes after the MATLAB script
 name_list = ''
-n_session = 6
+n_session = int(input_args[2])
 file_base = '_Atlas_hp2000_clean.dtseries.nii'
 for idx in range(n_session):
     ses_name = 'func-0%d' % (idx + 1)
