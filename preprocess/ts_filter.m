@@ -20,7 +20,7 @@ for idx = ses_idx
     
     % convert to percent change
     meanVec = mean(ts, 2);
-    ts = 100 * (ts - meanVec) ./ meanVec;
+    ts = 100 * ((ts - meanVec) ./ meanVec);
     
     % setup nuisance variables
     % decorrelation using PCA
