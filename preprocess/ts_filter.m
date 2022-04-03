@@ -1,13 +1,14 @@
 %% Setup
+function ts_filter(sub_name, acq_type, n_session)
 addpath('cifti-matlab');
 
-% Specify the subject name and data session
-sub_name = 'HERO_LZ';
-acq_type = 'pRF';
+% sub_name: Subject label
+% acq_type: Acquisition label
+% n_session: Number of sessions
+
 base_dir = strcat('~/Data/fMRI', '/', sub_name, '/', acq_type);
 
 %% Run preprocessing for all sessions
-n_session = 6;
 ses_idx = 1 : n_session;
 
 for idx = ses_idx
@@ -46,4 +47,6 @@ for idx = ses_idx
     cifti_data.cdata = residule';
     data_file = fullfile(base_dir, strcat(ses_name, '_Atlas_hp2000_clean.dtseries.nii'));
     cifti_write(cifti_data, data_file);
+end
+
 end

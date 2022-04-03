@@ -12,10 +12,21 @@ input_args.pop(0)
 
 sub_name = input_args[0]
 acq_type = input_args[1]
+n_session = int(input_args[2])
+
+# Setup directories
 home = os.path.expanduser('~')
 base = os.path.join(home, 'Data', 'fMRI',
                     sub_name, acq_type)
 base_dir = base
+
+# Run MATLAB command
+# Output filtered data to base_dir
+matlab_pth = os.path.join(home, 'Desktop',
+        'Orientation_Encode', 'preprocess')
+matlab_cmd = "matlab -nodisplay -r \"cd('%s'); ts_filter('%s', '%s', %s);exit\""
+matlab_cmd %= (matlab_pth, sub_name, acq_type, n_session)
+os.system(matlab_cmd)
 
 # Create file hierarchy
 dir_name = ['Filtered', sub_name, 'MNINonLinear', 'Results']
@@ -27,7 +38,6 @@ for dir in dir_name:
 # Move data files to corresponding folders
 # This step comes after the MATLAB script
 name_list = ''
-n_session = int(input_args[2])
 file_base = '_Atlas_hp2000_clean.dtseries.nii'
 for idx in range(n_session):
     ses_name = 'func-0%d' % (idx + 1)
