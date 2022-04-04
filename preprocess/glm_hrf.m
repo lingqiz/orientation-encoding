@@ -1,54 +1,75 @@
 % Simultaneous estimate of both the HRF function 
-% and the beta weights of stimulus presentation
+% and the Beta weights of stimulus presentation
 
 %% Load data from a single scan session
 addpath('cifti-matlab');
 
-% single scan: 91282 grayordinate * 2750 TRs (2200 sec)
+% Single scan session: 91282 grayordinate * 2750 TRs (2200 sec)
 % 220 sec / acquisition * 10 acquisitions
 base_dir = '~/Data/fMRI';
 sub_name = 'HERO_LZ';
 acq_type = 'NeuralCoding01';
+data_dir = fullfile(base_dir, sub_name, acq_type);
 
-ts_pt1 = cifti_read('ICAFIX_pt1_clean.dtseries.nii');
-ts_pt2 = cifti_read('ICAFIX_pt2_clean.dtseries.nii');
+ts_pt1 = cifti_read(fullfile(data_dir, 'ICAFIX_pt1_clean.dtseries.nii'));
+ts_pt2 = cifti_read(fullfile(data_dir, 'ICAFIX_pt2_clean.dtseries.nii'));
 data = {[ts_pt1.cdata, ts_pt2.cdata]};
 
-%% Set up stim regressors
-% single scan structure 
-% 12.5 s * 2 blank (begin/end)
-% (1.5 s stim + 3.5 ISI) * 39 presentation
-% attention event
-tr = 0.5; nTR = 2200 / 0.5;
-stimTime = (1:nTR )* tr;
+%% Load eccen, varea, and r-square map
+% to determine the ROI of our analysis
+[eccen, varea, rsqr] = load_map(sub_name);
 
-% nAcq = 10; nStim = 39;
-% 
-% stimDur = 1.5;
-% stimDly = 3.5;
-% blankDur = 12.5;
-% 
-% stim = zeros(nStim * nAcq, nTR);
-% t = 0; stimIdx = 0;
-% 
-% for idx = 1:nAcq
-%     t = t + blankDur; 
-%     for idy = 1:nStim
-%         stimIdx = stimIdx + 1;
-%         
-%         % TR begin index
-%         trStart = t / 0.8;
-%         t = t + 1.5;
-%         
-%         % TR end index 
-%         trEnd = t / 0.8;
-%         
-%         % Set stimulus regressor values
-%         stim(stimIdx, ceil(trStart) : floor(trEnd)) = 1.0;
-%         stim(stimIdx, floor(trStart)) = trStart - floor(trStart);
-%         stim(stimIdx, ceil(trEnd)) = ceil(trEnd) - trEnd;
-%                 
-%         t = t + 3.5;
-%     end
-%     t = t + blankDur;
-% end
+% V1, V2 and V3
+roi_mask = (varea == 1 | varea == 2 | varea == 3);
+fprintf('V1, V2, V3 # of Voxel: %d \n', sum(roi_mask));
+nVoxel = sum(roi_mask);
+
+% Apply eccentricity map
+ecc_threshold = 12.0;
+roi_mask  = roi_mask & (eccen > 0) & (eccen <= ecc_threshold);
+fprintf('Eccen mask: %d / %d selected \n', sum(roi_mask), nVoxel);
+nVoxel = sum(roi_mask);
+
+% Apply rsquare map
+r_threshold = 0.1;
+roi_mask  = roi_mask & (rsqr >= r_threshold);
+fprintf('Eccen mask: %d / %d selected \n', sum(roi_mask), nVoxel);
+
+%% Set up stimulus regressors
+rt = 0.8; dt = 0.5;
+totalTime = 2750 * rt;
+
+% Define a stimulus time axis with a different temporal support
+stimTime = ((1:totalTime / dt) - 1) * dt;
+
+% Single acquisition structure:
+% 12.5 s * 2 blank (begin/end)
+% (1.5 s Stim + 3.5 ISI) * 39 presentation
+% attention event
+nAcq = 10; nStim = 39;
+
+stimDur = 1.5;
+stimDly = 3.5;
+blankDur = 12.5;
+
+stim = zeros(nStim * nAcq, length(stimTime));
+t = 0; stimIdx = 0;
+
+% Calculate the time onset of each stimulus
+for idx = 1:nAcq
+    t = t + blankDur; 
+    for idy = 1:nStim
+        stimIdx = stimIdx + 1;
+        
+        % Stim begin index
+        idxStart = t / dt + 1;
+        t = t + 1.5;        
+        % Stim end index 
+        idxEnd = t / dt;
+        
+        % Set stimulus regressor values
+        stim(stimIdx, idxStart:idxEnd) = 1.0;               
+        t = t + 3.5;
+    end
+    t = t + blankDur;
+end
