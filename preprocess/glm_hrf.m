@@ -81,7 +81,7 @@ end
 stimTime = {stimTime'};
 stimulus = {stim};
 
-%% Setup RT event regressor
+% TODO: Setup RT event regressor
 
 %% Run GLM model with HRF fitting
 % (mtSinai model class)
