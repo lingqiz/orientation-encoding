@@ -1,7 +1,8 @@
-% Simultaneous estimate of both the HRF function 
+% Simultaneous estimate of both the HRF function
 % and the Beta weights of stimulus presentation
 
 %% Load data from a single scan session
+% tbUseProject('forwardModel') for setup
 addpath('cifti-matlab');
 
 % Single scan session: 91282 grayordinate * 2750 TRs (2200 sec)
@@ -33,11 +34,14 @@ nVoxel = sum(roi_mask);
 % Apply rsquare map
 r_threshold = 0.1;
 roi_mask  = roi_mask & (rsqr >= r_threshold);
-fprintf('Eccen mask: %d / %d selected \n', sum(roi_mask), nVoxel);
+fprintf('Rsqur mask: %d / %d selected \n', sum(roi_mask), nVoxel);
+
+vox_idx = 1:length(roi_mask);
+vox_idx = vox_idx(roi_mask)';
 
 %% Set up stimulus regressors
-rt = 0.8; dt = 0.5;
-totalTime = 2750 * rt;
+tr = 0.8; dt = 0.5;
+totalTime = 2750 * tr;
 
 % Define a stimulus time axis with a different temporal support
 stimTime = ((1:totalTime / dt) - 1) * dt;
@@ -57,19 +61,31 @@ t = 0; stimIdx = 0;
 
 % Calculate the time onset of each stimulus
 for idx = 1:nAcq
-    t = t + blankDur; 
+    t = t + blankDur;
     for idy = 1:nStim
         stimIdx = stimIdx + 1;
         
         % Stim begin index
         idxStart = t / dt + 1;
-        t = t + 1.5;        
-        % Stim end index 
+        t = t + 1.5;
+        % Stim end index
         idxEnd = t / dt;
         
         % Set stimulus regressor values
-        stim(stimIdx, idxStart:idxEnd) = 1.0;               
+        stim(stimIdx, idxStart:idxEnd) = 1.0;
         t = t + 3.5;
     end
     t = t + blankDur;
 end
+
+stimTime = {stimTime'};
+stimulus = {stim};
+
+%% Setup RT event regressor
+
+%% Run GLM model with HRF fitting
+% (mtSinai model class)
+results = forwardModel(data, stimulus, tr, ...
+    'modelClass', 'mtSinai', ...
+    'stimTime', stimTime, ...
+    'vxs', vox_idx);
