@@ -30,7 +30,7 @@ for idx = ses_idx
     latent = latent / sum(latent);
     cum_lt = cumsum(latent);
     
-    cutoff = ceil(interp1(cum_lt, 1:length(cum_lt), 1-1e-6));
+    cutoff = ceil(interp1(cum_lt, 1:length(cum_lt), 1-1e-5));
     score = score(:, 1:cutoff);
     
     % setup nuisance regressors (motion)
