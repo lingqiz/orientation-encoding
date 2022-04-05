@@ -125,8 +125,28 @@ end
 
 stim = [stim; eventRegressor];
 
-%% Run GLM model with HRF fitting
-% (mtSinai model class)
+%% Run GLM model with HRF fitting (mtSinai model class)
+% polynom low freq noise removal 
+modelOpts = {'polyDeg', 5};
 results = forwardModel({data}, {stim}, tr, ...
                   'modelClass', 'mtSinai', ...
-                  'stimTime', {stimTime'});
+                  'stimTime', {stimTime'}, ...
+                  'modelOpts', modelOpts);
+
+fl = sprintf('GLM_%s_%s.mat', sub_name, acq_type);
+fl_path = fullfile(base_dir, sub_name, fl);
+save(fl_path, 'results', 'roi_mask', 'sub_name', 'acq_type');
+
+%% Post model fitting checks
+figure();
+histogram(results.R2); box off;
+xlabel('R2'); ylabel('Count');
+
+% Show the results figures
+figFields = fieldnames(results.figures);
+if ~isempty(figFields)
+    for ii = 1:length(figFields)
+        figHandle = struct2handle(results.figures.(figFields{ii}).hgS_070000,0,'convert');
+        set(figHandle,'visible','on')
+    end
+end

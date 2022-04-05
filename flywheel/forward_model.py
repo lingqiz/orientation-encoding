@@ -15,8 +15,12 @@ prf_stim = project.get_file('pRFStimulus_108x108x420.mat')
 
 # Only run on specified subjects
 # given by command line argument
-sub_list = sys.argv
-sub_list.pop(0)
+# Second argument is mag_factor
+para_list = sys.argv
+para_list.pop(0)
+
+sub_list = [para_list[0]]
+mag_factor = float(para_list[1])
 
 # Iterate and record all sessions, sort by subject
 all_data = get_all_data(project)
@@ -71,7 +75,6 @@ for sub_label in all_data.keys():
 
     # Gear config
     # Need to change the screen magnification factor and/or HRF parameters
-    mag_factor = 0.9125
     modelOpts = '(pixelsPerDegree),5.1751,(polyDeg),5,(typicalGain),%s,' \
                 '(screenMagnification),%.5f' % (gain, mag_factor)
 
