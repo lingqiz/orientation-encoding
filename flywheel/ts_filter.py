@@ -51,7 +51,7 @@ for idx in range(n_session):
     file_path = os.path.join(ses_dir, file_name)
     if not os.path.exists(file_path):
         source_path = os.path.join(base, file_name)
-        os.system("mv %s %s" % (source_path, ses_dir))
+        os.system("cp %s %s" % (source_path, ses_dir))
 
 # Create icafix folder to match the format of icafix output
 folder_name = 'ICAFIX_multi' + name_list
