@@ -44,7 +44,7 @@ fprintf('V1, V2, V3 # of Voxel: %d \n', sum(roi_mask));
 nVoxel = sum(roi_mask);
 
 % Apply eccentricity map
-ecc_threshold = 12.0;
+ecc_threshold = 15.0;
 roi_mask  = roi_mask & (eccen > 0) & (eccen <= ecc_threshold);
 fprintf('Eccen mask: %d / %d selected \n', sum(roi_mask), nVoxel);
 nVoxel = sum(roi_mask);
@@ -59,7 +59,10 @@ data = data(roi_mask, :);
 
 %% Set up stimulus regressors
 tr = 0.8; dt = 0.5;
-totalTime = 2750 * tr;
+totalTime = size(data, 2) * tr;
+
+acqLen = 220.0;
+nAcq = totalTime / acqLen;
 
 % Define a stimulus time axis with a different temporal support
 stimTime = ((1:totalTime / dt) - 1) * dt;
@@ -68,7 +71,7 @@ stimTime = ((1:totalTime / dt) - 1) * dt;
 % 12.5 s * 2 blank (begin/end)
 % (1.5 s Stim + 3.5 ISI) * 39 presentation
 % attention event
-nAcq = 10; nStim = 39;
+nStim = 39;
 
 stimDur = 1.5;
 stimDly = 3.5;
@@ -96,13 +99,34 @@ for idx = 1:nAcq
     t = t + blankDur;
 end
 
-% RT event regressor
+%% Set up attent event regressor
+attEvent = load(fullfile(base_dir, sub_name, 'attenRT', 'atten_time.mat'));
+attEvent = attEvent.time;
 
-stimTime = {stimTime'};
-stimulus = {stim};
+% Plot attention RT
+figure();
+allRT = cat(1, attEvent{:});
+histogram(allRT(:, 2)); box off;
+xlabel('Time'); ylabel('Count');
+
+baseIdx = 0;
+eventRegressor = zeros(1, length(stimTime));
+
+for idx = 1:nAcq
+    baseTime = (idx - 1) * acqLen;
+    event = attEvent{baseIdx + idx};
+    eventTime = baseTime + event(:, 1);
+    
+    for et = eventTime
+        idxStart = ceil(et / dt) + 1;
+        eventRegressor(idxStart) = 1.0;
+    end
+end
+
+stim = [stim; eventRegressor];
 
 %% Run GLM model with HRF fitting
 % (mtSinai model class)
-results = forwardModel({data}, stimulus, tr, ...
-    'modelClass', 'mtSinai', ...
-    'stimTime', stimTime);
+results = forwardModel({data}, {stim}, tr, ...
+                  'modelClass', 'mtSinai', ...
+                  'stimTime', {stimTime'});
