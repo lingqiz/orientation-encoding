@@ -43,8 +43,10 @@ for idx = ses_idx
         
     % second, detrend regression
     rgs = [(1:size(ts, 1))', ones(size(ts, 1), 1)];
+    
     theta = (rgs' * rgs) \ (rgs' * ts);
     ts_hat = rgs * theta;
+    
     residule = ts - ts_hat;
     
     % save output as icafix output name
