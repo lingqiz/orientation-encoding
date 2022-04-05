@@ -61,7 +61,7 @@ for sub_label in all_data.keys():
 
     # Submit the forward model gear
     # Set up input parameters for submit forward model gear
-    icafix = False
+    icafix = True
     # Use ICAFIX output as input
     if icafix:
         gain = '300'
