@@ -13,7 +13,7 @@ ses_idx = 1 : n_session;
 
 for idx = ses_idx
     % load the data file for each session
-    ses_name = sprintf('func-0%d', idx);
+    ses_name = sprintf('func-%02d', idx);
     [cifti_data, motion_rg] = load_data(base_dir, sub_name, ses_name);
     
     % cifti time series
