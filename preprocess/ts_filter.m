@@ -33,14 +33,18 @@ for idx = ses_idx
     cutoff = ceil(interp1(cum_lt, 1:length(cum_lt), 1-1e-6));
     score = score(:, 1:cutoff);
     
-    % setup nuisance regressors
+    % setup nuisance regressors (motion)
     rgs = [score, ones(size(ts, 1), 1)];
-    
     % nuisance regression (normal equation)
     theta = (rgs' * rgs) \ (rgs' * ts);
     ts_hat = rgs * theta;
-    
     % save the residule as new time series
+    ts = ts - ts_hat;
+        
+    % second, detrend regression
+    rgs = [(1:size(ts, 1))', ones(size(ts, 1), 1)];
+    theta = (rgs' * rgs) \ (rgs' * ts);
+    ts_hat = rgs * theta;
     residule = ts - ts_hat;
     
     % save output as icafix output name
