@@ -11,11 +11,14 @@ data_dir = fullfile(base_dir, sub_name, acq_type);
 
 % Load motion regressed data
 base = 'func-%02d_Atlas_hp2000_clean.dtseries.nii';
-all_ts = cell(1, 10);
+all_ts = cell(1, length(acq_idx));
+counter = 1;
 for idx = acq_idx
     fl = sprintf(base, idx);
     ts = cifti_read(fullfile(data_dir, fl));
-    all_ts{idx} = ts.cdata;
+    
+    all_ts{counter} = ts.cdata;
+    counter = counter + 1;
 end
 
 data = cat(2, all_ts{:});
@@ -49,6 +52,7 @@ totalTime = size(data, 2) * tr;
 
 acqLen = 220.0;
 nAcq = totalTime / acqLen;
+fprintf('Construct stim regressor for %d acquisitions', nAcq);
 
 % Define a stimulus time axis with a different temporal support
 stimTime = ((1:totalTime / dt) - 1) * dt;
@@ -74,13 +78,13 @@ for idx = 1:nAcq
         
         % Stim begin index
         idxStart = t / dt + 1;
-        t = t + 1.5;
+        t = t + stimDur;
         % Stim end index
         idxEnd = t / dt;
         
         % Set stimulus regressor values
         stim(stimIdx, idxStart:idxEnd) = 1.0;
-        t = t + 3.5;
+        t = t + stimDly;
     end
     t = t + blankDur;
 end
