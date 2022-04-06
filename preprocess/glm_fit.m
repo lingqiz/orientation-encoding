@@ -1,4 +1,4 @@
-function glm_fit(sub_name, acq_type, acq_idx, base_idx)
+function glm_fit(sub_name, acq_type, acq_idx, base_idx, icafix)
 
 %% Load data from a single scan session
 % tbUseProject('forwardModel') for setup
@@ -9,16 +9,40 @@ addpath('cifti-matlab');
 base_dir = '~/Data/fMRI';
 data_dir = fullfile(base_dir, sub_name, acq_type);
 
-% Load motion regressed data
 base = 'func-%02d_Atlas_hp2000_clean.dtseries.nii';
 all_ts = cell(1, length(acq_idx));
+
 counter = 1;
-for idx = acq_idx
-    fl = sprintf(base, idx);
-    ts = cifti_read(fullfile(data_dir, fl));
-    
-    all_ts{counter} = ts.cdata;
-    counter = counter + 1;
+if icafix
+    % Load ICAFIX data
+    for idx = acq_idx
+        fl = sprintf(base, idx);
+        full_path = fullfile(data_dir, 'ICAFIX', fl);
+        ts = cifti_read(full_path);
+        ts = ts.cdata;
+        
+        % Convert to percent change
+        meanVec = mean(ts, 2);
+        ts = 100 * ((ts - meanVec) ./ meanVec);
+        
+        % Z-score normalization
+        meanVec = mean(ts, 2);
+        stdVec = std(ts, 0, 2);
+        ts = (ts - meanVec) ./ stdVec;
+        
+        % Add to ts list
+        all_ts{counter} = ts;
+        counter = counter + 1;
+    end    
+else
+    % Load motion regressed data
+    for idx = acq_idx
+        fl = sprintf(base, idx);
+        ts = cifti_read(fullfile(data_dir, fl));
+        
+        all_ts{counter} = ts.cdata;
+        counter = counter + 1;
+    end    
 end
 
 data = cat(2, all_ts{:});
@@ -116,14 +140,21 @@ end
 stim = [stim; eventRegressor];
 
 %% Run GLM model with HRF fitting (mtSinai model class)
-% polynom low freq noise removal 
+% polynom low frequency noise removal
 modelOpts = {'polyDeg', 4};
 results = forwardModel({data}, {stim}, tr, ...
-                  'modelClass', 'mtSinai', ...
-                  'stimTime', {stimTime'}, ...
-                  'modelOpts', modelOpts);
+    'modelClass', 'mtSinai', ...
+    'stimTime', {stimTime'}, ...
+    'modelOpts', modelOpts);
 
-fl = sprintf('GLM_%s_%s.mat', sub_name, acq_type);
+% file name setup
+if icafix
+    fl = sprintf('GLM_%s_%s_ICAFIX.mat', sub_name, acq_type);
+else
+    fl = sprintf('GLM_%s_%s.mat', sub_name, acq_type);
+end
+
+% save results
 fl_path = fullfile(base_dir, sub_name, fl);
 save(fl_path, 'results', 'roi_mask', 'sub_name', 'acq_type');
 
