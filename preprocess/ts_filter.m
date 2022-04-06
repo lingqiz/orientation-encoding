@@ -23,6 +23,14 @@ for idx = ses_idx
     meanVec = mean(ts, 2);
     ts = 100 * ((ts - meanVec) ./ meanVec);
 
+    % de-trend regression
+    rgs = [(1:size(ts, 1))', ones(size(ts, 1), 1)];
+
+    % solve with normal equation
+    % save the residule as new time series
+    theta = (rgs' * rgs) \ (rgs' * ts);
+    ts = ts - rgs * theta;
+
     % setup nuisance variables
     % decorrelation using PCA
     [~, score, latent] = pca(motion_rg);
@@ -35,16 +43,12 @@ for idx = ses_idx
 
     % setup motion nuisance regressors
     rgs = [score, ones(size(ts, 1), 1)];
+    
     % solve with normal equation
     % save the residule as new time series
     theta = (rgs' * rgs) \ (rgs' * ts);
     ts = ts - rgs * theta;
-
-    % second, de-trend regression
-    rgs = [(1:size(ts, 1))', ones(size(ts, 1), 1)];
-    theta = (rgs' * rgs) \ (rgs' * ts);
-    ts = ts - rgs * theta;
-
+    
     % save output as icafix output name
     cifti_data.cdata = ts';
     data_file = fullfile(base_dir, strcat(ses_name, '_Atlas_hp2000_clean.dtseries.nii'));
