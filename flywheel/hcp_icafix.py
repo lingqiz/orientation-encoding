@@ -22,10 +22,14 @@ for sub_label in all_data.keys():
     # Only run on specified subjects
     if sub_label not in sub_list:
         continue
-
     print('\nRunning icafix gear for subject: %s' % sub_label)
+
     # Run gear for pRF session
     # Get analysis for the pRF session
+    if not 'pRF' in all_data[sub_label].keys():
+        print('No pRF session found for subject: %s' % sub_label)
+        continue
+
     prf_ses = all_data[sub_label]['pRF']
     analyses = prf_ses.analyses
 
@@ -56,6 +60,10 @@ for sub_label in all_data.keys():
     n_session = 3
     for idx in range(n_session):
         ses_label = 'NeuralCoding0%s' % (idx + 1)
+        if ses_label not in all_data[sub_label].keys():
+            print('No %s session found for subject: %s' % (ses_label, sub_label))
+            continue
+
         stim_ses = all_data[sub_label][ses_label]
         func_data = []
 
