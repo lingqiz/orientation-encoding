@@ -11,3 +11,9 @@ The code automatically tracks the acquisition number.
 ### Dependencies
 - [PsychoPy](https://www.psychopy.org/)
 - [cifti-matlab](https://github.com/Washington-University/cifti-matlab)
+
+### Pre-processing Note
+- pRF session (flywheel): Hcp-Struct, Hcp-Func, ICAFIX, Forward Model, Bayes pRF
+- Stimulus session:
+ts_filter.m (percent change, motion regression, detrend, z-score)
+icafix + z-score normalization
