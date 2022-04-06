@@ -15,42 +15,38 @@ for idx = ses_idx
     % load the data file for each session
     ses_name = sprintf('func-%02d', idx);
     [cifti_data, motion_rg] = load_data(base_dir, sub_name, ses_name);
-    
+
     % cifti time series
     ts = cifti_data.cdata';
-    
+
     % convert to percent change
     meanVec = mean(ts, 2);
     ts = 100 * ((ts - meanVec) ./ meanVec);
-    
+
     % setup nuisance variables
     % decorrelation using PCA
     [~, score, latent] = pca(motion_rg);
-    
+
     latent = latent / sum(latent);
     cum_lt = cumsum(latent);
-    
+
     cutoff = ceil(interp1(cum_lt, 1:length(cum_lt), 1-1e-5));
     score = score(:, 1:cutoff);
-    
-    % setup nuisance regressors (motion)
+
+    % setup motion nuisance regressors
     rgs = [score, ones(size(ts, 1), 1)];
-    % nuisance regression (normal equation)
-    theta = (rgs' * rgs) \ (rgs' * ts);
-    ts_hat = rgs * theta;
+    % solve with normal equation
     % save the residule as new time series
-    ts = ts - ts_hat;
-        
-    % second, detrend regression
-    rgs = [(1:size(ts, 1))', ones(size(ts, 1), 1)];
-    
     theta = (rgs' * rgs) \ (rgs' * ts);
-    ts_hat = rgs * theta;
-    
-    residule = ts - ts_hat;
-    
+    ts = ts - rgs * theta;
+
+    % second, de-trend regression
+    rgs = [(1:size(ts, 1))', ones(size(ts, 1), 1)];
+    theta = (rgs' * rgs) \ (rgs' * ts);
+    ts = ts - rgs * theta;
+
     % save output as icafix output name
-    cifti_data.cdata = residule';
+    cifti_data.cdata = ts';
     data_file = fullfile(base_dir, strcat(ses_name, '_Atlas_hp2000_clean.dtseries.nii'));
     cifti_write(cifti_data, data_file);
 end
