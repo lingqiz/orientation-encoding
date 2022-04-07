@@ -21,6 +21,7 @@ para_list.pop(0)
 
 sub_list = [para_list[0]]
 mag_factor = float(para_list[1])
+icafix = int(para_list[2])
 
 # Iterate and record all sessions, sort by subject
 all_data = get_all_data(project)
@@ -61,14 +62,13 @@ for sub_label in all_data.keys():
 
     # Submit the forward model gear
     # Set up input parameters for submit forward model gear
-    icafix = True
-    # Use ICAFIX output as input
-    if icafix:
+    if icafix == 1:
+        print('Use ICAFIX output as input')
         gain = '300'
         inputs = {'funcZip01':func_data[0], 'funcZip02':func_data[1],
                 'maskFile':va_mask, 'stimFile':prf_stim, 'structZip':struct_data}
-    # Use simple filtered output as input
     else:
+        print('Use simple filtered time series as input')
         gain = '1'
         inputs = {'funcZip01':ts_filter, 'maskFile':va_mask,
                 'stimFile':prf_stim, 'structZip':struct_data}
