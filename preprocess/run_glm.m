@@ -58,16 +58,16 @@ attEvent = attEvent.time;
 resultsNull = glm_fit(dataNull, attEvent, 0);
 
 %% Run GLM on non-visual area
-maskPath = '~/Desktop/Orientation_Encode/docs/all_visual_areas_mask.nii';
-vareaMask = cifti_read(maskPath);
-vareaMask = vareaMask.cdata;
+[~, varea, ~] = load_map(sub_name);
+nonVisual = 1:length(varea);
+nonVisual = nonVisual(varea == 0);
 
-nonVisual = 1:length(vareaMask);
-nonVisual = nonVisual(~vareaMask);
-
-fprintf('Random select out of %d non-visual voxel \n', length(nonVisual));
 index = randsample(length(nonVisual), sum(roi_mask));
 index = nonVisual(sort(index));
+
+fprintf('Random select %d out of %d non-visual voxel \n', ...
+        length(index), length(nonVisual));
+    
 dataNonVis = data(index, :);
 
 % Run GLM model fit on non-visual voxel
