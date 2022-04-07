@@ -18,6 +18,6 @@ See here for information regarding the [HCP pre-processing pipeline](https://git
 - Stimulus session:  
 Pre-process  
 (option 1) `ts_filter.m` (%change, motion regression, linear detrend, z-score)  
-(option 2) icafix, %change, z-score  
+(option 2) ICAFIX, %change, z-score  
 
   Next, run `glm_fit.m` (nonlinear fitting of GLM + HRF based on [ForwardModel](https://github.com/gkaguirrelab/forwardModel))
