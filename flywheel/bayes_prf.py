@@ -47,6 +47,6 @@ for sub_label in all_data.keys():
               'scale':100, 'field-sign-weight':1.0, 'radius-weight':0.25}
 
     if get_response('Bayes pRF'):
-        print('\nSubmitting forward model for %s' % sub_label)
+        print('\nSubmitting Bayes pRF for %s' % sub_label)
         gear.run(analysis_label=analysis_label, config=config,
                  inputs=inputs, destination=prf_ses)
