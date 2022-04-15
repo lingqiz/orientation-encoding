@@ -6,7 +6,7 @@ totalTime = size(data, 2) * tr;
 
 acqLen = 220.0;
 nAcq = totalTime / acqLen;
-fprintf('Construct stim regressor for %d acquisitions', nAcq);
+fprintf('Construct stim regressor for %d acquisitions \n', nAcq);
 
 % Define a stimulus time axis with a different temporal support
 stimTime = ((1:totalTime / dt) - 1) * dt;
