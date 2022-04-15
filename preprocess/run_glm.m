@@ -8,7 +8,7 @@ base_idx = [0, 10, 19];
 icafix = false;
 
 nSes = 3;
-for idx = 2:nSes
+for idx = 1 : nSes
     acq_type = sprintf(acq_base, idx);
     fprintf('Run GLM for %s \n', acq_type);
     
