@@ -83,6 +83,10 @@ results = forwardModel({data}, {stim}, tr, ...
     'stimTime', {stimTime'}, ...
     'modelOpts', modelOpts);
 
+% return stim regressor
+results.stimTime = stimTime;
+results.stim = stim;
+
 %% Post model fitting checks
 if showPlot
     figure();
