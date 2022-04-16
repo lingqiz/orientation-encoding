@@ -49,30 +49,31 @@ for idx = 1:nAcq
 end
 
 %% Set up attent event regressor
-
-% Plot attention RT
-if showPlot
-    figure();
-    allRT = cat(1, attEvent{:});
-    histogram(allRT(:, 2)); box off;
-    xlabel('Time'); ylabel('Count');
-end
-
-baseIdx = base_idx;
-eventRegressor = zeros(1, length(stimTime));
-
-for idx = 1:nAcq
-    baseTime = (idx - 1) * acqLen;
-    event = attEvent{baseIdx + idx};
-    eventTime = baseTime + event(:, 1);
-    
-    for et = eventTime
-        idxStart = ceil(et / dt) + 1;
-        eventRegressor(idxStart) = 1.0;
+if ~isempty(attEvent)
+    % Plot attention RT
+    if showPlot
+        figure();
+        allRT = cat(1, attEvent{:});
+        histogram(allRT(:, 2)); box off;
+        xlabel('Time'); ylabel('Count');
     end
+    
+    baseIdx = base_idx;
+    eventRegressor = zeros(1, length(stimTime));
+    
+    for idx = 1:nAcq
+        baseTime = (idx - 1) * acqLen;
+        event = attEvent{baseIdx + idx};
+        eventTime = baseTime + event(:, 1);
+        
+        for et = eventTime
+            idxStart = ceil(et / dt) + 1;
+            eventRegressor(idxStart) = 1.0;
+        end
+    end
+    
+    stim = [stim; eventRegressor];
 end
-
-stim = [stim; eventRegressor];
 
 %% Run GLM model with HRF fitting (mtSinai model class)
 % polynom low frequency noise removal
