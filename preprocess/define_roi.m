@@ -3,7 +3,7 @@ function roi_mask = define_roi(sub_name, varargin)
 p = inputParser;
 p.addParameter('areaIndex', [1, 2, 3]);
 p.addParameter('eccThreshold', 12.0, @(x)(isnumeric(x) && numel(x) == 1));
-p.addParameter('rsqrThreshold', 0.15, @(x)(isnumeric(x) && numel(x) == 1));
+p.addParameter('rsqrThreshold', 0.10, @(x)(isnumeric(x) && numel(x) == 1));
 
 parse(p, varargin{:});
 areaIndex = p.Results.areaIndex;
