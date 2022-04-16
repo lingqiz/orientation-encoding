@@ -1,4 +1,9 @@
-function results = glm_fit(data, attEvent, base_idx)
+function results = glm_fit(data, attEvent, base_idx, showPlot)
+
+%% Default showPlot = True
+if ~exist('showPlot', 'var')
+    showPlot = true;
+end
 
 %% Set up stimulus regressors
 tr = 0.8; dt = 0.5;
@@ -46,10 +51,12 @@ end
 %% Set up attent event regressor
 
 % Plot attention RT
-figure();
-allRT = cat(1, attEvent{:});
-histogram(allRT(:, 2)); box off;
-xlabel('Time'); ylabel('Count');
+if showPlot
+    figure();
+    allRT = cat(1, attEvent{:});
+    histogram(allRT(:, 2)); box off;
+    xlabel('Time'); ylabel('Count');
+end
 
 baseIdx = base_idx;
 eventRegressor = zeros(1, length(stimTime));
@@ -76,16 +83,18 @@ results = forwardModel({data}, {stim}, tr, ...
     'modelOpts', modelOpts);
 
 %% Post model fitting checks
-figure();
-histogram(results.R2); box off;
-xlabel('R2'); ylabel('Count');
-
-% Show the results figures
-figFields = fieldnames(results.figures);
-if ~isempty(figFields)
-    for ii = 1:length(figFields)
-        figHandle = struct2handle(results.figures.(figFields{ii}).hgS_070000,0,'convert');
-        set(figHandle,'visible','on')
+if showPlot
+    figure();
+    histogram(results.R2); box off;
+    xlabel('R2'); ylabel('Count');
+    
+    % Show the results figures
+    figFields = fieldnames(results.figures);
+    if ~isempty(figFields)
+        for ii = 1:length(figFields)
+            figHandle = struct2handle(results.figures.(figFields{ii}).hgS_070000,0,'convert');
+            set(figHandle,'visible','on')
+        end
     end
 end
 
