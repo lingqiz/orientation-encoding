@@ -30,7 +30,8 @@ for idx = 1 : nSes
     attEvent = attEvent.time;
     
     % Run GLM model fit
-    results = glm_fit(data, attEvent, base_idx);
+    results = glm_fit(data, attEvent, base_idx, ...
+        'showPlot', true, 'modelClass', 'glm');
     
     % save results
     fl_path = fullfile(base_dir, sub_name, fl);
