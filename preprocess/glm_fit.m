@@ -1,9 +1,16 @@
-function results = glm_fit(data, attEvent, base_idx, showPlot)
+function results = glm_fit(data, attEvent, base_idx, varargin)
 
-%% Default showPlot = True
-if ~exist('showPlot', 'var')
-    showPlot = true;
-end
+%% Optional input parameters
+% modelClass: 
+% - glm: simple GLM with default HRF parameters
+% - mtSinai: nonlinear fitting HRF parameters
+p = inputParser;
+p.addParameter('showPlot', true);
+p.addParameter('modelClass', 'glm');
+
+parse(p, varargin{:});
+showPlot = p.Results.showPlot;
+modelClass = p.Results.modelClass;
 
 %% Set up stimulus regressors
 tr = 0.8; dt = 0.5;
@@ -79,7 +86,7 @@ end
 % polynom low frequency noise removal
 modelOpts = {'polyDeg', 4};
 results = forwardModel({data}, {stim}, tr, ...
-    'modelClass', 'mtSinai', ...
+    'modelClass', modelClass, ...
     'stimTime', {stimTime'}, ...
     'modelOpts', modelOpts);
 
