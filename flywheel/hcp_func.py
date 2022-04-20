@@ -35,6 +35,8 @@ coef_grad = proj.get_file('coeff.grad')
 for subject in subjects:
     # Find the hcp_struct information
     subject_id = subject.label
+    print(subject_id)
+
     for st in struct:
         if subject.id == st.parents.subject:
             struct_gear = st
@@ -44,6 +46,9 @@ for subject in subjects:
     sessions = subject.sessions()
     for session in sessions:
         if session.id not in sessions_that_have_func:
+            # print session.label
+            print(session.label)
+
             # Loop through acquisitions and get the spin echo images
             acquisitions = session.acquisitions()
 
