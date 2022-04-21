@@ -6,14 +6,15 @@ base_dir = '~/Data/fMRI';
 acq_idx = {1:10, 1:9, 0:10};
 base_idx = [0, 10, 19];
 icafix = false;
+modelClass = 'glm';
 
 nSes = 3;
 for idx = 1 : nSes
     acq_type = sprintf(acq_base, idx);
-    fprintf('Run GLM for %s \n', acq_type);
+    fprintf('Run %s fitting for %s \n', modelClass, acq_type);
     
     % save file name setup (add icafix suffix if applied)
-    fl = sprintf('GLM_%s_%s', sub_name, acq_type);
+    fl = sprintf('%s_%s_%s', modelClass, sub_name, acq_type);
     if icafix
         fl = strcat(fl, '_ICAFIX');
     end
@@ -31,7 +32,7 @@ for idx = 1 : nSes
     
     % Run GLM model fit
     results = glm_fit(data, attEvent, base_idx, ...
-        'showPlot', true, 'modelClass', 'glm');
+        'showPlot', true, 'modelClass', modelClass);
     
     % save results
     fl_path = fullfile(base_dir, sub_name, fl);
