@@ -29,18 +29,22 @@ def load_glm(sub_name, model_type='mtSinai'):
     for idx in range(3):
         # read GLM fits
         fl_name = '%s_%s_%s.mat' % (model_type, sub_name, session % (idx + 1))
-        model_fit = sio.loadmat(os.path.join(data_path, fl_name))
-        model_fit = model_fit['results'][0][0]['params']
+        model_fit = sio.loadmat(os.path.join(data_path, fl_name))['results'][0][0]
+
+        if idx == 0:
+            v_label = model_fit['v_label']
+            e_label = model_fit['e_label']
+        glm_beta = model_fit['params']
 
         # GLM weights on stimulus
-        response.append(model_fit[:, :N_DROP[model_type]])
+        response.append(glm_beta[:, :N_DROP[model_type]])
 
     # group response by acquisition
     # n trial per acquisition = 39
     response = np.hstack(response)
     response = response.reshape([response.shape[0], N_ACQ, N_TRIAL])
 
-    return response
+    return response, v_label.flatten(), e_label.flatten()
 
 # load experiment setup information
 def load_exp(sub_name):
