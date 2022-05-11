@@ -34,7 +34,7 @@ for idx = 1 : nSes
     results = glm_fit(data, attEvent, base_idx, ...
         'showPlot', true, 'modelClass', modelClass);
     
-    % add the varea label and label to results struct
+    % add the varea label and eccentricity label to results struct
     results.v_label = v_label;
     results.e_label = e_label;
     
