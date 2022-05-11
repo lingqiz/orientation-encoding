@@ -50,3 +50,22 @@ def load_exp(sub_name):
         cond_seq = np.array(json.load(json_file)['Cond_Seq'])
 
     return STIM_SEQ, STIM_VAL, cond_seq
+
+def sort_response(stim_key, stim_seq, cond_seq, response):
+    all_resp = []
+    for cond_idx in range(3):
+        # response for cond_idx, drop the first response
+        cond_resp = response[:, cond_seq == cond_idx, 1:]
+        cond_resp = cond_resp.reshape([cond_resp.shape[0], -1])
+
+        # sort data by stimulus condition
+        n_repeat = cond_resp.shape[1] / len(stim_key)
+
+        resp = np.zeros([len(stim_key), cond_resp.shape[0], int(n_repeat)])
+        for idx in range(len(stim_key)):
+            resp[idx] = cond_resp[:, stim_seq == stim_key[idx]]
+
+        # add to all response
+        all_resp.append(resp)
+
+    return all_resp
