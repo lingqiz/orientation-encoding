@@ -6,7 +6,7 @@ base_dir = '~/Data/fMRI';
 acq_idx = {1:10, 1:9, 0:10};
 base_idx = [0, 10, 19];
 icafix = false;
-modelClass = 'glm';
+modelClass = 'mtSinai';
 
 nSes = 3;
 for idx = 1 : nSes
@@ -22,7 +22,7 @@ for idx = 1 : nSes
     
     % load data defined by ROI
     data = load_session(sub_name, acq_type, acq_idx{idx}, icafix);
-    roi_mask = define_roi(sub_name);
+    [roi_mask, v_label, e_label] = define_roi(sub_name);
     
     data = data(roi_mask, :);
     
@@ -33,6 +33,10 @@ for idx = 1 : nSes
     % Run GLM model fit
     results = glm_fit(data, attEvent, base_idx, ...
         'showPlot', true, 'modelClass', modelClass);
+    
+    % add the varea label and label to results struct
+    results.v_label = v_label;
+    results.e_label = e_label;
     
     % save results
     fl_path = fullfile(base_dir, sub_name, fl);

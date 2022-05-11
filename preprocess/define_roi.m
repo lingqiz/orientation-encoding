@@ -1,4 +1,4 @@
-function roi_mask = define_roi(sub_name, varargin)
+function [roi_mask, v_label, e_label] = define_roi(sub_name, varargin)
 
 p = inputParser;
 p.addParameter('areaIndex', [1, 2, 3]);
@@ -29,5 +29,9 @@ nVoxel = sum(roi_mask);
 % apply rsquare map
 roi_mask  = roi_mask & (rsqr >= rsqrThreshold);
 fprintf('Rsqur mask: %d / %d selected \n', sum(roi_mask), nVoxel);
+
+% visual area and ecc label
+v_label = varea(roi_mask);
+e_label = eccen(roi_mask);
 
 end
