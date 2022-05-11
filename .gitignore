@@ -2,7 +2,9 @@
 /analysis/circstat
 /preprocess/cifti-matlab
 /docs
+/Neural/*
 __pycache__
 .vscode
 _Data
 flywheel.key
+*.ipynb
