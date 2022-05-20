@@ -15,7 +15,7 @@ class VoxelEncode():
 
         return resp
 
-    def __init__(self, n_func=8.0, delta=1.0):
+    def __init__(self, n_func=8, delta=1.0):
         '''
         n_func: number of basis functions
         delta: default sample delta (in degree)
@@ -39,6 +39,9 @@ class VoxelEncode():
         '''
         Estimate model weights given stimulus and response
         Stage 1: estimate beta weights using least-square
+
+        stim: stimulus value (n_trial)
+        voxel: voxel responses of shape (n_voxel, n_trial)
         '''
         stim = torch.tensor(stim, dtype=torch.float32)
         voxel = torch.tensor(voxel, dtype=torch.float32)
@@ -48,5 +51,17 @@ class VoxelEncode():
 
         return self.beta
 
+def ols_test(n_func=8, n_voxel=20, n_trial=50):
+    '''
+    Test OLS estimation part of VoxelEncode
+    '''
+    simulate = VoxelEncode()
+    simulate.beta = torch.rand(n_func, n_voxel)
 
+    stim_val = np.random.rand(n_trial) * 180.0
+    resp = simulate.forward(stim_val)
 
+    estimate = VoxelEncode()
+    estimate.ols(stim_val, resp.t().numpy())
+
+    return simulate.beta.flatten(), estimate.beta.flatten()
