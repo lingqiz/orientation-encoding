@@ -63,6 +63,7 @@ def load_response(sub_name, model_type='mtSinai'):
         cond_resp = response[:, cond_seq == idx, 1:]
         cond_resp = einops.rearrange(cond_resp, 'vox acq stim -> vox (acq stim)')
 
+        # rearrange into shape (n_voxel by n_trial), drop the baseline response
         all_resp.append(cond_resp[:, stim_seq != -1])
 
     return stim, all_resp, v_label, e_label
