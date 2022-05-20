@@ -1,4 +1,4 @@
-import os, json, numpy as np
+import os, json, einops, numpy as np
 import scipy.io as sio
 
 # Define useful constants
@@ -46,6 +46,27 @@ def load_glm(sub_name, model_type='mtSinai'):
 
     return response, v_label.flatten(), e_label.flatten()
 
+# load the sequence of responses for each condition
+def load_response(sub_name, model_type='mtSinai'):
+    # load data
+    response, v_label, e_label = load_glm(sub_name, model_type)
+    stim_seq, stim_val, cond_seq = load_exp(sub_name)
+
+    # produce stimulus sequence
+    stim_val = np.append(stim_val, -1)
+    stim_seq = stim_val[stim_seq.flatten() - 1]
+    stim = stim_seq[stim_seq != -1]
+
+    all_resp = []
+    for idx in range(3):
+        # get the response for each condition, drop the first response
+        cond_resp = response[:, cond_seq == idx, 1:]
+        cond_resp = einops.rearrange(cond_resp, 'vox acq stim -> vox (acq stim)')
+
+        all_resp.append(cond_resp[:, stim_seq != -1])
+
+    return stim, all_resp, v_label, e_label
+
 # load experiment setup information
 def load_exp(sub_name):
     # load json file
@@ -55,6 +76,7 @@ def load_exp(sub_name):
 
     return STIM_SEQ, STIM_VAL, cond_seq
 
+# sort the data by stim condition and values
 def sort_response(stim_key, stim_seq, cond_seq, response):
     all_resp = []
     for cond_idx in range(3):
