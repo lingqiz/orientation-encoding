@@ -1,7 +1,10 @@
 import torch, math, einops, numpy as np
 from torch.autograd.functional import jacobian
 
-class VoxelEncode():
+class VoxelEncodeBase():
+    '''
+    Base class for Voxel Encoding Models
+    '''
 
     @staticmethod
     def tuning(stim, pref):
@@ -51,6 +54,15 @@ class VoxelEncode():
 
         return self.beta
 
+class VoxelEncode(VoxelEncodeBase):
+
+    def __init__(self, n_func=8, delta=1.0):
+        '''
+        n_func: number of basis functions
+        delta: default sample delta (in degree)
+        '''
+        super().__init__(n_func, delta)
+
 def ols_test(n_func=8, n_voxel=20, n_trial=50):
     '''
     Test OLS estimation part of VoxelEncode
@@ -64,4 +76,4 @@ def ols_test(n_func=8, n_voxel=20, n_trial=50):
     estimate = VoxelEncode()
     estimate.ols(stim_val, resp.t().numpy())
 
-    return simulate.beta.flatten(), estimate.beta.flatten()
+    return simulate, estimate
