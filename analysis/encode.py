@@ -1,4 +1,5 @@
 import torch, math, einops, numpy as np
+from torch.distributions import MultivariateNormal
 from torch.autograd.functional import jacobian
 
 class VoxelEncodeBase():
@@ -18,12 +19,10 @@ class VoxelEncodeBase():
 
         return resp
 
-    def __init__(self, n_func=8, delta=1.0):
+    def __init__(self, n_func=8):
         '''
         n_func: number of basis functions
-        delta: default sample delta (in degree)
         '''
-        self.domain = torch.arange(0, 180.0, delta, dtype=torch.float32)
         self.pref = torch.arange(0, 180.0, 180.0 / n_func, dtype=torch.float32)
         self.beta = None
 
@@ -36,7 +35,7 @@ class VoxelEncodeBase():
 
         stim = torch.tensor(stim, dtype=torch.float32)
         resp = self.tuning(stim, self.pref)
-        return resp @ self.beta
+        return (resp @ self.beta).t()
 
     def ols(self, stim, voxel):
         '''
@@ -54,26 +53,78 @@ class VoxelEncodeBase():
 
         return self.beta
 
-class VoxelEncode(VoxelEncodeBase):
+class VoxelEncodeNoise(VoxelEncodeBase):
 
-    def __init__(self, n_func=8, delta=1.0):
+    def __init__(self, n_func=8):
         '''
         n_func: number of basis functions
-        delta: default sample delta (in degree)
+        rho: global noise correlation between voxels
+        sigma: vector of noise standard deviations
         '''
-        super().__init__(n_func, delta)
+        super().__init__(n_func)
+        self.rho = 0.0
+        self.sigma = None
+        self.cov = None
 
+    # multivariate normal distribution negative log-likelihood
+    def log_llhd(self, x, mu, cov):
+        return torch.logdet(cov) + (x - mu).t() @ torch.inverse(cov) @ (x - mu)
+
+    # objective function
+    def objective(self, stim, voxel, cov):
+        voxel = torch.tensor(voxel, dtype=torch.float32)
+        mean_resp = super().forward(stim)
+
+        vals = torch.zeros(voxel.shape[1])
+        for idx in range(voxel.shape[1]):
+            vals[idx] = self.log_llhd(voxel[:, idx], mean_resp[:, idx], cov)
+
+        return torch.sum(vals) / voxel.shape[1]
+
+    # define the covariance matrix (noise model)
+    def cov_mtx(self, rho, sigma):
+        return (1 - rho) * torch.diag((sigma ** 2).flatten()) + rho * (sigma @ sigma.t())
+
+    def forward(self, stim):
+        # mean response through tuning function
+        mean_resp = super().forward(stim)
+        sample = torch.zeros_like(mean_resp)
+
+        # sample from multivariate normal distribution
+        for idx in range(mean_resp.shape[1]):
+            dist = MultivariateNormal(mean_resp[:, idx], self.cov)
+            sample[:, idx] = dist.sample()
+
+        return sample
+
+    # estimate noise model
+    def mle(self, stim, voxel):
+        '''
+        Estimate model weights given stimulus and response
+        Stage 2: estimate noise covariance matrix using maximum likelihood
+
+        stim: stimulus value (n_trial)
+        voxel: voxel responses of shape (n_voxel, n_trial)
+        '''
+        pass
+
+class VoxelEncode(VoxelEncodeNoise):
+
+    def __init__(self, n_func=8):
+        super().__init__(n_func)
+
+# some simple testing routines for model fitting
 def ols_test(n_func=8, n_voxel=20, n_trial=50):
     '''
     Test OLS estimation part of VoxelEncode
     '''
-    simulate = VoxelEncode()
+    simulate = VoxelEncodeBase()
     simulate.beta = torch.rand(n_func, n_voxel)
 
     stim_val = np.random.rand(n_trial) * 180.0
     resp = simulate.forward(stim_val)
 
-    estimate = VoxelEncode()
-    estimate.ols(stim_val, resp.t().numpy())
+    estimate = VoxelEncodeBase()
+    estimate.ols(stim_val, resp.numpy())
 
     return simulate, estimate
