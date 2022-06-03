@@ -158,19 +158,40 @@ class VoxelEncode(VoxelEncodeNoise):
 
     def __init__(self, n_func=8):
         super().__init__(n_func)
+        # additional channel noise parameter
+        self.chnl = None
 
-# some simple testing routines for model fitting
-def ols_test(n_func=8, n_voxel=20, n_trial=50):
-    '''
-    Test OLS estimation part of VoxelEncode
-    '''
-    simulate = VoxelEncodeBase()
-    simulate.beta = torch.rand(n_func, n_voxel)
+    # override (full) noise model
+    def _cov_mtx(self, rho, sigma, chnl):
+        return rho * (sigma @ sigma.t()) \
+        + (1 - rho) * torch.diag((sigma ** 2).flatten()) \
+        + (chnl ** 2) * self.beta.t() @ self.beta
 
-    stim_val = np.random.rand(n_trial) * 180.0
-    resp = simulate.forward(stim_val)
+    def _clamp(self, rho, sigma, chnl):
+        '''
+        Range constraint
+        '''
+        with torch.no_grad():
+            rho.clamp_(0.0, 1.0 - 1e-6)
+            sigma.clamp_min_(1e-6)
+            chnl.clamp_min_(0.0)
 
-    estimate = VoxelEncodeBase()
-    estimate.ols(stim_val, resp.numpy())
+    def mle(self, stim, voxel, n_iter=250, n_print=50):
+        '''
+        Wrapper for maximum likelihood estimation
+        '''
+        # initialize noise model parameters
+        rho = torch.zeros(1, dtype=torch.float32, requires_grad=True)
+        sigma = torch.ones(voxel.shape[0], dtype=torch.float32, requires_grad=True)
+        chnl = torch.ones(1, dtype=torch.float32, requires_grad=True)
 
-    return simulate, estimate
+        # run mle using gradient descent (Adam optimizer)
+        self._mle([rho, sigma, chnl], stim, voxel, n_iter, n_print)
+
+        # save noise model parameters
+        self.rho = rho.item()
+        self.sigma = sigma.detach().clone()
+        self.chnl = chnl.item()
+        self.cov = self._cov_mtx(self.rho, self.sigma, self.chnl)
+
+        return self.rho, self.sigma.clone(), self.chnl
