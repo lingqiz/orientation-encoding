@@ -67,7 +67,7 @@ class VoxelEncodeNoise(VoxelEncodeBase):
         self.cov = None
 
     # multivariate normal distribution negative log-likelihood
-    def log_llhd(self, x, mu, cov):
+    def _log_llhd(self, x, mu, cov):
         return torch.logdet(cov) + (x - mu).t() @ torch.inverse(cov) @ (x - mu)
 
     # objective function
@@ -77,12 +77,12 @@ class VoxelEncodeNoise(VoxelEncodeBase):
 
         vals = torch.zeros(voxel.shape[1])
         for idx in range(voxel.shape[1]):
-            vals[idx] = self.log_llhd(voxel[:, idx], mean_resp[:, idx], cov)
+            vals[idx] = self._log_llhd(voxel[:, idx], mean_resp[:, idx], cov)
 
         return torch.sum(vals) / voxel.shape[1]
 
     # define the covariance matrix (noise model)
-    def cov_mtx(self, rho, sigma):
+    def _cov_mtx(self, rho, sigma):
         return (1 - rho) * torch.diag((sigma ** 2).flatten()) + rho * (sigma @ sigma.t())
 
     def forward(self, stim):
@@ -100,23 +100,46 @@ class VoxelEncodeNoise(VoxelEncodeBase):
     # estimate noise model
     def mle(self, stim, voxel, n_iter=250, n_print=50):
         '''
+        Wrapper for maximum likelihood estimation
+        '''
+        # initialize noise model parameters
+        rho = torch.zeros(1, dtype=torch.float32, requires_grad=True)
+        sigma = torch.ones(voxel.shape[0], dtype=torch.float32, requires_grad=True)
+
+        # run mle using gradient descent (Adam optimizer)
+        self._mle([rho, sigma], stim, voxel, n_iter, n_print)
+
+        # save noise model parameters
+        self.rho = rho.item()
+        self.sigma = sigma.detach().clone()
+        self.cov = self._cov_mtx(self.rho, self.sigma)
+
+        return self.rho, self.sigma.clone()
+
+    def _clamp(self, rho, sigma):
+        '''
+        Range constraint
+        '''
+        with torch.no_grad():
+            rho.clamp_(0.0, 1.0 - 1e-6)
+            sigma.clamp_min_(1e-6)
+
+    def _mle(self, para, stim, voxel, n_iter, n_print):
+        '''
         Estimate model weights given stimulus and response
         Stage 2: estimate noise covariance matrix using maximum likelihood
 
         stim: stimulus value (n_trial)
         voxel: voxel responses of shape (n_voxel, n_trial)
         '''
-        # initialize noise model parameters
-        rho = torch.zeros(1, dtype=torch.float32, requires_grad=True)
-        sigma = torch.ones(voxel.shape[0], dtype=torch.float32, requires_grad=True)
-        optim = torch.optim.Adam([rho, sigma], lr=0.01)
+        optim = torch.optim.Adam(para, lr=0.01)
 
         # run optimization
         for iter in range(n_iter):
             optim.zero_grad()
 
             # compute the negative log-likelihood
-            cov = self.cov_mtx(rho, sigma)
+            cov = self._cov_mtx(*para)
             loss = self.objective(stim, voxel, cov)
 
             # run the optimization step
@@ -124,20 +147,12 @@ class VoxelEncodeNoise(VoxelEncodeBase):
             optim.step()
 
             # range constraint
-            with torch.no_grad():
-                rho.clamp_(0.0, 1.0 - 1e-6)
-                sigma.clamp_min_(1e-6)
+            self._clamp(*para)
 
             # print loss
             if iter % n_print == 0:
                 print("Iter: {}, Loss: {}".format(iter, loss.item()))
-
-        # save the estimated noise model
-        self.rho = rho.item()
-        self.sigma = sigma.detach().clone()
-        self.cov = self.cov_mtx(self.rho, self.sigma)
-
-        return self.rho, self.sigma.clone()
+        return
 
 class VoxelEncode(VoxelEncodeNoise):
 
