@@ -158,6 +158,7 @@ class VoxelEncode(VoxelEncodeNoise):
 
     def __init__(self, n_func=8):
         super().__init__(n_func)
+
         # additional channel noise parameter
         self.chnl = None
 
@@ -167,6 +168,7 @@ class VoxelEncode(VoxelEncodeNoise):
         + (1 - rho) * torch.diag((sigma ** 2).flatten()) \
         + (chnl ** 2) * self.beta.t() @ self.beta
 
+    # range constraint for the model parameters
     def _clamp(self, rho, sigma, chnl):
         '''
         Range constraint
