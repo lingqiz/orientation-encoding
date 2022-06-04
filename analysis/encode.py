@@ -103,7 +103,7 @@ class VoxelEncodeNoise(VoxelEncodeBase):
         return sample
 
     # estimate noise model
-    def mle(self, stim, voxel, n_iter=250, n_print=50):
+    def mle(self, stim, voxel, lr=0.025, n_iter=250, n_print=50):
         '''
         Wrapper for maximum likelihood estimation
         '''
@@ -112,7 +112,7 @@ class VoxelEncodeNoise(VoxelEncodeBase):
         sigma = torch.ones(voxel.shape[0], dtype=torch.float32, requires_grad=True, device=self.device)
 
         # run mle using gradient descent (Adam optimizer)
-        self._mle([rho, sigma], stim, voxel, n_iter, n_print)
+        self._mle([rho, sigma], stim, voxel, lr, n_iter, n_print)
 
         # save noise model parameters
         self.rho = rho.item()
@@ -129,7 +129,7 @@ class VoxelEncodeNoise(VoxelEncodeBase):
             rho.clamp_(0.0, 1.0 - 1e-6)
             sigma.clamp_min_(1e-6)
 
-    def _mle(self, para, stim, voxel, n_iter, n_print):
+    def _mle(self, para, stim, voxel, lr, n_iter, n_print):
         '''
         Estimate model weights given stimulus and response
         Stage 2: estimate noise covariance matrix using maximum likelihood
@@ -137,7 +137,7 @@ class VoxelEncodeNoise(VoxelEncodeBase):
         stim: stimulus value (n_trial)
         voxel: voxel responses of shape (n_voxel, n_trial)
         '''
-        optim = torch.optim.Adam(para, lr=0.01)
+        optim = torch.optim.Adam(para, lr=lr)
 
         # run optimization
         for iter in range(n_iter):
@@ -183,7 +183,7 @@ class VoxelEncode(VoxelEncodeNoise):
             sigma.clamp_min_(1e-6)
             chnl.clamp_min_(0.0)
 
-    def mle(self, stim, voxel, n_iter=250, n_print=50):
+    def mle(self, stim, voxel, lr=0.025, n_iter=250, n_print=50):
         '''
         Wrapper for maximum likelihood estimation
         '''
@@ -193,7 +193,7 @@ class VoxelEncode(VoxelEncodeNoise):
         chnl = torch.ones(1, dtype=torch.float32, requires_grad=True, device=self.device)
 
         # run mle using gradient descent (Adam optimizer)
-        self._mle([rho, sigma, chnl], stim, voxel, n_iter, n_print)
+        self._mle([rho, sigma, chnl], stim, voxel, lr, n_iter, n_print)
 
         # save noise model parameters
         self.rho = rho.item()
