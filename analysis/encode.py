@@ -19,11 +19,12 @@ class VoxelEncodeBase():
 
         return resp
 
-    def __init__(self, n_func=8):
+    def __init__(self, n_func=8, device='cpu'):
         '''
         n_func: number of basis functions
-        '''
-        self.pref = torch.arange(0, 180.0, 180.0 / n_func, dtype=torch.float32)
+        '''        
+        self.pref = torch.arange(0, 180.0, 180.0 / n_func, dtype=torch.float32, device=device)
+        self.device = device
         self.beta = None
 
     def forward(self, stim):
@@ -33,7 +34,7 @@ class VoxelEncodeBase():
         if self.beta is None:
             raise Exception("Model weights are not yet estimated")
 
-        stim = torch.tensor(stim, dtype=torch.float32)
+        stim = torch.tensor(stim, dtype=torch.float32, device=self.device)
         resp = self.tuning(stim, self.pref)
         return (resp @ self.beta).t()
 
@@ -45,8 +46,8 @@ class VoxelEncodeBase():
         stim: stimulus value (n_trial)
         voxel: voxel responses of shape (n_voxel, n_trial)
         '''
-        stim = torch.tensor(stim, dtype=torch.float32)
-        voxel = torch.tensor(voxel, dtype=torch.float32)
+        stim = torch.tensor(stim, dtype=torch.float32, device=self.device)
+        voxel = torch.tensor(voxel, dtype=torch.float32, device=self.device)
 
         rgs = self.tuning(stim, self.pref)
         self.beta = torch.linalg.solve(rgs.t() @ rgs, rgs.t() @ voxel.t())
@@ -55,29 +56,33 @@ class VoxelEncodeBase():
 
 class VoxelEncodeNoise(VoxelEncodeBase):
 
-    def __init__(self, n_func=8):
+    def __init__(self, n_func=8, device='cpu'):
         '''
         n_func: number of basis functions
         rho: global noise correlation between voxels
         sigma: vector of noise standard deviations
         '''
-        super().__init__(n_func)
+        super().__init__(n_func, device)
         self.rho = 0.0
         self.sigma = None
         self.cov = None
 
     # multivariate normal distribution negative log-likelihood
-    def _log_llhd(self, x, mu, cov):
-        return torch.logdet(cov) + (x - mu).t() @ torch.inverse(cov) @ (x - mu)
+    def _log_llhd(self, x, mu, logdet, invcov):
+        return logdet + (x - mu).t() @ invcov @ (x - mu)
 
     # objective function
     def objective(self, stim, voxel, cov):
-        voxel = torch.tensor(voxel, dtype=torch.float32)
+        voxel = torch.tensor(voxel, dtype=torch.float32, device=self.device)
         mean_resp = super().forward(stim)
+        
+        # log-det of the covariance matrix and its inverse
+        logdet = torch.logdet(cov)
+        invcov = torch.inverse(cov)
 
-        vals = torch.zeros(voxel.shape[1])
+        vals = torch.zeros(voxel.shape[1], device=self.device)
         for idx in range(voxel.shape[1]):
-            vals[idx] = self._log_llhd(voxel[:, idx], mean_resp[:, idx], cov)
+            vals[idx] = self._log_llhd(voxel[:, idx], mean_resp[:, idx], logdet, invcov)
 
         return torch.sum(vals) / voxel.shape[1]
 
@@ -88,7 +93,7 @@ class VoxelEncodeNoise(VoxelEncodeBase):
     def forward(self, stim):
         # mean response through tuning function
         mean_resp = super().forward(stim)
-        sample = torch.zeros_like(mean_resp)
+        sample = torch.zeros_like(mean_resp, device=self.device)
 
         # sample from multivariate normal distribution
         for idx in range(mean_resp.shape[1]):
@@ -103,8 +108,8 @@ class VoxelEncodeNoise(VoxelEncodeBase):
         Wrapper for maximum likelihood estimation
         '''
         # initialize noise model parameters
-        rho = torch.zeros(1, dtype=torch.float32, requires_grad=True)
-        sigma = torch.ones(voxel.shape[0], dtype=torch.float32, requires_grad=True)
+        rho = torch.zeros(1, dtype=torch.float32, requires_grad=True, device=self.device)
+        sigma = torch.ones(voxel.shape[0], dtype=torch.float32, requires_grad=True, device=self.device)
 
         # run mle using gradient descent (Adam optimizer)
         self._mle([rho, sigma], stim, voxel, n_iter, n_print)
@@ -156,8 +161,8 @@ class VoxelEncodeNoise(VoxelEncodeBase):
 
 class VoxelEncode(VoxelEncodeNoise):
 
-    def __init__(self, n_func=8):
-        super().__init__(n_func)
+    def __init__(self, n_func=8, device='cpu'):
+        super().__init__(n_func, device=device)
 
         # additional channel noise parameter
         self.chnl = None
@@ -183,9 +188,9 @@ class VoxelEncode(VoxelEncodeNoise):
         Wrapper for maximum likelihood estimation
         '''
         # initialize noise model parameters
-        rho = torch.zeros(1, dtype=torch.float32, requires_grad=True)
-        sigma = torch.ones(voxel.shape[0], dtype=torch.float32, requires_grad=True)
-        chnl = torch.ones(1, dtype=torch.float32, requires_grad=True)
+        rho = torch.zeros(1, dtype=torch.float32, requires_grad=True, device=self.device)
+        sigma = torch.ones(voxel.shape[0], dtype=torch.float32, requires_grad=True, device=self.device)
+        chnl = torch.ones(1, dtype=torch.float32, requires_grad=True, device=self.device)
 
         # run mle using gradient descent (Adam optimizer)
         self._mle([rho, sigma, chnl], stim, voxel, n_iter, n_print)
