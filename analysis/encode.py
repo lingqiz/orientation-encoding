@@ -91,9 +91,8 @@ class VoxelEncodeNoise(VoxelEncodeBase):
     
     # orientation decoding
     def decode(self, voxel):
-        ornt = torch.arange(0, 180.0, 1.0, dtype=torch.float32, device=self.device)        
-        voxel = einops.repeat(torch.tensor(voxel, dtype=torch.float32, 
-                    device=self.device), 'n -> n k', k = ornt.shape[0])
+        ornt = np.arange(0, 180.0, 1.0, dtype=np.float32)        
+        voxel = einops.repeat(voxel, 'n -> n k', k = ornt.shape[0])
         
         log_llhd = - self.objective(ornt, voxel, self.cov, sum_llhd=False)
         estimate = ornt[torch.argmax(log_llhd)]
