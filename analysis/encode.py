@@ -67,6 +67,34 @@ class VoxelEncodeNoise(VoxelEncodeBase):
         self.sigma = None
         self.cov = None
 
+    def forward(self, stim):
+        '''
+        Sample from a multivariate normal distribution model of voxel responses 
+        '''
+        # mean response through tuning function
+        mean_resp = super().forward(stim)
+        sample = torch.zeros_like(mean_resp, device=self.device)
+
+        # sample from multivariate normal distribution
+        for idx in range(mean_resp.shape[1]):
+            dist = MultivariateNormal(mean_resp[:, idx], self.cov)
+            sample[:, idx] = dist.sample()
+
+        return sample
+    
+    # orientation decoding
+    def decode(self, voxel):
+        '''
+        Compute the MLE estimate and the likelihood 
+        of orientation given voxel activities
+        '''
+        ornt = np.arange(0, 180.0, 1.0, dtype=np.float32)        
+        voxel = einops.repeat(voxel, 'n -> n k', k = ornt.shape[0])
+        
+        log_llhd = - self.objective(ornt, voxel, self.cov, sum_llhd=False)
+        estimate = ornt[torch.argmax(log_llhd)]
+        return estimate, log_llhd
+
     # multivariate normal distribution negative log-likelihood
     def _log_llhd(self, x, mu, logdet, invcov):
         return logdet + (x - mu).t() @ invcov @ (x - mu)
@@ -89,49 +117,9 @@ class VoxelEncodeNoise(VoxelEncodeBase):
 
         return torch.sum(vals) / voxel.shape[1]
     
-    # orientation decoding
-    def decode(self, voxel):
-        ornt = np.arange(0, 180.0, 1.0, dtype=np.float32)        
-        voxel = einops.repeat(voxel, 'n -> n k', k = ornt.shape[0])
-        
-        log_llhd = - self.objective(ornt, voxel, self.cov, sum_llhd=False)
-        estimate = ornt[torch.argmax(log_llhd)]
-        return estimate, log_llhd
-
     # define the covariance matrix (noise model)
     def _cov_mtx(self, rho, sigma):
         return (1 - rho) * torch.diag((sigma ** 2).flatten()) + rho * (sigma @ sigma.t())
-
-    def forward(self, stim):
-        # mean response through tuning function
-        mean_resp = super().forward(stim)
-        sample = torch.zeros_like(mean_resp, device=self.device)
-
-        # sample from multivariate normal distribution
-        for idx in range(mean_resp.shape[1]):
-            dist = MultivariateNormal(mean_resp[:, idx], self.cov)
-            sample[:, idx] = dist.sample()
-
-        return sample
-
-    # estimate noise model
-    def mle(self, stim, voxel, lr=0.025, n_iter=250, n_print=50):
-        '''
-        Wrapper for maximum likelihood estimation
-        '''
-        # initialize noise model parameters
-        rho = torch.zeros(1, dtype=torch.float32, requires_grad=True, device=self.device)
-        sigma = torch.ones(voxel.shape[0], dtype=torch.float32, requires_grad=True, device=self.device)
-
-        # run mle using gradient descent (Adam optimizer)
-        self._mle([rho, sigma], stim, voxel, lr, n_iter, n_print)
-
-        # save noise model parameters
-        self.rho = rho.item()
-        self.sigma = sigma.detach().clone()
-        self.cov = self._cov_mtx(self.rho, self.sigma)
-
-        return self.rho, self.sigma.clone()
 
     def _clamp(self, rho, sigma):
         '''
@@ -170,6 +158,25 @@ class VoxelEncodeNoise(VoxelEncodeBase):
             if iter % n_print == 0:
                 print("Iter: {}, NegLL: {}".format(iter, loss.item()))
         return
+    
+    # estimate noise model
+    def mle(self, stim, voxel, lr=0.025, n_iter=250, n_print=50):
+        '''
+        Wrapper for maximum likelihood estimation
+        '''
+        # initialize noise model parameters
+        rho = torch.zeros(1, dtype=torch.float32, requires_grad=True, device=self.device)
+        sigma = torch.ones(voxel.shape[0], dtype=torch.float32, requires_grad=True, device=self.device)
+
+        # run mle using gradient descent (Adam optimizer)
+        self._mle([rho, sigma], stim, voxel, lr, n_iter, n_print)
+
+        # save noise model parameters
+        self.rho = rho.item()
+        self.sigma = sigma.detach().clone()
+        self.cov = self._cov_mtx(self.rho, self.sigma)
+
+        return self.rho, self.sigma.clone()
 
 class VoxelEncode(VoxelEncodeNoise):
 
