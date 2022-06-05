@@ -5,8 +5,8 @@ import sys
 # different class for choices of IO methods
 if not len(sys.argv) == 2:
     sub_val = str(input('Enter Unique Subject ID:'))
-
-sub_val = str(sys.argv[1])
+else:
+    sub_val = str(sys.argv[1])
 
 N_TRIAL = 38
 exp = OrientEncodeKeyboard(sub_val, N_TRIAL)
