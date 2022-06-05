@@ -1,3 +1,4 @@
+from scipy.misc import derivative
 import torch, math, einops, numpy as np
 from torch.distributions import MultivariateNormal
 from torch.autograd.functional import jacobian
@@ -53,6 +54,21 @@ class VoxelEncodeBase():
         stim = torch.tensor(stim, dtype=torch.float32, device=self.device)
         resp = self.tuning(stim, self.pref)
         return (resp @ self.beta).t()
+    
+    def derivative(self, delta=1.0):
+        '''
+        Compute the derivative of the tuning function
+        '''
+        domain = torch.arange(0, 180, delta, dtype=torch.float32, device=self.device)
+        forward = lambda x: self.tuning(x, self.pref) @ self.beta
+        
+        # take the derivative of the tuning function at each stimulus value
+        result = []
+        for stim in domain:
+            diff = jacobian(forward, torch.tensor([stim], device=self.device))
+            result.append(diff.squeeze().unsqueeze(1))
+        
+        return torch.cat(result, dim=1)
 
     def ols(self, stim, voxel):
         '''
@@ -97,6 +113,14 @@ class VoxelEncodeNoise(VoxelEncodeBase):
             sample[:, idx] = dist.sample()
 
         return sample
+    
+    def fisher(self, delta=1.0):
+        '''
+        Fisher information as a function of stimulus
+        '''
+        fprime = self.derivative(delta)
+        fisher = fprime.t() @ torch.inverse(self.cov) @ fprime
+        return torch.diag(fisher)
     
     # orientation decoding
     def decode(self, voxel, method='mle'):
