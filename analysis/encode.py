@@ -168,7 +168,7 @@ class VoxelEncodeNoise(VoxelEncodeBase):
 
             # print loss
             if iter % n_print == 0:
-                print("Iter: {}, Loss: {}".format(iter, loss.item()))
+                print("Iter: {}, NegLL: {}".format(iter, loss.item()))
         return
 
 class VoxelEncode(VoxelEncodeNoise):
