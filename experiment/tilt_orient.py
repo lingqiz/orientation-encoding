@@ -130,7 +130,7 @@ class OrientEncode:
             45, 25, 35, 65, 115, 5, 125, 75, 175]).astype(np.double)
 
     # static variable for the surround conditions (SF, Ori)
-    COND = [(NaN, NaN), (0.5, 30), (0.5, 150)]
+    COND = [(NaN, NaN), (1.0, 30), (1.0, 150)]
 
     def __init__(self, sub_val, n_trial, mode='uniform', atten_task=False):
         # subject name/id
@@ -190,11 +190,11 @@ class OrientEncode:
         self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, screen=1, monitor='sc_3t', units='deg', winType=window_backend)
 
         # initialize stimulus
-        self.target = visual.GratingStim(self.win, sf=0.50, size=10.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.10)
-        self.surround = visual.GratingStim(self.win, sf=0.50, size=18.0, mask='raisedCos', contrast=0.10)
+        self.target = visual.GratingStim(self.win, sf=1.0, size=10.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.10)
+        self.surround = visual.GratingStim(self.win, sf=1.0, size=18.0, mask='raisedCos', contrast=0.10)
         self.noise = visual.NoiseStim(self.win, units='pix', mask='raisedCos', size=1024, contrast=0.10, noiseClip=3.0,
                                     noiseType='Filtered', texRes=1024, noiseElementSize=4, noiseFractalPower=0,
-                                    noiseFilterLower=7.5/1024.0, noiseFilterUpper=12.5/1024.0, noiseFilterOrder=3.0)
+                                    noiseFilterLower=15.0/1024.0, noiseFilterUpper=25.0/1024.0, noiseFilterOrder=3.0)
 
         self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='raisedCos', size=0.25)
         self.feedback = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)

@@ -17,9 +17,10 @@ exp.mode = 'uniform'
 exp.atten_task = True
 
 # exp condition
-# 5s trial duration
+# 7s trial duration
 exp.stim_dur = 1.5
-exp.delay = 3.5
+exp.delay = 5.5
+exp.blank = 12.7
 
 # run experiment
 exp.start()
