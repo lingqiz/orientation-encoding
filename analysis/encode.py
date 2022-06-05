@@ -1,7 +1,7 @@
-from scipy.misc import derivative
 import torch, math, einops, numpy as np
 from torch.distributions import MultivariateNormal
 from torch.autograd.functional import jacobian
+from astropy.stats import circstats
 
 class VoxelEncodeBase():
     '''
@@ -19,27 +19,19 @@ class VoxelEncodeBase():
         resp = torch.pow(rectify, 5)
 
         return resp
-    
+
     @staticmethod
     def circ_mean(value, prob):
         '''
         Compute the mean of a circular probability distribution
         '''
-        sin_mean = torch.sum(prob * torch.sin(value))
-        cos_mean = torch.sum(prob * torch.cos(value))
-        mean = torch.atan(sin_mean / cos_mean)
-        
-        if cos_mean < 0:
-            mean += math.pi
-        elif cos_mean > 0 and mean < 0:
-            mean += 2 * math.pi
-
-        return mean  
+        mean = circstats.circmean(value / 90.0 * math.pi, weights=prob)
+        return mean / math.pi * 90.0
 
     def __init__(self, n_func=8, device='cpu'):
         '''
         n_func: number of basis functions
-        '''        
+        '''
         self.pref = torch.arange(0, 180.0, 180.0 / n_func, dtype=torch.float32, device=device)
         self.device = device
         self.beta = None
@@ -54,20 +46,20 @@ class VoxelEncodeBase():
         stim = torch.tensor(stim, dtype=torch.float32, device=self.device)
         resp = self.tuning(stim, self.pref)
         return (resp @ self.beta).t()
-    
+
     def derivative(self, delta=1.0):
         '''
         Compute the derivative of the tuning function
         '''
         domain = torch.arange(0, 180, delta, dtype=torch.float32, device=self.device)
         forward = lambda x: self.tuning(x, self.pref) @ self.beta
-        
+
         # take the derivative of the tuning function at each stimulus value
         result = []
         for stim in domain:
             diff = jacobian(forward, torch.tensor([stim], device=self.device))
             result.append(diff.squeeze().unsqueeze(1))
-        
+
         return torch.cat(result, dim=1)
 
     def ols(self, stim, voxel):
@@ -101,7 +93,7 @@ class VoxelEncodeNoise(VoxelEncodeBase):
 
     def forward(self, stim):
         '''
-        Sample from a multivariate normal distribution model of voxel responses 
+        Sample from a multivariate normal distribution model of voxel responses
         '''
         # mean response through tuning function
         mean_resp = super().forward(stim)
@@ -113,7 +105,7 @@ class VoxelEncodeNoise(VoxelEncodeBase):
             sample[:, idx] = dist.sample()
 
         return sample
-    
+
     def fisher(self, delta=1.0):
         '''
         Fisher information as a function of stimulus
@@ -121,30 +113,28 @@ class VoxelEncodeNoise(VoxelEncodeBase):
         fprime = self.derivative(delta)
         fisher = fprime.t() @ torch.inverse(self.cov) @ fprime
         return torch.diag(fisher)
-    
+
     # orientation decoding
     def decode(self, voxel, method='mle'):
         '''
-        Compute the MLE estimate and the likelihood 
+        Compute the MLE estimate and the likelihood
         of orientation given voxel activities
         '''
         delta = 0.5
-        ornt = np.arange(0, 180.0, delta, dtype=np.float32)        
+        ornt = np.arange(0, 180.0, delta, dtype=np.float32)
         voxel = einops.repeat(voxel, 'n -> n k', k = ornt.shape[0])
-        
+
         log_llhd = - self.objective(ornt, voxel, self.cov, sum_llhd=False)
-               
+
         if method == 'mle':
             estimate = ornt[torch.argmax(log_llhd)]
             return estimate, log_llhd
-        
+
         elif method == 'mean':
-            ornt = torch.tensor(ornt, dtype=torch.float32, device=self.device)
             prob = torch.exp(log_llhd - torch.max(log_llhd))
-            prob = prob / torch.sum(prob)
-            
-            estimate = self.circ_mean(ornt / 90.0 * math.pi, prob)            
-            return estimate.item() / math.pi * 90.0, prob
+            prob = (prob / torch.sum(prob)).cpu().numpy()
+
+            return self.circ_mean(ornt, prob), prob
 
     # multivariate normal distribution negative log-likelihood
     def _log_llhd(self, x, mu, logdet, invcov):
@@ -154,11 +144,11 @@ class VoxelEncodeNoise(VoxelEncodeBase):
     def objective(self, stim, voxel, cov, sum_llhd=True):
         voxel = torch.tensor(voxel, dtype=torch.float32, device=self.device)
         mean_resp = super().forward(stim)
-        
+
         # log-det of the covariance matrix and its inverse
         logdet = torch.logdet(cov)
         invcov = torch.inverse(cov)
-        
+
         # compute negative log-likelihood
         vals = self._log_llhd(voxel, mean_resp, logdet, invcov)
 
@@ -166,7 +156,7 @@ class VoxelEncodeNoise(VoxelEncodeBase):
             return vals
 
         return torch.sum(vals) / voxel.shape[1]
-    
+
     # define the covariance matrix (noise model)
     def _cov_mtx(self, rho, sigma):
         return (1 - rho) * torch.diag((sigma ** 2).flatten()) + rho * (sigma @ sigma.t())
@@ -208,7 +198,7 @@ class VoxelEncodeNoise(VoxelEncodeBase):
             if iter % n_print == 0:
                 print("Iter: {}, NegLL: {}".format(iter, loss.item()))
         return
-    
+
     # estimate noise model
     def mle(self, stim, voxel, lr=0.025, n_iter=250, n_print=50):
         '''
