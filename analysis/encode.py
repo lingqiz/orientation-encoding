@@ -34,6 +34,14 @@ class VoxelEncodeBase():
         # convert to [0, 180] deg range
         return mean / math.pi * 90.0
 
+    @staticmethod
+    def circ_std(value, prob):
+        '''
+        Compute the standard deviation of a circular probability distribution
+        '''
+        std = circstats.circstd(value / 90.0 * math.pi, weights=prob)
+        return std / math.pi * 90.0
+
     def __init__(self, n_func=8, device='cpu'):
         '''
         n_func: number of basis functions
@@ -140,7 +148,10 @@ class VoxelEncodeNoise(VoxelEncodeBase):
             prob = torch.exp(log_llhd - torch.max(log_llhd))
             prob = (prob / torch.sum(prob)).cpu().numpy()
 
-            return self.circ_mean(ornt, prob), prob
+            est = self.circ_mean(ornt, prob)
+            std = self.circ_std(ornt, prob)
+
+            return est, std, prob
 
     # multivariate normal distribution negative log-likelihood
     def _log_llhd(self, x, mu, logdet, invcov):
