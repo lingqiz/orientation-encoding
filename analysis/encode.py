@@ -26,6 +26,12 @@ class VoxelEncodeBase():
         Compute the mean of a circular probability distribution
         '''
         mean = circstats.circmean(value / 90.0 * math.pi, weights=prob)
+
+        # convert to [0, 2 * pi] ard range
+        if mean < 0:
+            mean += math.pi * 2
+
+        # convert to [0, 180] deg range
         return mean / math.pi * 90.0
 
     def __init__(self, n_func=8, device='cpu'):
