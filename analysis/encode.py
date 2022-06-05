@@ -18,6 +18,22 @@ class VoxelEncodeBase():
         resp = torch.pow(rectify, 5)
 
         return resp
+    
+    @staticmethod
+    def circ_mean(value, prob):
+        '''
+        Compute the mean of a circular probability distribution
+        '''
+        sin_mean = torch.sum(prob * torch.sin(value))
+        cos_mean = torch.sum(prob * torch.cos(value))
+        mean = torch.atan(sin_mean / cos_mean)
+        
+        if cos_mean < 0:
+            mean += math.pi
+        elif cos_mean > 0 and mean < 0:
+            mean += 2 * math.pi
+
+        return mean  
 
     def __init__(self, n_func=8, device='cpu'):
         '''
@@ -83,17 +99,28 @@ class VoxelEncodeNoise(VoxelEncodeBase):
         return sample
     
     # orientation decoding
-    def decode(self, voxel):
+    def decode(self, voxel, method='mle'):
         '''
         Compute the MLE estimate and the likelihood 
         of orientation given voxel activities
         '''
-        ornt = np.arange(0, 180.0, 1.0, dtype=np.float32)        
+        delta = 0.5
+        ornt = np.arange(0, 180.0, delta, dtype=np.float32)        
         voxel = einops.repeat(voxel, 'n -> n k', k = ornt.shape[0])
         
         log_llhd = - self.objective(ornt, voxel, self.cov, sum_llhd=False)
-        estimate = ornt[torch.argmax(log_llhd)]
-        return estimate, log_llhd
+               
+        if method == 'mle':
+            estimate = ornt[torch.argmax(log_llhd)]
+            return estimate, log_llhd
+        
+        elif method == 'mean':
+            ornt = torch.tensor(ornt, dtype=torch.float32, device=self.device)
+            prob = torch.exp(log_llhd - torch.max(log_llhd))
+            prob = prob / torch.sum(prob)
+            
+            estimate = self.circ_mean(ornt / 90.0 * math.pi, prob)            
+            return estimate.item() / math.pi * 90.0, prob
 
     # multivariate normal distribution negative log-likelihood
     def _log_llhd(self, x, mu, logdet, invcov):
