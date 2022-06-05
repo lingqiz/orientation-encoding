@@ -124,7 +124,7 @@ class VoxelEncodeNoise(VoxelEncodeBase):
 
     # multivariate normal distribution negative log-likelihood
     def _log_llhd(self, x, mu, logdet, invcov):
-        return logdet + (x - mu).t() @ invcov @ (x - mu)
+        return logdet + torch.diag((x - mu).t() @ invcov @ (x - mu))
 
     # objective function for mle fitting and orientation decoding
     def objective(self, stim, voxel, cov, sum_llhd=True):
@@ -134,10 +134,9 @@ class VoxelEncodeNoise(VoxelEncodeBase):
         # log-det of the covariance matrix and its inverse
         logdet = torch.logdet(cov)
         invcov = torch.inverse(cov)
-
-        vals = torch.zeros(voxel.shape[1], device=self.device)
-        for idx in range(voxel.shape[1]):
-            vals[idx] = self._log_llhd(voxel[:, idx], mean_resp[:, idx], logdet, invcov)
+        
+        # compute negative log-likelihood
+        vals = self._log_llhd(voxel, mean_resp, logdet, invcov)
 
         if not sum_llhd:
             return vals
