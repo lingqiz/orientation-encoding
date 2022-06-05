@@ -266,9 +266,9 @@ class OrientEncode:
     def run(self):
         '''
         Experiment parameters:
-            12.5s * 2 blank (beginning and end)
-            (1+19+19) trial * (1.5s stim + 3.5s delay)
-            220s total, 220/0.8 = 275 TRs
+            13.5s * 2 blank (beginning and end)
+            (1+19+19) trial * (1.5s stim + 5.5s delay)
+            300s total, 300/0.8 = 375 TRs
         '''
         # start experiment
         # clock for global and trial timing
