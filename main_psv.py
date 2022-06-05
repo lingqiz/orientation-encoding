@@ -20,7 +20,7 @@ exp.atten_task = True
 # 7s trial duration
 exp.stim_dur = 1.5
 exp.delay = 5.5
-exp.blank = 12.7
+exp.blank = 13.5
 
 # run experiment
 exp.start()
