@@ -71,7 +71,7 @@ def load_response(sub_name, model_type='mtSinai'):
 # load experiment setup information
 def load_exp(sub_name):
     # load json file
-    json_path = os.path.join(_data_path(sub_name), 'LQZ.json')
+    json_path = os.path.join(_data_path(sub_name), '%s.json' % sub_name)
     with open(json_path, 'r') as json_file:
         cond_seq = np.array(json.load(json_file)['Cond_Seq'])
 
