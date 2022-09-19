@@ -35,7 +35,7 @@ for idx = 1 : nSes
     attEvent = attEvent.time;
     
     % Run GLM model fit
-    results = glm_fit(data, expPara, attEvent, base_idx, ...
+    results = glm_fit(data, expPara, attEvent, base_idx(idx), ...
             'showPlot', true, 'modelClass', modelClass);
     
     % add the varea label and eccentricity label to results struct
@@ -83,13 +83,13 @@ dataNonVis = data(index, :);
 % Run GLM model fit on non-visual voxel
 resultsNonVis = glm_fit(dataNonVis, attEvent, 0);
 
-%% Run GLM model with a new design
+%% Run GLM model with a new design 
 sub_name = 'HERO_JM';
 acq_base = 'NeuralCoding%02d';
 base_dir = '~/Data/fMRI';
 
 acq_idx = {1:10};
-base_idx = [0];
+base_idx = 0;
 icafix = false;
 modelClass = 'glm';
 
@@ -97,9 +97,11 @@ modelClass = 'glm';
 expPara = struct('acqLen', 320, 'nStim', 39, ...
     'stimDur', 1.5, 'stimDly', 6.0, 'blankDur', 13.75);
 
+% Session: NeuralCoding00
+
 nSes = 1;
 for idx = 1 : nSes
-    acq_type = sprintf(acq_base, idx);
+    acq_type = sprintf(acq_base, idx - 1);
     fprintf('Run %s fitting for %s \n', modelClass, acq_type);
     
     % save file name setup (add icafix suffix if applied)
@@ -120,7 +122,7 @@ for idx = 1 : nSes
     attEvent = attEvent.time;
     
     % Run GLM model fit
-    results = glm_fit(data, expPara, attEvent, base_idx, ...
+    results = glm_fit(data, expPara, attEvent, base_idx(idx), ...
             'showPlot', true, 'modelClass', modelClass);
     
     % add the varea label and eccentricity label to results struct
