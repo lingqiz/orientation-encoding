@@ -4,8 +4,8 @@ function data = load_session(sub_name, acq_type, acq_idx, icafix)
 % tbUseProject('forwardModel') for setup
 addpath('cifti-matlab');
 
-% Single scan session: 91282 grayordinate * nAcq * 275 TRs
-% 220 sec / acquisition * n acquisitions
+% Single scan session: 91282 grayordinate * nAcq * nRs
+% Session length (sec) / acquisition * n acquisitions
 base_dir = '~/Data/fMRI';
 data_dir = fullfile(base_dir, sub_name, acq_type);
 

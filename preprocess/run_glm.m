@@ -6,7 +6,11 @@ base_dir = '~/Data/fMRI';
 acq_idx = {1:10, 1:9, 0:10};
 base_idx = [0, 10, 19];
 icafix = false;
-modelClass = 'mtSinai';
+modelClass = 'glm';
+
+% Setup the structure of a single acquisition
+expPara = struct('acqLen', 220, 'nStim', 39, ...
+    'stimDur', 1.5, 'stimDly', 3.5, 'blankDur', 12.5);
 
 nSes = 3;
 for idx = 1 : nSes
@@ -31,8 +35,8 @@ for idx = 1 : nSes
     attEvent = attEvent.time;
     
     % Run GLM model fit
-    results = glm_fit(data, attEvent, base_idx, ...
-        'showPlot', true, 'modelClass', modelClass);
+    results = glm_fit(data, expPara, attEvent, base_idx, ...
+            'showPlot', true, 'modelClass', modelClass);
     
     % add the varea label and eccentricity label to results struct
     results.v_label = v_label;
@@ -78,3 +82,52 @@ dataNonVis = data(index, :);
 
 % Run GLM model fit on non-visual voxel
 resultsNonVis = glm_fit(dataNonVis, attEvent, 0);
+
+%% Run GLM model with a new design
+sub_name = 'HERO_JM';
+acq_base = 'NeuralCoding%02d';
+base_dir = '~/Data/fMRI';
+
+acq_idx = {1:10};
+base_idx = [0];
+icafix = false;
+modelClass = 'glm';
+
+% Setup the structure of a single acquisition
+expPara = struct('acqLen', 320, 'nStim', 39, ...
+    'stimDur', 1.5, 'stimDly', 6.0, 'blankDur', 13.75);
+
+nSes = 1;
+for idx = 1 : nSes
+    acq_type = sprintf(acq_base, idx);
+    fprintf('Run %s fitting for %s \n', modelClass, acq_type);
+    
+    % save file name setup (add icafix suffix if applied)
+    fl = sprintf('%s_%s_%s', modelClass, sub_name, acq_type);
+    if icafix
+        fl = strcat(fl, '_ICAFIX');
+    end
+    fl = strcat(fl, '.mat');
+    
+    % load data defined by ROI
+    data = load_session(sub_name, acq_type, acq_idx{idx}, icafix);
+    [roi_mask, v_label, e_label] = define_roi(sub_name);
+    
+    data = data(roi_mask, :);
+    
+    % load attention event data
+    attEvent = load(fullfile(base_dir, sub_name, 'attenRT', 'atten_time.mat'));
+    attEvent = attEvent.time;
+    
+    % Run GLM model fit
+    results = glm_fit(data, expPara, attEvent, base_idx, ...
+            'showPlot', true, 'modelClass', modelClass);
+    
+    % add the varea label and eccentricity label to results struct
+    results.v_label = v_label;
+    results.e_label = e_label;
+    
+    % save results
+    fl_path = fullfile(base_dir, sub_name, fl);
+    save(fl_path, 'results', 'roi_mask', 'sub_name', 'acq_type');
+end

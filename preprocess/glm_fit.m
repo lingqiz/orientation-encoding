@@ -1,4 +1,4 @@
-function results = glm_fit(data, attEvent, base_idx, varargin)
+function results = glm_fit(data, expPara, attEvent, base_idx, varargin)
 
 %% Optional input parameters
 % modelClass: 
@@ -13,10 +13,13 @@ showPlot = p.Results.showPlot;
 modelClass = p.Results.modelClass;
 
 %% Set up stimulus regressors
-tr = 0.8; dt = 0.5;
+tr = 0.8; dt = 0.25;
 totalTime = size(data, 2) * tr;
 
-acqLen = 220.0;
+% acquisition length (sec) of a single session
+acqLen = expPara.acqLen;
+
+% compute how many acquisitions there are
 nAcq = totalTime / acqLen;
 fprintf('Construct stim regressor for %d acquisitions \n', nAcq);
 
@@ -24,14 +27,15 @@ fprintf('Construct stim regressor for %d acquisitions \n', nAcq);
 stimTime = ((1:totalTime / dt) - 1) * dt;
 
 % Single acquisition structure:
-% 12.5 s * 2 blank (begin/end)
-% (1.5 s Stim + 3.5 ISI) * 39 presentation
-% attention event
-nStim = 39;
+% passin in as expPara structure
 
-stimDur = 1.5;
-stimDly = 3.5;
-blankDur = 12.5;
+% 2 blank periods (begin/end)
+% (Stim + ISI) * N stim presentation
+% randomly timed attention event
+nStim = expPara.nStim;
+stimDur = expPara.stimDur;
+stimDly = expPara.stimDly;
+blankDur = expPara.blankDur;
 
 stim = zeros(nStim * nAcq, length(stimTime));
 t = 0; stimIdx = 0;
@@ -82,7 +86,7 @@ if ~isempty(attEvent)
     stim = [stim; eventRegressor];
 end
 
-%% Run GLM model with HRF fitting (mtSinai model class)
+%% Run GLM model with HRF fitting
 % polynom low frequency noise removal
 modelOpts = {'polyDeg', 4};
 results = forwardModel({data}, {stim}, tr, ...
