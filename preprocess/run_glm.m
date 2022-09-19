@@ -91,7 +91,7 @@ base_dir = '~/Data/fMRI';
 acq_idx = {1:10};
 base_idx = 0;
 icafix = false;
-modelClass = 'glm';
+modelClass = 'mtSinai';
 
 % Setup the structure of a single acquisition
 expPara = struct('acqLen', 320, 'nStim', 39, ...
