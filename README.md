@@ -20,4 +20,5 @@ Pre-process
 (option 1) `ts_filter.m` (%change, motion regression, linear detrend, z-score)  
 (option 2) ICAFIX, %change, z-score  
 
+  Run `load_atten.py` to extra the attentional event data into `.mat` file format  
   Next, run `glm_fit.m` (nonlinear fitting of GLM + HRF based on [ForwardModel](https://github.com/gkaguirrelab/forwardModel))
