@@ -225,7 +225,7 @@ class VoxelEncodeNoise(VoxelEncodeBase):
         rho = torch.zeros(1, dtype=torch.float32, requires_grad=True, device=self.device)
         sigma = torch.ones(voxel.shape[0], dtype=torch.float32, requires_grad=True, device=self.device)
 
-        # run mle using gradient descent (Adam optimizer)
+        # run mle using gradient descent
         self._mle([rho, sigma], stim, voxel, lr, n_iter, n_print)
 
         # save noise model parameters
@@ -264,11 +264,11 @@ class VoxelEncode(VoxelEncodeNoise):
         Wrapper for maximum likelihood estimation
         '''
         # initialize noise model parameters
-        rho = torch.zeros(1, dtype=torch.float32, requires_grad=True, device=self.device)
         sigma = torch.ones(voxel.shape[0], dtype=torch.float32, requires_grad=True, device=self.device)
-        chnl = torch.ones(1, dtype=torch.float32, requires_grad=True, device=self.device)
+        rho = torch.tensor(0.1, dtype=torch.float32, requires_grad=True, device=self.device)
+        chnl = torch.tensor(0.25, dtype=torch.float32, requires_grad=True, device=self.device)
 
-        # run mle using gradient descent (Adam optimizer)
+        # run mle using gradient descent (SGD optimizer)
         self._mle([rho, sigma, chnl], stim, voxel, lr, n_iter, n_print)
 
         # save noise model parameters
