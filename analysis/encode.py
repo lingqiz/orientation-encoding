@@ -309,19 +309,20 @@ class VoxelEncode(VoxelEncodeNoise):
                     requires_grad=True, device=self.device)
         chnl = torch.tensor(paras[1], dtype=torch.float32,
                     requires_grad=True, device=self.device)
-        sigma = torch.tensor(paras[2:], dtype=torch.float32,
-                    requires_grad=True, device=self.device)
+        sigma = torch.tensor(paras[2:], dtype=torch.float32, device=self.device)
+        sigma = torch.reshape(sigma, (voxel.shape[0], 1))
+        sigma = sigma.clone().detach().requires_grad_(True)
 
         # compute loss function
-        vars = [rho, sigma, chnl]
-        loss = self.objective(stim, voxel, self._cov_mtx(*vars))
+        cov = self._cov_mtx(rho, sigma, chnl)
+        loss = self.objective(stim, voxel, cov)
         loss.backward()
 
         # record gradient
         grad = np.zeros_like(paras)
         grad[0] = rho.grad
         grad[1] = chnl.grad
-        grad[2:] = sigma.grad
+        grad[2:] = sigma.grad.flatten()
 
         # return loss and gradient value
         return loss.item(), grad
