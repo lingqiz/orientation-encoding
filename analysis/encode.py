@@ -3,6 +3,7 @@ from torch.distributions import MultivariateNormal
 from torch.autograd.functional import jacobian
 from astropy.stats import circstats
 from scipy.optimize import minimize, Bounds
+from warnings import warn
 
 class VoxelEncodeBase():
     '''
@@ -264,6 +265,10 @@ class VoxelEncode(VoxelEncodeNoise):
         '''
         Wrapper for maximum likelihood estimation
         '''
+        warn(('Pure gradient descent optimization is deprecated. '
+             'Use @mle_bnd method instead for better convergence.'),
+             DeprecationWarning, stacklevel=2)
+
         # initialize noise model parameters
         sigma = torch.ones(voxel.shape[0], dtype=torch.float32, requires_grad=True, device=self.device)
         rho = torch.tensor(0.1, dtype=torch.float32, requires_grad=True, device=self.device)
@@ -289,8 +294,8 @@ class VoxelEncode(VoxelEncodeNoise):
 
         # define variables
         x0 = np.array([0.10, 0.25, *(0.75*np.ones(voxel.shape[0]))])
-        bounds = Bounds(lb = [1e-2] * x0.size,
-                        ub = [1.0-1e-2] + [10.0] * (x0.size - 1),
+        bounds = Bounds(lb = [1e-3] * x0.size,
+                        ub = [1.0-1e-3] + [100.0] * (x0.size - 1),
                         keep_feasible=True)
 
         # run optimization
