@@ -294,14 +294,24 @@ class VoxelEncode(VoxelEncodeNoise):
 
         # define variables
         x0 = np.array([0.10, 0.25, *(0.75*np.ones(voxel.shape[0]))])
-        bounds = Bounds(lb = [1e-3] * x0.size,
-                        ub = [1.0-1e-3] + [100.0] * (x0.size - 1),
+        bounds = Bounds(lb = [1e-2] * x0.size,
+                        ub = [0.25] + [5.0] * (x0.size - 1),
                         keep_feasible=True)
 
         # run optimization
+        # scipy Sequential Least SQuares Programming
         res = minimize(fun, x0, jac=True, bounds=bounds,
                         options={'maxiter':1e4, 'disp':True})
-        print(res.message)
+        print('Success:', res.success, res.message)
+        print('Fval:', res.fun)
+        
+        # record model parameters
+        self.rho = res.x[0]
+        self.chnl = res.x[1]
+        self.sigma = torch.reshape(torch.tensor(res.x[2:], 
+                    dtype=torch.float32), (voxel.shape[0], 1))
+        self.cov = self._cov_mtx(self.rho, self.sigma, self.chnl)
+
         return res
 
     def obj_packed(self, stim, voxel, paras):
