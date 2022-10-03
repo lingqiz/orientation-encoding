@@ -2,6 +2,7 @@ import torch, math, einops, numpy as np
 from torch.distributions import MultivariateNormal
 from torch.autograd.functional import jacobian
 from astropy.stats import circstats
+from scipy.optimize import minimize, Bounds
 
 class VoxelEncodeBase():
     '''
@@ -278,3 +279,49 @@ class VoxelEncode(VoxelEncodeNoise):
         self.cov = self._cov_mtx(self.rho, self.sigma, self.chnl)
 
         return self.rho, self.sigma.clone(), self.chnl
+
+    def mle_bnd(self, stim, voxel):
+        '''
+        Maximum likelihood estimation with scipy bounded optimization
+        '''
+        # define objective function
+        fun = lambda paras : self.obj_packed(stim, voxel, paras)
+
+        # define variables
+        x0 = np.array([0.10, 0.25, *(0.75*np.ones(voxel.shape[0]))])
+        bounds = Bounds(lb = [1e-2] * x0.size,
+                        ub = [1.0-1e-2] + [10.0] * (x0.size - 1),
+                        keep_feasible=True)
+
+        # run optimization
+        res = minimize(fun, x0, jac=True, bounds=bounds,
+                        options={'maxiter':1e4, 'disp':True})
+        print(res.message)
+        return res
+
+    def obj_packed(self, stim, voxel, paras):
+        '''
+        Objective function with numpy parameter vector
+        and gradient returned as numpy vector
+        '''
+        # create torch variable
+        rho = torch.tensor(paras[0], dtype=torch.float32,
+                    requires_grad=True, device=self.device)
+        chnl = torch.tensor(paras[1], dtype=torch.float32,
+                    requires_grad=True, device=self.device)
+        sigma = torch.tensor(paras[2:], dtype=torch.float32,
+                    requires_grad=True, device=self.device)
+
+        # compute loss function
+        vars = [rho, sigma, chnl]
+        loss = self.objective(stim, voxel, self._cov_mtx(*vars))
+        loss.backward()
+
+        # record gradient
+        grad = np.zeros_like(paras)
+        grad[0] = rho.grad
+        grad[1] = chnl.grad
+        grad[2:] = sigma.grad
+
+        # return loss and gradient value
+        return loss.item(), grad
