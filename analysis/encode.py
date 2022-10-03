@@ -290,7 +290,7 @@ class VoxelEncode(VoxelEncodeNoise):
         Maximum likelihood estimation with scipy bounded optimization
         '''
         # define objective function
-        fun = lambda paras : self.obj_packed(stim, voxel, paras)
+        fun = lambda paras : self.obj_wrapper(stim, voxel, paras)
 
         # define variables
         x0 = np.array([0.05, 0.10, *(0.50 * np.ones(voxel.shape[0]))])
@@ -304,17 +304,17 @@ class VoxelEncode(VoxelEncodeNoise):
                         options={'maxiter':1e4, 'disp':True})
         print('Success:', res.success, res.message)
         print('Fval:', res.fun)
-        
+
         # record model parameters
         self.rho = res.x[0]
         self.chnl = res.x[1]
-        self.sigma = torch.reshape(torch.tensor(res.x[2:], 
+        self.sigma = torch.reshape(torch.tensor(res.x[2:],
                     dtype=torch.float32), (voxel.shape[0], 1))
         self.cov = self._cov_mtx(self.rho, self.sigma, self.chnl)
 
         return res
 
-    def obj_packed(self, stim, voxel, paras):
+    def obj_wrapper(self, stim, voxel, paras):
         '''
         Objective function with numpy parameter vector
         and gradient returned as numpy vector
