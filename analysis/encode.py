@@ -293,7 +293,7 @@ class VoxelEncode(VoxelEncodeNoise):
         fun = lambda paras : self.obj_packed(stim, voxel, paras)
 
         # define variables
-        x0 = np.array([0.10, 0.25, *(0.75*np.ones(voxel.shape[0]))])
+        x0 = np.array([0.05, 0.10, *(0.50 * np.ones(voxel.shape[0]))])
         bounds = Bounds(lb = [1e-2] * x0.size,
                         ub = [0.25] + [5.0] * (x0.size - 1),
                         keep_feasible=True)
