@@ -41,7 +41,8 @@ for idx = 1:nSession
     ts = ts(:, roi_mask);
     sigTime = ((1 : size(ts, 1)) - 1) * spPeriod;
     
-    cutoff = 1 / 40.0;
+    % cutoff frequency 
+    cutoff = 1 / 60.0;
     ts = highpass(ts, cutoff, spRate);
     
     %% Motion regression
@@ -65,7 +66,7 @@ for idx = 1:nSession
     
     %% Extract time course
     baseShift = 4.0;
-    tRange = 0 : 0.5 : 4.0;
+    tRange = 0 : 0.5 : 3.5;
     signal = zeros(nStim, length(tRange), size(ts, 2));
     
     % get the time series
@@ -95,9 +96,11 @@ for idx = 1:nSession
     
 end
 
-% all a dummy column
+% all a dummy column for compatibility with other formats
 allBeta = [allBeta, zeros(size(allBeta, 1), 1)];
 
 %% Save results
+fl_path = fullfile('~/Data/fMRI', sub_name, sprintf('%s_%s_%s.mat', 'avg', sub_name, acq_type));
+
 results = struct('params', allBeta, 'v_label', v_label, 'e_label', e_label);
-save('avgResp.mat', 'results', 'sub_name', 'acq_type', 'roi_mask');
+save(fl_path, 'results', 'sub_name', 'acq_type', 'roi_mask');
