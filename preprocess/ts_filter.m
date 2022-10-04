@@ -18,11 +18,12 @@ for idx = ses_idx
 
     % cifti time series
     ts = cifti_data.cdata';
-
-    % convert to percent change
-    meanVec = mean(ts, 1);
-    ts = 100 * ((ts - meanVec) ./ meanVec);
     
+    % cutoff frequency
+    spRate = 1 / 0.80;
+    cutoff = 1 / 40.0;
+    ts = highpass(ts, cutoff, spRate);
+   
     % setup nuisance variables
     % decorrelation using PCA
     [~, score, latent] = pca(motion_rg);
@@ -38,12 +39,6 @@ for idx = ses_idx
     
     % solve with normal equation
     % save the residule as new time series
-    theta = (rgs' * rgs) \ (rgs' * ts);
-    ts = ts - rgs * theta;
-    
-    % de-trend regression
-    rgs = [(1:size(ts, 1))', ones(size(ts, 1), 1)];
-
     theta = (rgs' * rgs) \ (rgs' * ts);
     ts = ts - rgs * theta;
     

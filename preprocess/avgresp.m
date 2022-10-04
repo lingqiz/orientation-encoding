@@ -1,8 +1,10 @@
-%% Setup the analysis
-sub_name = 'HERO_JM';
-acq_type = 'NeuralCoding00';
-
+function avgresp(sub_name, acq_type, n_session)
 addpath('cifti-matlab');
+
+% sub_name: Subject label
+% acq_type: Acquisition label
+% n_session: Number of sessions
+
 base_dir = strcat('~/Data/fMRI', '/', sub_name, '/', acq_type);
 [roi_mask, v_label, e_label] = define_roi(sub_name);
 
@@ -22,11 +24,10 @@ stimTime = 1:nStim;
 stimTime = (stimTime - 1) * (stimDur + stimDly) + blankDur;
 
 %% load the data file for each session
-nSession = 10;
 allBeta = [];
-fprintf('Run preprocessing for %d sessions \n', nSession);
+fprintf('Run preprocessing for %d sessions \n', n_session);
 
-for idx = 1:nSession
+for idx = 1 : n_session
     
     ses_name = sprintf('func-%02d', idx);
     [cifti_data, motion_rg] = load_data(base_dir, ...
@@ -105,3 +106,5 @@ fl_path = fullfile('~/Data/fMRI', sub_name, ...
 
 results = struct('params', allBeta, 'v_label', v_label, 'e_label', e_label);
 save(fl_path, 'results', 'sub_name', 'acq_type', 'roi_mask');
+
+end
