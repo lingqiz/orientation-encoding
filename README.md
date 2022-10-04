@@ -17,10 +17,10 @@ The code automatically tracks the acquisition number.
 See here for information regarding the [HCP pre-processing pipeline](https://github.com/Washington-University/HCPpipelines)
 - Stimulus session:  
 Pre-process  
-(option 1) `ts_filter.m` (high-pass filter, motion regression, z-score within each run)  
-(option 2) ICAFIX, %change, z-score  
+*(option 1)* `ts_filter.m` (high-pass filter, motion regression, z-score within each run)  
+*(option 2)* ICAFIX, %change, z-score  
 
   Run `load_atten.py` to extra the attentional event data into `.mat` file format  
   Next, run `glm_fit.m` (nonlinear fitting of GLM + HRF based on [ForwardModel](https://github.com/gkaguirrelab/forwardModel))    
   
-  (option 3) `avg_resp.m` (high-pass filter, motion regression, align time course after each stimulus presentation, z-score across corresponding time points, average within a time window [4s, 8s])  
+  *(option 3)* `avg_resp.m` (high-pass filter, motion regression, align time course after each stimulus presentation, z-score across corresponding time points, average within a time window [4s, 8s])  
