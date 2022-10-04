@@ -18,7 +18,7 @@ See here for information regarding the [HCP pre-processing pipeline](https://git
 - Stimulus session:  
 Pre-process  
 *(option 1)* `ts_filter.m` (high-pass filter, motion regression, z-score within each run)  
-*(option 2)* ICAFIX, %change, z-score  
+*(option 2)* ICAFIX, percent change, z-score  
 
   Run `load_atten.py` to extra the attentional event data into `.mat` file format  
   Next, run `glm_fit.m` (nonlinear fitting of GLM + HRF based on [ForwardModel](https://github.com/gkaguirrelab/forwardModel))    
