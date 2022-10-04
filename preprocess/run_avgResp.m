@@ -65,7 +65,7 @@ for idx = 1:nSession
     
     %% Extract time course
     baseShift = 4.0;
-    tRange = 0 : 0.5 : 3.5;
+    tRange = 0 : 0.5 : 4.0;
     signal = zeros(nStim, length(tRange), size(ts, 2));
     
     % get the time series
@@ -75,8 +75,8 @@ for idx = 1:nSession
         signal(idy, :, :) = value;
     end
     
-    % z-score for corresponding time point
-    for idz = 1:size(tRange)
+    % z-score for corresponding time point    
+    for idz = 1:length(tRange)
         value = signal(:, idz, :);
         arySize = size(value);
         
@@ -86,7 +86,7 @@ for idx = 1:nSession
         stdVec = std(value, 0, 1);
         value = (value - meanVec) ./ stdVec;
         
-        signal(:, idz, :) = value;
+        signal(:, idz, :) = reshape(value, arySize);        
     end
     
     % beta (responses)
@@ -94,6 +94,9 @@ for idx = 1:nSession
     allBeta = [allBeta, beta'];
     
 end
+
+% all a dummy column
+allBeta = [allBeta, zeros(size(allBeta, 1), 1)];
 
 %% Save results
 results = struct('params', allBeta, 'v_label', v_label, 'e_label', e_label);

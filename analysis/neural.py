@@ -3,7 +3,7 @@ import scipy.io as sio
 
 # Define useful constants
 N_ACQ = 30; N_TRIAL = 39
-N_DROP = {'mtSinai':-4, 'glm':-1}
+N_DROP = {'mtSinai':-4, 'glm':-1, 'avg':-1}
 
 # Note the duplication of these also in tilt_orient.py
 STIM_PATH = os.path.join('.', 'experiment', 'stim_seq.txt')
