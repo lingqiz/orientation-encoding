@@ -295,7 +295,7 @@ class VoxelEncode(VoxelEncodeNoise):
         # define variables
         x0 = np.array([0.05, 0.10, *(0.50 * np.ones(voxel.shape[0]))])
         bounds = Bounds(lb = [1e-2] * x0.size,
-                        ub = [0.50] + [10.0] * (x0.size - 1),
+                        ub = [1-1e-2] + [10.0] * (x0.size - 1),
                         keep_feasible=True)
 
         # run optimization
