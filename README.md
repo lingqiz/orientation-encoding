@@ -23,4 +23,4 @@ Pre-process
   Run `load_atten.py` to extra the attentional event data into `.mat` file format  
   Next, run `glm_fit.m` (nonlinear fitting of GLM + HRF based on [ForwardModel](https://github.com/gkaguirrelab/forwardModel))    
   
-  (option 3) `avg_resp.m` (high-pass filter, motion regression, align time course after each stimulus presentation, z-score across corresponding time points, average within a time windown [4s, 8s])  
+  (option 3) `avg_resp.m` (high-pass filter, motion regression, align time course after each stimulus presentation, z-score across corresponding time points, average within a time window [4s, 8s])  
