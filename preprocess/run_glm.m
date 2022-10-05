@@ -84,7 +84,7 @@ dataNonVis = data(index, :);
 resultsNonVis = glm_fit(dataNonVis, attEvent, 0);
 
 %% Run GLM model with a new design
-sub_name = 'HERO_JM';
+sub_name = 'HERO_LZ';
 acq_base = 'NeuralCoding%02d';
 base_dir = '~/Data/fMRI';
 

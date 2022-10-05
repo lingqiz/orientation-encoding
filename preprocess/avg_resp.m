@@ -1,4 +1,4 @@
-function avgresp(sub_name, acq_type, n_session)
+function avg_resp(sub_name, acq_type, n_session)
 addpath('cifti-matlab');
 
 % sub_name: Subject label
