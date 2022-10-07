@@ -1,7 +1,7 @@
 function results = glm_fit(data, expPara, attEvent, base_idx, varargin)
 
 %% Optional input parameters
-% modelClass: 
+% modelClass:
 % - glm: simple GLM with default HRF parameters
 % - mtSinai: nonlinear fitting HRF parameters
 p = inputParser;
@@ -87,8 +87,16 @@ if ~isempty(attEvent)
 end
 
 %% Run GLM model with HRF fitting
-% polynom low frequency noise removal
+% polynom: low frequency noise removal
+% paraSD: bounds on the HRF parameters
 modelOpts = {'polyDeg', 4};
+
+if strcmp(modelClass, 'mtSinai')
+    index = length(modelOpts);
+    modelOpts{index + 1} = 'paraSD';
+    modelOpts{index + 2} = 2;
+end
+
 results = forwardModel({data}, {stim}, tr, ...
     'modelClass', modelClass, ...
     'stimTime', {stimTime'}, ...
