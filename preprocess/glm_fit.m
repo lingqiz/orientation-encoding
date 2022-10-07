@@ -94,7 +94,7 @@ modelOpts = {'polyDeg', 4};
 if strcmp(modelClass, 'mtSinai')
     index = length(modelOpts);
     modelOpts{index + 1} = 'paraSD';
-    modelOpts{index + 2} = 2;
+    modelOpts{index + 2} = 3;
 end
 
 results = forwardModel({data}, {stim}, tr, ...
