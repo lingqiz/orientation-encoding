@@ -18,12 +18,12 @@ for idx = ses_idx
 
     % cifti time series
     ts = cifti_data.cdata';
-    
+
     % cutoff frequency
     spRate = 1 / 0.80;
-    cutoff = 1 / 40.0;
+    cutoff = 1 / 60.0;
     ts = highpass(ts, cutoff, spRate);
-   
+
     % setup nuisance variables
     % decorrelation using PCA
     [~, score, latent] = pca(motion_rg);
@@ -36,17 +36,17 @@ for idx = ses_idx
 
     % setup motion nuisance regressors
     rgs = [score, ones(size(ts, 1), 1)];
-    
+
     % solve with normal equation
     % save the residule as new time series
     theta = (rgs' * rgs) \ (rgs' * ts);
     ts = ts - rgs * theta;
-    
+
     % z-score normalization
     meanVec = mean(ts, 1);
     stdVec = std(ts, 0, 1);
     ts = (ts - meanVec) ./ stdVec;
-    
+
     % save output as icafix output name
     cifti_data.cdata = ts';
     data_file = fullfile(base_dir, strcat(ses_name, '_Atlas_hp2000_clean.dtseries.nii'));
