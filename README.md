@@ -14,7 +14,8 @@ The code automatically tracks the acquisition number.
 
 ### Pre-processing Note
 - pRF session (flywheel): HcpStruct - HcpFunc - ICAFIX - [ForwardModel](https://github.com/gkaguirrelab/forwardModel) - [BayesPRF](https://elifesciences.org/articles/40224)  
-See here for information regarding the [HCP pre-processing pipeline](https://github.com/Washington-University/HCPpipelines)
+See here for information regarding the [HCP pre-processing pipeline](https://github.com/Washington-University/HCPpipelines)  
+Alternatively, skip ICAFIX and use `ts_filter.py`
 - Stimulus session:  
 Pre-process  
 *(option 1)* `ts_filter.m` (high-pass filter, motion regression, z-score within each run)  
