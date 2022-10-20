@@ -285,7 +285,7 @@ class VoxelEncode(VoxelEncodeNoise):
 
         return self.rho, self.sigma.clone(), self.chnl
 
-    def mle_bnd(self, stim, voxel):
+    def mle_bnd(self, stim, voxel, verbose=True):
         '''
         Maximum likelihood estimation with scipy bounded optimization
         '''
@@ -302,16 +302,20 @@ class VoxelEncode(VoxelEncodeNoise):
         # scipy Sequential Least SQuares Programming
         res = minimize(fun, x0, jac=True, bounds=bounds,
                         options={'maxiter':1e4, 'disp':True})
-        print('Success:', res.success, res.message)
-        print('Fval:', res.fun)
+
+        if verbose:
+            print('Success:', res.success, res.message)
+            print('Fval:', res.fun)
 
         # record model parameters
-        self.rho = res.x[0]
-        self.chnl = res.x[1]
+        self.rho = torch.tensor(res.x[0], dtype=torch.float32, device=self.device)
+        self.chnl = torch.tensor(res.x[1], dtype=torch.float32, device=self.device)
         self.sigma = torch.reshape(torch.tensor(res.x[2:],
-                    dtype=torch.float32), (voxel.shape[0], 1))
-        self.cov = self._cov_mtx(self.rho, self.sigma, self.chnl)
+                                    dtype=torch.float32,
+                                    device=self.device),
+                                    (voxel.shape[0], 1))
 
+        self.cov = self._cov_mtx(self.rho, self.sigma, self.chnl)
         return res
 
     def obj_wrapper(self, stim, voxel, paras):
@@ -335,9 +339,9 @@ class VoxelEncode(VoxelEncodeNoise):
 
         # record gradient
         grad = np.zeros_like(paras)
-        grad[0] = rho.grad
-        grad[1] = chnl.grad
-        grad[2:] = sigma.grad.flatten()
+        grad[0] = rho.grad.cpu()
+        grad[1] = chnl.grad.cpu()
+        grad[2:] = sigma.grad.flatten().cpu()
 
         # return loss and gradient value
         return loss.item(), grad
