@@ -97,9 +97,6 @@ for idx = 1 : n_session
     
 end
 
-% all a dummy column for compatibility with other formats
-allBeta = [allBeta, zeros(size(allBeta, 1), 1)];
-
 %% Save results
 fl_path = fullfile('~/Data/fMRI', sub_name, ...
     sprintf('%s_%s_%s.mat', 'avg', sub_name, acq_type));
