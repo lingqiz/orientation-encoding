@@ -248,7 +248,7 @@ class OrientEncode:
             while self.global_ctd.getTime() <= 0:
                 # 2 hz contrast modulation
                 t = self.global_ctd.getTime() + self.stim_dur
-                crst = 0.1 * np.cos(4.0 * np.pi * t + np.pi) + 0.1
+                crst = 0.10 * np.cos(4.0 * np.pi * t + np.pi) + 0.10
                 
                 self.target.contrast = crst
                 self.target.draw()
