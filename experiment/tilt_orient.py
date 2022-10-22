@@ -119,6 +119,7 @@ class OrientEncode:
     DEFAULT_DELAY = 10.5
     DEFAULT_BLANK = 12.0
     DEFAULT_LEN = 3.0
+    N_SESSION = 20
    
     def __init__(self, sub_val, n_trial, mode='uniform', atten_task=False):
         # subject name/id
@@ -134,13 +135,24 @@ class OrientEncode:
                 self.sub_record = json.load(file_handle)
         else:
             os.mkdir(self.data_dir)
+            
+            # sample stimulus to present
+            # using stratified sampling over [0, 1] to ensure uniformity
+            edges = np.linspace(0, 1, n_trial * self.N_SESSION + 1)
+            samples = np.array([np.random.uniform(edges[idx], edges[idx+1]) 
+                                for idx in range(n_trial * self.N_SESSION)]) * 180.0
+            np.random.shuffle(samples)
+            stim_seq = samples.astype(np.int).tolist()
+
             # create subject record and save initial json file
-            self.sub_record = {
-                'Ses_Counter' : 0,
-                'Stim_Seq' : []}
+            self.sub_record = {'Ses_Counter' : 0,
+                               'Stim_Seq' : stim_seq}
 
             self._save_json()
             print('create subject file at ' + self.record_path)
+
+        stim_seq = np.reshape(np.array(self.sub_record['Stim_Seq']), 
+                             (self.N_SESSION, n_trial))
 
         # will be used for recording response
         self.resp_flag = True
@@ -156,17 +168,9 @@ class OrientEncode:
         self.stim_dur = self.DEFAULT_DUR
         self.delay = self.DEFAULT_DELAY
         self.blank = self.DEFAULT_BLANK
-
-        # sample stimulus to present
-        # using stratified sampling over [0, 1] to ensure uniformity
-        edges = np.linspace(0, 1, self.n_trial + 1)
-        samples = np.array([np.random.uniform(edges[idx], edges[idx+1]) 
-                            for idx in range(self.n_trial)]) * 180.0
-        np.random.shuffle(samples)
         
-        # record the stimulus sequence 
-        self.stim_seq = samples.astype(np.int)
-        self.sub_record['Stim_Seq'].extend(self.stim_seq)        
+        # get the stimulus sequence 
+        self.stim_seq = stim_seq[self.sub_record['Ses_Counter'], :]        
 
         # initialize window, message
         # monitor = 'rm_413' for psychophysics and 'sc_3t' for imaging session
@@ -268,11 +272,7 @@ class OrientEncode:
             while self.global_ctd.getTime() <= 0:
                 self._draw_blank()
 
-        # end blank period
-        self.global_ctd.add(self.blank)
-        while self.global_ctd.getTime () <= 0:
-            self._draw_blank()
-
+        # record session time       
         self.session_time = self.global_clock.getTime()
 
         if self.atten_task:
