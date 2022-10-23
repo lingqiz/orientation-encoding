@@ -179,7 +179,7 @@ class OrientEncode:
         # initialize stimulus
         self.target = visual.GratingStim(self.win, sf=1.0, size=10.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.20)
 
-        # Not in use for now
+        # not in use for now
         self.surround = visual.GratingStim(self.win, sf=1.0, size=18.0, mask='raisedCos', contrast=0.10)
         self.noise = visual.NoiseStim(self.win, units='pix', mask='raisedCos', size=1024, contrast=0.10, noiseClip=3.0,
                                     noiseType='Filtered', texRes=1024, noiseElementSize=4, noiseFractalPower=0,
@@ -224,9 +224,9 @@ class OrientEncode:
     def run(self):
         '''
         Experiment parameters:
-            12.0s * 2 blank (beginning and end)
+            12.0s * 1 blank (beginning)
             20 trial * (1.5s stim + 10.5s delay)
-            264s total, 264/0.8 = 330 TRs
+            252s total, 252/0.8 = 315 TRs
         '''
         # start experiment
         # clock for global and trial timing
