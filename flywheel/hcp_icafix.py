@@ -6,7 +6,7 @@ label = 'label=orientation_encoding'
 fw, project, time_stamp = flywheel_init(label)
 
 # Get the gear and analysis label
-gear = fw.lookup('gears/hcp-icafix/0.2.1_rc1')
+gear = fw.lookup('gears/hcp-icafix/0.2.1_rc2')
 analysis_label = 'hcp-icafix %s' % gear.gear.version
 
 # Only run on specified subjects
