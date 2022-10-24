@@ -43,7 +43,7 @@ for idx = 1 : n_session
     sigTime = ((1 : size(ts, 1)) - 1) * spPeriod;
     
     % cutoff frequency 
-    cutoff = 1 / 90.0;
+    cutoff = 1 / 60.0;
     ts = highpass(ts, cutoff, spRate);
     
     %% Motion regression

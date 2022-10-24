@@ -83,7 +83,7 @@ dataNonVis = data(index, :);
 % Run GLM model fit on non-visual voxel
 resultsNonVis = glm_fit(dataNonVis, attEvent, 0);
 
-%% Run GLM model with a new design
+%% Run GLM model with a new design (Sept 2022)
 sub_name = 'HERO_JM';
 acq_base = 'NeuralCoding%02d';
 base_dir = '~/Data/fMRI';
@@ -124,6 +124,53 @@ attEvent = attEvent.time;
 % Run GLM model fit
 results = glm_fit(data, expPara, attEvent, base_idx(idx), ...
     'showPlot', true, 'modelClass', modelClass);
+
+% add the varea label and eccentricity label to results struct
+results.v_label = v_label;
+results.e_label = e_label;
+
+% save results
+fl_path = fullfile(base_dir, sub_name, fl);
+save(fl_path, 'results', 'roi_mask', 'sub_name', 'acq_type');
+
+%% Run GLM model with a new design (Oct 2022)
+sub_name = 'HERO_TW';
+acq_base = 'NeuralCoding%02d';
+base_dir = '~/Data/fMRI';
+
+nAcq = 10;
+acq_idx = {1:nAcq};
+base_idx = 0;
+icafix = false;
+modelClass = 'glm';
+
+% Setup the structure of a single acquisition
+expPara = struct('acqLen', 252, 'nStim', 20, ...
+    'stimDur', 1.5, 'stimDly', 10.50, 'blankDur', 12.0);
+
+% Session: NeuralCoding00
+idx = 1;
+ses_idx = 0;
+
+acq_type = sprintf(acq_base, ses_idx);
+fprintf('Run %s fitting for %s \n', modelClass, acq_type);
+
+% save file name setup (add icafix suffix if applied)
+fl = strcat(sprintf('%s_%s_%s', modelClass, sub_name, acq_type), '.mat');
+
+% load data defined by ROI
+data = load_session(sub_name, acq_type, acq_idx{idx}, icafix);
+[roi_mask, v_label, e_label] = define_roi(sub_name);
+
+data = data(roi_mask, :);
+
+% Run GLM model fit
+results = glm_fit(data, expPara, [], base_idx(idx), ...
+    'showPlot', true, 'modelClass', modelClass);
+
+figure(2);
+subplot(1, 10, 1:9);
+xlim([0, expPara.acqLen * nAcq]);
 
 % add the varea label and eccentricity label to results struct
 results.v_label = v_label;

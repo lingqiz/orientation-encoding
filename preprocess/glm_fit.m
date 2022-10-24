@@ -13,7 +13,7 @@ showPlot = p.Results.showPlot;
 modelClass = p.Results.modelClass;
 
 %% Set up stimulus regressors
-tr = 0.8; dt = 0.25;
+tr = 0.8; dt = 0.50;
 totalTime = size(data, 2) * tr;
 
 % acquisition length (sec) of a single session
@@ -29,7 +29,7 @@ stimTime = ((1:totalTime / dt) - 1) * dt;
 % Single acquisition structure:
 % passin in as expPara structure
 
-% 2 blank periods (begin/end)
+% 1 blank periods (beginning)
 % (Stim + ISI) * N stim presentation
 % randomly timed attention event
 nStim = expPara.nStim;
@@ -53,10 +53,9 @@ for idx = 1:nAcq
         idxEnd = t / dt;
         
         % Set stimulus regressor values
-        stim(stimIdx, idxStart:idxEnd) = 1.0;
+        stim(stimIdx, idxStart:idxEnd) = 1.0;        
         t = t + stimDly;
-    end
-    t = t + blankDur;
+    end   
 end
 
 %% Set up attent event regressor
@@ -89,7 +88,7 @@ end
 %% Run GLM model with HRF fitting
 % polynom: low frequency noise removal
 % paraSD: bounds on the HRF parameters
-modelOpts = {'polyDeg', 4};
+modelOpts = {'polyDeg', 1};
 
 if strcmp(modelClass, 'mtSinai')
     index = length(modelOpts);

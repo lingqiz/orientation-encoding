@@ -21,7 +21,7 @@ for idx = ses_idx
 
     % cutoff frequency
     spRate = 1 / 0.80;
-    cutoff = 1 / 90.0;
+    cutoff = 1 / 60.0;
     ts = highpass(ts, cutoff, spRate);
 
     % setup nuisance variables
