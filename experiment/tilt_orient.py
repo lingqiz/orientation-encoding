@@ -1,7 +1,6 @@
 from psychopy import core, visual
 from datetime import datetime
 from .sampler import sample_orientation
-from numpy.core.numeric import NaN
 import os, threading, json, time, numpy as np
 
 # for keyboard IO
@@ -117,21 +116,11 @@ class AttentThread(threading.Thread):
 class OrientEncode:
 
     DEFAULT_DUR = 1.5
-    DEFAULT_DELAY = 3.5
-    DEFAULT_BLANK = 12.5
+    DEFAULT_DELAY = 10.5
+    DEFAULT_BLANK = 12.0
     DEFAULT_LEN = 3.0
-
-    SEQ_LEN = 19
-    SEN_NUM = 10
-    STIM_SEQ_PATH = os.path.join('.', 'experiment', 'stim_seq.txt')
-
-    # HARD CODE stim index -> stim orientation
-    STIM_VAL = np.array([55, 105, 15, 155, 85, 135, 145, 95, 165,
-            45, 25, 35, 65, 115, 5, 125, 75, 175]).astype(np.double)
-
-    # static variable for the surround conditions (SF, Ori)
-    COND = [(NaN, NaN), (0.5, 30), (0.5, 150)]
-
+    N_SESSION = 20
+   
     def __init__(self, sub_val, n_trial, mode='uniform', atten_task=False):
         # subject name/id
         self.sub_val = sub_val
@@ -146,22 +135,24 @@ class OrientEncode:
                 self.sub_record = json.load(file_handle)
         else:
             os.mkdir(self.data_dir)
-
-            # create a list of random triplet for SEN_NUM times
-            cond_seq = []
-            for _ in range(self.SEN_NUM):
-                triplet = list(range(3))
-                np.random.shuffle(triplet)
-                cond_seq.extend(triplet)
+            
+            # sample stimulus to present
+            # using stratified sampling over [0, 1] to ensure uniformity
+            edges = np.linspace(0, 1, n_trial * self.N_SESSION + 1)
+            samples = np.array([np.random.uniform(edges[idx], edges[idx+1]) 
+                                for idx in range(n_trial * self.N_SESSION)]) * 180.0
+            np.random.shuffle(samples)
+            stim_seq = samples.astype(np.int).tolist()
 
             # create subject record and save initial json file
-            self.sub_record = {
-                'Cond_Seq' : cond_seq,
-                'Cond_Ctr' : 0,
-                '0' : 0, '1' : 0, '2' : 0}
+            self.sub_record = {'Ses_Counter' : 0,
+                               'Stim_Seq' : stim_seq}
 
             self._save_json()
             print('create subject file at ' + self.record_path)
+
+        stim_seq = np.reshape(np.array(self.sub_record['Stim_Seq']), 
+                             (self.N_SESSION, n_trial))
 
         # will be used for recording response
         self.resp_flag = True
@@ -177,24 +168,22 @@ class OrientEncode:
         self.stim_dur = self.DEFAULT_DUR
         self.delay = self.DEFAULT_DELAY
         self.blank = self.DEFAULT_BLANK
-
-        # read in stim sequence
-        with open(self.STIM_SEQ_PATH, 'r') as seq_file:
-            stim_seq = seq_file.read().replace('\n', ' ').split()
-            stim_seq = list(map(int, stim_seq))
-
-        self.stim_seq = np.array(stim_seq).reshape((self.SEN_NUM, self.SEQ_LEN * 2))
+        
+        # get the stimulus sequence 
+        self.stim_seq = stim_seq[self.sub_record['Ses_Counter'], :]        
 
         # initialize window, message
         # monitor = 'rm_413' for psychophysics and 'sc_3t' for imaging session
         self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, screen=1, monitor='sc_3t', units='deg', winType=window_backend)
 
         # initialize stimulus
-        self.target = visual.GratingStim(self.win, sf=0.50, size=10.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.10)
-        self.surround = visual.GratingStim(self.win, sf=0.50, size=18.0, mask='raisedCos', contrast=0.10)
+        self.target = visual.GratingStim(self.win, sf=1.0, size=10.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.20)
+
+        # not in use for now
+        self.surround = visual.GratingStim(self.win, sf=1.0, size=18.0, mask='raisedCos', contrast=0.10)
         self.noise = visual.NoiseStim(self.win, units='pix', mask='raisedCos', size=1024, contrast=0.10, noiseClip=3.0,
                                     noiseType='Filtered', texRes=1024, noiseElementSize=4, noiseFractalPower=0,
-                                    noiseFilterLower=7.5/1024.0, noiseFilterUpper=12.5/1024.0, noiseFilterOrder=3.0)
+                                    noiseFilterLower=15.0/1024.0, noiseFilterUpper=25.0/1024.0, noiseFilterOrder=3.0)
 
         self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='raisedCos', size=0.25)
         self.feedback = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)
@@ -209,33 +198,7 @@ class OrientEncode:
         with open(self.record_path, 'w+') as record:
             record.write(json.dumps(self.sub_record, indent=2))
         return
-
-    def _set_stim(self, idx):
-        # surround orientation
-        self.next_surround = None
-        cond_idx = self.condi_id
-
-        # center orientation
-        # index self.SEQ_LEN is the null condition
-        stim_idx = self.stim_seq[self.acqst_id, idx]
-        stim_ori = self.STIM_VAL[stim_idx - 1] if stim_idx < self.SEQ_LEN else -1
-
-        if np.isnan(self.COND[cond_idx][0]):
-            self.record.add_surround(NaN)
-            self.noise.updateNoise()
-            self.next_surround = self.noise
-        else:
-            self.record.add_surround(self.COND[cond_idx][1])
-            self.surround.sf, self.surround.ori = self.COND[cond_idx]
-            self.next_surround = self.surround
-
-        # center orientation
-        self.show_center = True if stim_idx < self.SEQ_LEN else False
-        self.record.add_stimulus(stim_ori)
-        self.target.ori = stim_ori
-
-        return
-
+    
     def _draw_blank(self):
         self.fixation.draw()
         self.win.flip()
@@ -244,19 +207,14 @@ class OrientEncode:
 
     def start(self):
         # determine condition and sequence
-        counter = self.sub_record['Cond_Ctr']
-        self.condi_id = self.sub_record['Cond_Seq'][counter]
-        self.acqst_id = self.sub_record[str(self.condi_id)]
-
-        print('Acquisition %d / %d' % (counter + 1, len(self.sub_record['Cond_Seq'])))
-        print('Cond_ID %d, Seq_ID %d' % (self.condi_id, self.acqst_id))
+        self.counter = self.sub_record['Ses_Counter']
+        print('Acquisition ID %d' % self.counter)
 
         # update condition and sequence
-        self.sub_record['Cond_Ctr'] += 1
-        self.sub_record[str(self.condi_id)] += 1
+        self.sub_record['Ses_Counter'] += 1
 
         # set up for the first trial
-        self._set_stim(idx=0)
+        self.target.ori = self.stim_seq[0]
 
         # wait for scanner signal
         self.io_wait(wait_key='T')
@@ -266,9 +224,9 @@ class OrientEncode:
     def run(self):
         '''
         Experiment parameters:
-            12.5s * 2 blank (beginning and end)
-            (1+19+19) trial * (1.5s stim + 3.5s delay)
-            220s total, 220/0.8 = 275 TRs
+            12.0s * 1 blank (beginning)
+            20 trial * (1.5s stim + 10.5s delay)
+            252s total, 252/0.8 = 315 TRs
         '''
         # start experiment
         # clock for global and trial timing
@@ -288,18 +246,15 @@ class OrientEncode:
         while self.global_ctd.getTime () <= 0:
             self._draw_blank()
 
-        for idx in range(self.n_trial + 1):
+        for idx in range(self.n_trial):
             # draw stimulus for a fixed duration
             self.global_ctd.add(self.stim_dur)
             while self.global_ctd.getTime() <= 0:
                 # 2 hz contrast modulation
                 t = self.global_ctd.getTime() + self.stim_dur
-                crst = 0.05 * np.cos(4.0 * np.pi * t + np.pi) + 0.05
-                # draw stim
-                self.next_surround.contrast = crst
-                self.next_surround.draw()
-
-                self.target.contrast = crst if self.show_center else 0.0
+                crst = 0.10 * np.cos(4.0 * np.pi * t + np.pi) + 0.10
+                
+                self.target.contrast = crst
                 self.target.draw()
 
                 # draw fixation dot
@@ -311,17 +266,13 @@ class OrientEncode:
             self.global_ctd.add(self.delay)
 
             # setup stim condition for next trial
-            if idx < self.n_trial:
-                self._set_stim(idx=idx)
+            if idx < self.n_trial - 1:
+                self.target.ori = self.stim_seq[idx + 1]
 
             while self.global_ctd.getTime() <= 0:
                 self._draw_blank()
 
-        # end blank period
-        self.global_ctd.add(self.blank)
-        while self.global_ctd.getTime () <= 0:
-            self._draw_blank()
-
+        # record session time       
         self.session_time = self.global_clock.getTime()
 
         if self.atten_task:
@@ -332,8 +283,7 @@ class OrientEncode:
 
     def save_data(self):
         file_name = '_'.join([self.sub_val,
-                            'C' + str(self.condi_id),
-                            'S' + str(self.acqst_id),
+                            'S' + str(self.counter),
                             self.time_stmp])
 
         # write the RT for the attention task
