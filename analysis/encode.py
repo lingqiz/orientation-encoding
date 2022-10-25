@@ -293,9 +293,9 @@ class VoxelEncode(VoxelEncodeNoise):
         fun = lambda paras : self.obj_wrapper(stim, voxel, paras)
 
         # define variables
-        x0 = np.array([0.05, 0.10, *(0.50 * np.ones(voxel.shape[0]))])
-        bounds = Bounds(lb = [1e-2] * x0.size,
-                        ub = [0.80] + [10.0] * (x0.size - 1),
+        x0 = np.array([0.10, 0.30, *(0.10 * np.random.random(voxel.shape[0]) + 0.70)])
+        bounds = Bounds(lb = [0.01] + [0.05] * (x0.size - 1),
+                        ub = [0.90] + [2.5] * (x0.size - 1),
                         keep_feasible=True)
 
         # run optimization
