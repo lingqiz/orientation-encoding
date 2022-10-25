@@ -138,7 +138,7 @@ sub_name = 'HERO_TW';
 acq_base = 'NeuralCoding%02d';
 base_dir = '~/Data/fMRI';
 
-nAcq = 10;
+nAcq = 18;
 acq_idx = {1:nAcq};
 base_idx = 0;
 icafix = false;
@@ -169,7 +169,8 @@ results = glm_fit(data, expPara, [], base_idx(idx), ...
     'showPlot', true, 'modelClass', modelClass);
 
 figure(2);
-subplot(1, 10, 1:9);
+plotIdx = 1:9;
+subplot(1, 10, plotIdx);
 xlim([0, expPara.acqLen * nAcq]);
 
 % add the varea label and eccentricity label to results struct

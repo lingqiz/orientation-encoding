@@ -1,8 +1,10 @@
 function [roi_mask, v_label, e_label] = define_roi(sub_name, varargin)
 
 p = inputParser;
+
+% Default ROI: V1 - V3 area, 10 degree eccentricity, r-square > 0.10
 p.addParameter('areaIndex', [1, 2, 3]);
-p.addParameter('eccThreshold', 12.0, @(x)(isnumeric(x) && numel(x) == 1));
+p.addParameter('eccThreshold', 10.0, @(x)(isnumeric(x) && numel(x) == 1));
 p.addParameter('rsqrThreshold', 0.10, @(x)(isnumeric(x) && numel(x) == 1));
 
 parse(p, varargin{:});

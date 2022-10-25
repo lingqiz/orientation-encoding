@@ -9,8 +9,8 @@ base_dir = strcat('~/Data/fMRI', '/', sub_name, '/', acq_type);
 [roi_mask, v_label, e_label] = define_roi(sub_name);
 
 %% Time course of the stimulus
-expPara = struct('acqLen', 320, 'nStim', 39, ...
-    'stimDur', 1.5, 'stimDly', 6.0, 'blankDur', 13.75);
+expPara = struct('acqLen', 252, 'nStim', 20, ...
+    'stimDur', 1.5, 'stimDly', 10.50, 'blankDur', 12.0);
 
 % 2 blank periods (begin/end)
 % (Stim + ISI) * N stim presentation
@@ -67,7 +67,7 @@ for idx = 1 : n_session
     
     %% Extract time course
     baseShift = 4.0;
-    tRange = 0 : 0.5 : 4.0;
+    tRange = 0 : 0.8 : 4.0;
     signal = zeros(nStim, length(tRange), size(ts, 2));
     
     % get the time series
