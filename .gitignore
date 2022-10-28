@@ -3,9 +3,11 @@
 /preprocess/cifti-matlab
 /docs
 /Neural/*
+/data/*
 __pycache__
 .vscode
 _Data
 flywheel.key
 *.ipynb
 *.mlx
+*.mat
