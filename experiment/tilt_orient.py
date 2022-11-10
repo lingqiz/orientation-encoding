@@ -178,13 +178,12 @@ class OrientEncode:
 
         # initialize stimulus
         self.target = visual.GratingStim(self.win, sf=1.0, size=12.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.20)
-
-        # not in use for now
-        self.surround = visual.GratingStim(self.win, sf=1.0, size=18.0, mask='raisedCos', contrast=0.10)
         self.noise = visual.NoiseStim(self.win, units='pix', mask='raisedCos', size=1024, contrast=0.10, noiseClip=3.0,
                                     noiseType='Filtered', texRes=1024, noiseElementSize=4, noiseFractalPower=0,
                                     noiseFilterLower=15.0/1024.0, noiseFilterUpper=25.0/1024.0, noiseFilterOrder=3.0)
-
+        # not in use for now
+        self.surround = visual.GratingStim(self.win, sf=1.0, size=18.0, mask='raisedCos', contrast=0.10)
+        
         self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='raisedCos', size=0.25)
         self.center = visual.GratingStim(self.win, sf=0.0, size=2.0, mask='raisedCos', maskParams={'fringeWidth':0.15}, contrast=0.0)        
         self.prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=10.0, lineColor='black', size=1, contrast=0.80)
@@ -255,6 +254,9 @@ class OrientEncode:
                 t = self.global_ctd.getTime() + self.stim_dur
                 crst = 0.10 * np.cos(4.0 * np.pi * t + np.pi) + 0.10
                 
+                self.noise.contrast = crst
+                self.noise.draw()
+                
                 self.target.contrast = crst
                 self.target.draw()
                 self.center.draw()
@@ -271,6 +273,7 @@ class OrientEncode:
             if idx < self.n_trial - 1:
                 self.target.ori = self.stim_seq[idx + 1]
                 self.target.phase = np.random.rand()
+                self.noise.updateNoise()
 
             while self.global_ctd.getTime() <= 0:
                 self._draw_blank()
