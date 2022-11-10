@@ -118,7 +118,7 @@ class OrientEncode:
     DEFAULT_DUR = 1.5
     DEFAULT_DELAY = 10.5
     DEFAULT_BLANK = 12.0
-    DEFAULT_LEN = 3.0
+    DEFAULT_LEN = 5.0
     DEFAULT_RESP = 4.0
     DEFAULT_ISI = 4.0
     N_SESSION = 20
