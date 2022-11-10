@@ -14,7 +14,7 @@ exp = OrientEncodeKeyboard(sub_val, N_TRIAL)
 # start running the experiment
 # passive viewing condition
 exp.mode = 'uniform'
-exp.atten_task = True
+exp.atten_task = False
 
 # exp condition
 # 7s trial duration
