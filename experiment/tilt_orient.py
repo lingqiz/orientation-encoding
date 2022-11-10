@@ -177,7 +177,7 @@ class OrientEncode:
         self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, screen=1, monitor='sc_3t', units='deg', winType=window_backend)
 
         # initialize stimulus
-        self.target = visual.GratingStim(self.win, sf=1.0, size=10.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.20)
+        self.target = visual.GratingStim(self.win, sf=1.0, size=12.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.20)
 
         # not in use for now
         self.surround = visual.GratingStim(self.win, sf=1.0, size=18.0, mask='raisedCos', contrast=0.10)
@@ -186,8 +186,8 @@ class OrientEncode:
                                     noiseFilterLower=15.0/1024.0, noiseFilterUpper=25.0/1024.0, noiseFilterOrder=3.0)
 
         self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='raisedCos', size=0.25)
-        self.feedback = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=5.0, lineColor='black', size=1, contrast=0.80)
-        self.prob = visual.GratingStim(self.win, sf=0.5, size=[2.0, 5.0], mask='gauss', contrast=1.0)
+        self.center = visual.GratingStim(self.win, sf=0.0, size=2.0, mask='raisedCos', maskParams={'fringeWidth':0.15}, contrast=0.0)        
+        self.prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=10.0, lineColor='black', size=1, contrast=0.80)
 
         # data recorder
         self.record = DataRecord()
@@ -215,6 +215,7 @@ class OrientEncode:
 
         # set up for the first trial
         self.target.ori = self.stim_seq[0]
+        self.target.phase = np.random.rand()
 
         # wait for scanner signal
         self.io_wait(wait_key='T')
@@ -256,6 +257,7 @@ class OrientEncode:
                 
                 self.target.contrast = crst
                 self.target.draw()
+                self.center.draw()
 
                 # draw fixation dot
                 self.fixation.draw()
@@ -268,7 +270,17 @@ class OrientEncode:
             # setup stim condition for next trial
             if idx < self.n_trial - 1:
                 self.target.ori = self.stim_seq[idx + 1]
+                self.target.phase = np.random.rand()
 
+            while self.global_ctd.getTime() <= 0:
+                self._draw_blank()
+
+            # response period
+            self.global_ctd.add(self.resp_dur)
+            response = self.io_response()
+
+            # ISI
+            self.global_ctd.add(self.isi)
             while self.global_ctd.getTime() <= 0:
                 self._draw_blank()
 
@@ -334,8 +346,7 @@ class OrientEncodeKeyboard(OrientEncode):
         resp = int(sample_orientation(n_sample=1, uniform=True))
         self.prob.setOri(resp)
 
-        # global variable for recording response
-        self.resp_flag = True
+        # global variable for recording response        
         self.increment = 0
 
         # define callback function for keyboard event
@@ -347,17 +358,9 @@ class OrientEncodeKeyboard(OrientEncode):
 
         def release_callback(event):
             self.increment = 0.0
-
-        def confirm_callback(event):
-            self.resp_flag = False
-
-        def aboard_callback(event):
-            self.resp_flag = False
-            self.win.close()
-            core.quit()
-
+     
         # key binding for recording response
-        key_bind = {'left':left_callback, 'right':right_callback, 'space':confirm_callback, 'escape':aboard_callback}
+        key_bind = {'left':left_callback, 'right':right_callback}
         for key, callback in key_bind.items():
             keyboard.on_press_key(key, callback)
 
@@ -365,7 +368,10 @@ class OrientEncodeKeyboard(OrientEncode):
             keyboard.on_release_key(key, release_callback)
 
         # wait/record for response
-        while self.resp_flag:
+        while self.global_ctd.getTime() <= 0:
+            t = self.global_ctd.getTime()
+            self.prob.contrast = np.abs(t / self.resp_dur * 0.75)
+
             if not self.increment == 0:
                 resp += self.increment
                 resp %= 180
