@@ -119,6 +119,8 @@ class OrientEncode:
     DEFAULT_DELAY = 10.5
     DEFAULT_BLANK = 12.0
     DEFAULT_LEN = 3.0
+    DEFAULT_RESP = 4.0
+    DEFAULT_ISI = 4.0
     N_SESSION = 20
    
     def __init__(self, sub_val, n_trial, mode='uniform', atten_task=False):
@@ -143,10 +145,12 @@ class OrientEncode:
                                 for idx in range(n_trial * self.N_SESSION)]) * 180.0
             np.random.shuffle(samples)
             stim_seq = samples.astype(np.int).tolist()
+            resp_seq = []
 
             # create subject record and save initial json file
             self.sub_record = {'Ses_Counter' : 0,
-                               'Stim_Seq' : stim_seq}
+                               'Stim_Seq' : stim_seq,
+                               'Resp_Seq' : resp_seq}
 
             self._save_json()
             print('create subject file at ' + self.record_path)
@@ -168,6 +172,8 @@ class OrientEncode:
         self.stim_dur = self.DEFAULT_DUR
         self.delay = self.DEFAULT_DELAY
         self.blank = self.DEFAULT_BLANK
+        self.resp_dur = self.DEFAULT_RESP
+        self.isi = self.DEFAULT_ISI
         
         # get the stimulus sequence 
         self.stim_seq = stim_seq[self.sub_record['Ses_Counter'], :]        
@@ -279,8 +285,9 @@ class OrientEncode:
                 self._draw_blank()
 
             # response period
-            self.global_ctd.add(self.resp_dur)
+            self.global_ctd.add(self.resp_dur)            
             response = self.io_response()
+            self.sub_record['Resp_Seq'].append(int(response))
 
             # ISI
             self.global_ctd.add(self.isi)
