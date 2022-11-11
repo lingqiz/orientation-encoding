@@ -370,11 +370,11 @@ class OrientEncodeKeyboard(OrientEncode):
             self.increment = 0.0
      
         # key binding for recording response
-        key_bind = {'left':left_callback, 'right':right_callback}
+        key_bind = {'B':left_callback, 'Y':right_callback}
         for key, callback in key_bind.items():
             keyboard.on_press_key(key, callback)
 
-        for key in ['left', 'right']:
+        for key in ['B', 'Y']:
             keyboard.on_release_key(key, release_callback)
 
         # wait/record for response
