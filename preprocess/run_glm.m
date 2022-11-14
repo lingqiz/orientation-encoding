@@ -142,7 +142,7 @@ nAcq = 10;
 acq_idx = {1:nAcq};
 base_idx = 0;
 icafix = false;
-modelClass = 'mtSinai';
+modelClass = 'glm';
 
 % Setup the structure of a single acquisition (check Python file)
 expPara = struct('acqLen', 324, 'nStim', 20, ...
@@ -150,7 +150,7 @@ expPara = struct('acqLen', 324, 'nStim', 20, ...
 
 % Session: NeuralCoding01 / 02
 idx = 1;
-ses_idx = 2;
+ses_idx = 1;
 
 acq_type = sprintf(acq_base, ses_idx);
 fprintf('Run %s fitting for %s \n', modelClass, acq_type);
