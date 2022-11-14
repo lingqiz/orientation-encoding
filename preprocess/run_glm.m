@@ -138,19 +138,19 @@ sub_name = 'HERO_TW';
 acq_base = 'NeuralCoding%02d';
 base_dir = '~/Data/fMRI';
 
-nAcq = 18;
+nAcq = 10;
 acq_idx = {1:nAcq};
 base_idx = 0;
 icafix = false;
-modelClass = 'glm';
+modelClass = 'mtSinai';
 
-% Setup the structure of a single acquisition
-expPara = struct('acqLen', 252, 'nStim', 20, ...
-    'stimDur', 1.5, 'stimDly', 10.50, 'blankDur', 12.0);
+% Setup the structure of a single acquisition (check Python file)
+expPara = struct('acqLen', 324, 'nStim', 20, ...
+    'stimDur', 1.5, 'stimDly', 14.50, 'blankDur', 4.0);
 
-% Session: NeuralCoding00
+% Session: NeuralCoding01 / 02
 idx = 1;
-ses_idx = 0;
+ses_idx = 2;
 
 acq_type = sprintf(acq_base, ses_idx);
 fprintf('Run %s fitting for %s \n', modelClass, acq_type);

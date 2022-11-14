@@ -1,5 +1,5 @@
 %% Setup
-function ts_filter(sub_name, acq_type, n_session)
+function ts_filter(sub_name, acq_type, n_session, cutoff_t)
 addpath('cifti-matlab');
 
 % sub_name: Subject label
@@ -7,6 +7,11 @@ addpath('cifti-matlab');
 % n_session: Number of sessions
 
 base_dir = strcat('~/Data/fMRI', '/', sub_name, '/', acq_type);
+
+% default cutoff temporal frequency
+if ~exist('cutoff_t','var')
+    cutoff_t = 90.0;
+end
 
 %% Run preprocessing for all sessions
 ses_idx = 1 : n_session;
@@ -21,7 +26,7 @@ for idx = ses_idx
 
     % cutoff frequency
     spRate = 1 / 0.80;
-    cutoff = 1 / 60.0;
+    cutoff = 1 / cutoff_t;
     ts = highpass(ts, cutoff, spRate);
 
     % setup nuisance variables

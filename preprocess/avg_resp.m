@@ -1,4 +1,4 @@
-function avg_resp(sub_name, acq_type, n_session)
+function avg_resp(sub_name, acq_type, n_session, cutoff_t)
 addpath('cifti-matlab');
 
 % sub_name: Subject label
@@ -8,9 +8,14 @@ addpath('cifti-matlab');
 base_dir = strcat('~/Data/fMRI', '/', sub_name, '/', acq_type);
 [roi_mask, v_label, e_label] = define_roi(sub_name);
 
+% default cutoff temporal frequency
+if ~exist('cutoff_t','var')
+    cutoff_t = 90.0;
+end
+
 %% Time course of the stimulus
-expPara = struct('acqLen', 252, 'nStim', 20, ...
-    'stimDur', 1.5, 'stimDly', 10.50, 'blankDur', 12.0);
+expPara = struct('acqLen', 324, 'nStim', 20, ...
+    'stimDur', 1.5, 'stimDly', 14.50, 'blankDur', 4.0);
 
 % 2 blank periods (begin/end)
 % (Stim + ISI) * N stim presentation
@@ -43,7 +48,7 @@ for idx = 1 : n_session
     sigTime = ((1 : size(ts, 1)) - 1) * spPeriod;
     
     % cutoff frequency 
-    cutoff = 1 / 60.0;
+    cutoff = 1 / cutoff_t;
     ts = highpass(ts, cutoff, spRate);
     
     %% Motion regression
