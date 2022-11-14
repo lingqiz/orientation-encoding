@@ -10,7 +10,7 @@ base_dir = strcat('~/Data/fMRI', '/', sub_name, '/', acq_type);
 
 % default cutoff temporal frequency
 if ~exist('cutoff_t','var')
-    cutoff_t = 240.0;
+    cutoff_t = 180.0;
 end
 
 %% Run preprocessing for all sessions
