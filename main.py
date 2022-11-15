@@ -16,12 +16,12 @@ exp = OrientEncodeKeyboard(sub_val, N_TRIAL)
 exp.mode = 'uniform'
 exp.atten_task = False
 
-# exp parameters 
+# exp parameters
 exp.stim_dur = 1.5
 exp.blank = 4.0
-exp.delay = 6.5
+exp.delay = 4.5
 exp.resp_dur = 4.0
-exp.isi = 4.0
+exp.isi = 2.0
 
 # run experiment
 exp.start()
