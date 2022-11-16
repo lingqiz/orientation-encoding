@@ -138,12 +138,13 @@ class VoxelEncodeNoise(VoxelEncodeBase):
         '''
         # setup variable
         delta = 0.5
-        ornt = np.arange(0, 180.0, delta, dtype=np.float32)
         voxel = einops.repeat(voxel, 'n -> n k', k = ornt.shape[0])
+        ornt = np.arange(0, 180.0, delta, dtype=np.float32)
+        ornt_torch = torch.tensor(ornt, dtype=torch.float32, device=self.device)
 
         # compute negative log likelihood
         voxel = torch.tensor(voxel, dtype=torch.float32, device=self.device)
-        log_llhd = self.likelihood(ornt, voxel)
+        log_llhd = self.likelihood(ornt_torch, voxel)
 
         # compute decoding
         if method == 'mle':
@@ -177,7 +178,8 @@ class VoxelEncodeNoise(VoxelEncodeBase):
 
     # call to likelihood function that allows for differentiation
     def likelihood(self, theta, voxel):
-        mean_resp = super().forward(theta)
+        resp = self.tuning(theta, self.pref)
+        mean_resp = (resp @ self.beta).t()
         return - self._log_llhd(voxel, mean_resp, self.logdet, self.invcov)
 
     # define the covariance matrix (noise model)
