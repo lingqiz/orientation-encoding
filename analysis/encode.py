@@ -136,10 +136,12 @@ class VoxelEncodeNoise(VoxelEncodeBase):
         Compute the likelihood and estimate
         of orientation given voxel activities
         '''
+        # setup variable
         delta = 0.5
         ornt = np.arange(0, 180.0, delta, dtype=np.float32)
         voxel = einops.repeat(voxel, 'n -> n k', k = ornt.shape[0])
 
+        # compute negative log likelihood
         log_llhd = - self.objective(ornt, voxel, self.cov, sum_llhd=False)
 
         if method == 'mle':
@@ -152,10 +154,7 @@ class VoxelEncodeNoise(VoxelEncodeBase):
 
             est = self.circ_mean(ornt, prob)
             std = self.circ_std(ornt, prob)
-            return est, std, prob
-
-        elif method == 'llhd':
-            return log_llhd
+            return est, std, (ornt, prob)
 
     # multivariate normal distribution negative log-likelihood
     def _log_llhd(self, x, mu, logdet, invcov):
