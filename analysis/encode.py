@@ -133,7 +133,7 @@ class VoxelEncodeNoise(VoxelEncodeBase):
     # orientation decoding
     def decode(self, voxel, method='mle'):
         '''
-        Compute the MLE estimate and the likelihood
+        Compute the likelihood and estimate
         of orientation given voxel activities
         '''
         delta = 0.5
@@ -152,8 +152,10 @@ class VoxelEncodeNoise(VoxelEncodeBase):
 
             est = self.circ_mean(ornt, prob)
             std = self.circ_std(ornt, prob)
-
             return est, std, prob
+
+        elif method == 'llhd':
+            return log_llhd
 
     # multivariate normal distribution negative log-likelihood
     def _log_llhd(self, x, mu, logdet, invcov):
