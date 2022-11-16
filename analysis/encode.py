@@ -138,9 +138,9 @@ class VoxelEncodeNoise(VoxelEncodeBase):
         '''
         # setup variable
         delta = 0.5
-        voxel = einops.repeat(voxel, 'n -> n k', k = ornt.shape[0])
         ornt = np.arange(0, 180.0, delta, dtype=np.float32)
         ornt_torch = torch.tensor(ornt, dtype=torch.float32, device=self.device)
+        voxel = einops.repeat(voxel, 'n -> n k', k = ornt.shape[0])
 
         # compute negative log likelihood
         voxel = torch.tensor(voxel, dtype=torch.float32, device=self.device)
