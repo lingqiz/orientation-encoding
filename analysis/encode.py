@@ -142,8 +142,10 @@ class VoxelEncodeNoise(VoxelEncodeBase):
         voxel = einops.repeat(voxel, 'n -> n k', k = ornt.shape[0])
 
         # compute negative log likelihood
-        log_llhd = - self.objective(ornt, voxel, self.cov, sum_llhd=False)
+        voxel = torch.tensor(voxel, dtype=torch.float32, device=self.device)
+        log_llhd = self.likelihood(ornt, voxel)
 
+        # compute decoding
         if method == 'mle':
             estimate = ornt[torch.argmax(log_llhd)]
             return estimate, log_llhd
@@ -161,7 +163,7 @@ class VoxelEncodeNoise(VoxelEncodeBase):
         return logdet + torch.diag((x - mu).t() @ invcov @ (x - mu))
 
     # objective function for mle fitting and orientation decoding
-    def objective(self, stim, voxel, cov, sum_llhd=True):
+    def objective(self, stim, voxel, cov):
         voxel = torch.tensor(voxel, dtype=torch.float32, device=self.device)
         mean_resp = super().forward(stim)
 
@@ -171,11 +173,12 @@ class VoxelEncodeNoise(VoxelEncodeBase):
 
         # compute negative log-likelihood
         vals = self._log_llhd(voxel, mean_resp, logdet, invcov)
-
-        if not sum_llhd:
-            return vals
-
         return torch.sum(vals) / voxel.shape[1]
+
+    # call to likelihood function that allows for differentiation
+    def likelihood(self, theta, voxel):
+        mean_resp = super().forward(theta)
+        return - self._log_llhd(voxel, mean_resp, self.logdet, self.invcov)
 
     # define the covariance matrix (noise model)
     def _cov_mtx(self, rho, sigma):
@@ -316,7 +319,11 @@ class VoxelEncode(VoxelEncodeNoise):
                                     device=self.device),
                                     (voxel.shape[0], 1))
 
+        # cache covariance matrix value
         self.cov = self._cov_mtx(self.rho, self.sigma, self.chnl)
+        self.logdet = torch.logdet(self.cov)
+        self.invcov = torch.inverse(self.cov)
+
         return res
 
     def obj_wrapper(self, stim, voxel, paras):
