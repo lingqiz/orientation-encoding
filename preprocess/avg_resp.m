@@ -14,8 +14,8 @@ if ~exist('cutoff_t','var')
 end
 
 %% Time course of the stimulus
-expPara = struct('acqLen', 324, 'nStim', 20, ...
-    'stimDur', 1.5, 'stimDly', 14.50, 'blankDur', 4.0);
+expPara = struct('acqLen', 244, 'nStim', 20, ...
+    'stimDur', 1.5, 'stimDly', 10.50, 'blankDur', 4.0);
 
 % 2 blank periods (begin/end)
 % (Stim + ISI) * N stim presentation
@@ -59,7 +59,7 @@ for idx = 1 : n_session
     latent = latent / sum(latent);
     cum_lt = cumsum(latent);
     
-    cutoff = ceil(interp1(cum_lt, 1:length(cum_lt), 1-1e-5));
+    cutoff = sum(cum_lt < 1-1e-3);
     score = score(:, 1:cutoff);
     
     % setup motion nuisance regressors
