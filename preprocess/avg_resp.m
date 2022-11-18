@@ -71,7 +71,7 @@ for idx = 1 : n_session
     ts = ts - rgs * theta;
     
     %% Extract time course
-    baseShift = 4.5;
+    baseShift = 4.0;
     tRange = 0 : 0.5 : 3.5;
     signal = zeros(nStim, length(tRange), size(ts, 2));
     

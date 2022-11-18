@@ -134,7 +134,7 @@ fl_path = fullfile(base_dir, sub_name, fl);
 save(fl_path, 'results', 'roi_mask', 'sub_name', 'acq_type');
 
 %% Run GLM model with a new design (Oct 2022)
-sub_name = 'HERO_TW';
+sub_name = 'HERO_JM';
 acq_base = 'NeuralCoding%02d';
 base_dir = '~/Data/fMRI';
 
@@ -145,8 +145,8 @@ icafix = false;
 modelClass = 'glm';
 
 % Setup the structure of a single acquisition (check Python file)
-expPara = struct('acqLen', 324, 'nStim', 20, ...
-    'stimDur', 1.5, 'stimDly', 14.50, 'blankDur', 4.0);
+expPara = struct('acqLen', 244, 'nStim', 20, ...
+    'stimDur', 1.5, 'stimDly', 10.50, 'blankDur', 4.0);
 
 % Session: NeuralCoding01 / 02
 idx = 1;
