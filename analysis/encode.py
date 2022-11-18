@@ -47,8 +47,19 @@ class VoxelEncodeBase():
     def __init__(self, n_func=8, device='cpu'):
         '''
         n_func: number of basis functions
+
+        a set of basis tuning function
+        that tile through the space
         '''
-        self.pref = torch.arange(0, 180.0, 180.0 / n_func, dtype=torch.float32, device=device)
+        delta = 180.0 / n_func
+
+        pref = (np.arange(0, 180.0, delta)
+        + np.random.rand() * delta) % 180.0
+
+        self.pref = torch.tensor(pref,
+                    dtype=torch.float32,
+                    device=device)
+
         self.device = device
         self.beta = None
 
