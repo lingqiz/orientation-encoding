@@ -44,17 +44,18 @@ class VoxelEncodeBase():
         std = circstats.circstd(value / 90.0 * math.pi, weights=prob)
         return std / math.pi * 90.0
 
-    def __init__(self, n_func=8, device='cpu'):
+    def __init__(self, n_func=8, shift=0.0, device='cpu'):
         '''
         n_func: number of basis functions
+        shift: [0, 1], shift the tuning to different center
+        device: `cpu` or `cuda`
 
-        a set of basis tuning function
+        define a set of basis tuning function
         that tile through the space
         '''
         delta = 180.0 / n_func
-
         pref = (np.arange(0, 180.0, delta)
-        + np.random.rand() * delta) % 180.0
+                    + shift * delta) % 180.0
 
         self.pref = torch.tensor(pref,
                     dtype=torch.float32,
@@ -107,13 +108,13 @@ class VoxelEncodeBase():
 
 class VoxelEncodeNoise(VoxelEncodeBase):
 
-    def __init__(self, n_func=8, device='cpu'):
+    def __init__(self, n_func=8, shift=0.0, device='cpu'):
         '''
         n_func: number of basis functions
         rho: global noise correlation between voxels
         sigma: vector of noise standard deviations
         '''
-        super().__init__(n_func, device)
+        super().__init__(n_func, shift, device)
         self.rho = 0.0
         self.sigma = None
         self.cov = None
@@ -256,8 +257,8 @@ class VoxelEncodeNoise(VoxelEncodeBase):
 
 class VoxelEncode(VoxelEncodeNoise):
 
-    def __init__(self, n_func=8, device='cpu'):
-        super().__init__(n_func, device=device)
+    def __init__(self, n_func=8, shift=0.0, device='cpu'):
+        super().__init__(n_func, shift, device)
 
         # additional channel noise parameter
         self.chnl = None
