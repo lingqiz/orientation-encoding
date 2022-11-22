@@ -90,7 +90,7 @@ class VoxelEncodeBase():
 
         return torch.cat(result, dim=1)
 
-    def ols(self, stim, voxel):
+    def ols(self, stim, voxel, lda=0.0):
         '''
         Estimate model weights given stimulus and response
         Stage 1: estimate beta weights using least-square
@@ -101,9 +101,14 @@ class VoxelEncodeBase():
         stim = torch.tensor(stim, dtype=torch.float32, device=self.device)
         voxel = torch.tensor(voxel, dtype=torch.float32, device=self.device)
 
+        # construct the regressor
         rgs = self.tuning(stim, self.pref)
-        self.beta = torch.linalg.solve(rgs.t() @ rgs, rgs.t() @ voxel.t())
 
+        # solve for beta weights with ridge regression
+        outer = rgs.t() @ rgs
+        idnty = torch.eye(*outer.size(), out=torch.empty_like(outer))
+        self.beta = torch.linalg.solve(outer + lda * idnty,
+                                        rgs.t() @ voxel.t())
         return self.beta
 
 class VoxelEncodeNoise(VoxelEncodeBase):
