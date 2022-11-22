@@ -11,6 +11,10 @@ class RegressDecode():
         self.lda = 7.5e-4
 
     def fit_model(self, stim, resp):
+        '''
+        Fit two separate SVRs from voxel to
+        the sin and cos phase of orientation
+        '''
         stim = stim / self.range * 2 * np.pi
         sin = np.sin(stim)
         cos = np.cos(stim)
@@ -24,6 +28,10 @@ class RegressDecode():
             self.svr.append(svr_obj)
 
     def decode(self, resp):
+        '''
+        From the voxel response decode the
+        sin and cos value of the stimulus
+        '''
         sin, cos = [decoder.predict(resp.T) for
                     decoder in self.svr]
         est = np.arctan2(sin, cos)
