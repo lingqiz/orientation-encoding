@@ -10,7 +10,7 @@ base_dir = strcat('~/Data/fMRI', '/', sub_name, '/', acq_type);
 
 % default cutoff temporal frequency
 if ~exist('cutoff_t','var')
-    cutoff_t = 150.0;
+    cutoff_t = 180.0;
 end
 
 %% Time course of the stimulus
@@ -71,8 +71,8 @@ for idx = 1 : n_session
     ts = ts - rgs * theta;
     
     %% Extract time course
-    baseShift = 4.5;
-    tRange = 0 : 0.5 : 3.5;
+    baseShift = 4.0;
+    tRange = 0 : 0.5 : 4.0;
     signal = zeros(nStim, length(tRange), size(ts, 2));
     
     % get the time series
