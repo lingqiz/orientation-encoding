@@ -17,7 +17,6 @@ The code automatically tracks the acquisition number.
 See here for information regarding the [HCP pre-processing pipeline](https://github.com/Washington-University/HCPpipelines)  
 ~~Alternatively, skip ICAFIX and use ts_filter.py~~
 - Stimulus session:  
-Pre-process  
 *(option 1)* `ts_filter.m` (high-pass filter, motion regression, z-score within each run)  
 Next, run `glm_fit.m` (nonlinear fitting of GLM + HRF based on [ForwardModel](https://github.com/gkaguirrelab/forwardModel))    
   
