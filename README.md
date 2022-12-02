@@ -1,5 +1,4 @@
 # Orientation-Encode
-Code for running the experiment and data analysis pipeline for orientation encoding experiment with tilt illusion.
 
 ### Instruction
 Each subject should be assigned a unique `subject_ID`.
