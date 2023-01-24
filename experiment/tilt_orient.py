@@ -1,11 +1,12 @@
 from psychopy import core, visual
 from datetime import datetime
 from .sampler import sample_orientation
-import os, threading, json, time, numpy as np
+import os, json, numpy as np
 
 # for keyboard IO
 try:
     import keyboard
+    
 except Exception as exc:
     print(exc)
     print('Unable to import keyboard module, \
@@ -45,73 +46,6 @@ class DataRecord:
         data_mtx[1, :] = self.stimulus
 
         return data_mtx
-
-# separate thread for attention task
-class AttentThread(threading.Thread):
-    def __init__(self, exp):
-        threading.Thread.__init__(self)
-        self.exp = exp
-        self.init_delay = 2.5
-        self.min_gap = 5.0
-        self.onset_prob = 0.01
-        self.onset_itvl = 0.2
-        self.wait_flag = False
-
-    def run(self):
-        # function for the attention task
-        clock = core.Clock()
-
-        # initial delay start for 3s
-        clock.reset()
-        while clock.getTime() <= self.init_delay:
-            pass
-
-        while self.exp.exp_run:
-            if np.random.rand() < self.onset_prob:
-                # flip the color of fixation dot
-                gt = self.exp.global_clock.getTime()
-                self.exp.fixation.color = (1.0, 0.0, 0.0)
-
-                # wait for reaction
-                # for fMRI button box, use B and Y
-                clock.reset()
-                self._key_wait(['B', 'Y'])
-
-                # record RT
-                rt = clock.getTime()
-                self.exp.atten_rt.append((gt, rt))
-                self.exp.fixation.color = (0.5, 0.5, 0.5)
-
-                # min gap between attention task
-                clock.reset()
-                while self._delay_check(clock, self.min_gap):
-                    pass
-
-            # check flip dot condition every 200 ms (onset_itvl)
-            clock.reset()
-            while self._delay_check(clock, self.onset_itvl):
-                pass
-
-    def _key_wait(self, keys):
-        # wait on multiple keys
-        # B and Y for scanner two button box
-        self.wait_flag = True
-        def confirm_callback(event):
-            self.wait_flag= False
-
-        # register callback
-        for key in keys:
-            keyboard.on_release_key(key, confirm_callback)
-
-        # wait for key press
-        while self.wait_flag and self.exp.exp_run:
-            time.sleep(0.01)
-
-        keyboard.unhook_all()
-        return
-
-    def _delay_check(self, clock, itvl):
-        return clock.getTime() <= itvl and self.exp.exp_run
 
 class OrientEncode:
 
@@ -193,10 +127,7 @@ class OrientEncode:
         self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='raisedCos', size=0.25)
         self.center = visual.GratingStim(self.win, sf=0.0, size=2.0, mask='raisedCos', maskParams={'fringeWidth':0.15}, contrast=0.0)
         self.prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=10.0, lineColor='black', size=1, contrast=0.80)
-
-        # data recorder
-        self.record = DataRecord()
-
+        
         return
 
     def _save_json(self):
@@ -240,15 +171,7 @@ class OrientEncode:
         self.global_ctd = core.Clock()
 
         # initial blank period
-        self.global_ctd.add(self.blank)
-        # init the attention task for passive viewing condition
-        if self.atten_task:
-            self.exp_run = True
-            self.atten_rt = []
-
-            self.atten_thread = AttentThread(self)
-            self.atten_thread.start()
-
+        self.global_ctd.add(self.blank)        
         while self.global_ctd.getTime () <= 0:
             self._draw_blank()
 
@@ -304,16 +227,6 @@ class OrientEncode:
         return
 
     def save_data(self):
-        file_name = '_'.join([self.sub_val,
-                            'S' + str(self.counter),
-                            self.time_stmp])
-
-        # write the RT for the attention task
-        if self.atten_task:
-            rt_mtx = np.array(self.atten_rt)
-            file_path = os.path.join(self.data_dir, file_name)
-            np.savetxt(file_path + '_RT' + '.csv', rt_mtx, delimiter=",")
-
         # write subject record
         self._save_json()
 
