@@ -12,3 +12,4 @@ flywheel.key
 *.ipynb
 *.mlx
 *.mat
+.DS_Store
