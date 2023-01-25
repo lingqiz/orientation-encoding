@@ -1,7 +1,7 @@
 from psychopy import core, visual
 from datetime import datetime
 from .sampler import sample_orientation
-import os, json, numpy as np
+import os, json, random, numpy as np
 
 # for keyboard IO
 try:
@@ -56,6 +56,8 @@ class OrientEncode:
     DEFAULT_RESP = 4.0
     DEFAULT_ISI = 4.0
     N_SESSION = 20
+    N_COND = 3
+    SURROUND_VAL = [None, 35.0, 145.0]
 
     def __init__(self, sub_val, n_trial, mode='uniform', atten_task=False):
         # subject name/id
@@ -81,8 +83,17 @@ class OrientEncode:
             stim_seq = samples.astype(np.int).tolist()
             resp_seq = []
 
+            # sequence of conditions
+            cond = []
+            for _ in range(self.N_SESSION):
+                cond_idx = [0, 1, 2]
+                random.shuffle(cond_idx)
+                cond.extend(cond_idx)
+
             # create subject record and save initial json file
-            self.sub_record = {'Ses_Counter' : 0,
+            self.sub_record = {'Cond_List' : cond,
+                               'Ses_Counter' : 0,
+                               'Cond_Counter' : [0, 0, 0],
                                'Stim_Seq' : stim_seq,
                                'Resp_Seq' : resp_seq}
 
@@ -110,7 +121,9 @@ class OrientEncode:
         self.isi = self.DEFAULT_ISI
 
         # get the stimulus sequence
-        self.stim_seq = stim_seq[self.sub_record['Ses_Counter'], :]
+        self.run_idx = self.sub_record['Ses_Counter']
+        self.cond_idx = self.sub_record['Cond_List'][self.run_idx]
+        self.stim_seq = stim_seq[self.sub_record['Cond_Counter'][self.cond_idx], :]
 
         # initialize window, message
         # monitor = 'rm_413' for psychophysics and 'sc_3t' for imaging session
@@ -120,9 +133,9 @@ class OrientEncode:
         self.target = visual.GratingStim(self.win, sf=1.0, size=12.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.20)
         self.noise = visual.NoiseStim(self.win, units='pix', mask='raisedCos', size=1024, contrast=0.10, noiseClip=3.0,
                                     noiseType='Filtered', texRes=1024, noiseElementSize=4, noiseFractalPower=0,
-                                    noiseFilterLower=15.0/1024.0, noiseFilterUpper=25.0/1024.0, noiseFilterOrder=3.0)
-        # not in use for now
+                                    noiseFilterLower=15.0/1024.0, noiseFilterUpper=25.0/1024.0, noiseFilterOrder=3.0)        
         self.surround = visual.GratingStim(self.win, sf=1.0, size=18.0, mask='raisedCos', contrast=0.10)
+        self.surround.ori = self.SURROUND_VAL[self.cond_idx]
 
         self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='raisedCos', size=0.25)
         self.center = visual.GratingStim(self.win, sf=0.0, size=2.0, mask='raisedCos', maskParams={'fringeWidth':0.15}, contrast=0.0)
@@ -143,11 +156,12 @@ class OrientEncode:
 
     def start(self):
         # determine condition and sequence
-        self.counter = self.sub_record['Ses_Counter']
-        print('Acquisition ID %d' % self.counter)
-
-        # update condition and sequence
-        self.sub_record['Ses_Counter'] += 1
+        print('Acquisition ID %d' % self.run_idx)
+        print('Surround Cond %d #%d' % (self.cond_idx, 
+            self.sub_record['Cond_Counter'][self.cond_idx]))
+        
+        self.sub_record['Ses_Counter'] += 1    
+        self.sub_record['Cond_Counter'][self.cond_idx] += 1
 
         # set up for the first trial
         self.target.ori = self.stim_seq[0]
@@ -183,9 +197,15 @@ class OrientEncode:
                 t = self.global_ctd.getTime() + self.stim_dur
                 crst = 0.10 * np.cos(4.0 * np.pi * t + np.pi) + 0.10
 
-                self.noise.contrast = crst
-                self.noise.draw()
-
+                if self.cond_idx == 0:
+                    # draw noise surround
+                    self.noise.contrast = crst
+                    self.noise.draw()
+                else:
+                    # draw oriented surround
+                    self.surround.contrast = crst
+                    self.surround.draw()
+                
                 self.target.contrast = crst
                 self.target.draw()
                 self.center.draw()
@@ -202,8 +222,14 @@ class OrientEncode:
             if idx < self.n_trial - 1:
                 self.target.ori = self.stim_seq[idx + 1]
                 self.target.phase = np.random.rand()
-                self.noise.updateNoise()
 
+                # update surround
+                if self.cond_idx == 0:
+                    self.noise.updateNoise()
+                else:
+                    self.surround.phase = np.random.rand()
+
+            # blank period
             while self.global_ctd.getTime() <= 0:
                 self._draw_blank()
 
