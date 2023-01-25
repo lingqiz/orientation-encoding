@@ -57,7 +57,7 @@ class OrientEncode:
     DEFAULT_ISI = 4.0
     N_SESSION = 20
     N_COND = 3
-    SURROUND_VAL = [None, 35.0, 145.0]
+    SURROUND_VAL = [-1, 35.0, 145.0]
 
     def __init__(self, sub_val, n_trial, mode='uniform', atten_task=False):
         # subject name/id
