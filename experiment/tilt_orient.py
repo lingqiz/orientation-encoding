@@ -76,12 +76,13 @@ class OrientEncode:
 
             # sample stimulus to present
             # using stratified sampling over [0, 1] to ensure uniformity
-            edges = np.linspace(0, 1, n_trial * self.N_SESSION + 1)
-            samples = np.array([np.random.uniform(edges[idx], edges[idx+1])
+            stim_seq = []
+            for _ in range(self.N_COND):
+                edges = np.linspace(0, 1, n_trial * self.N_SESSION + 1)
+                samples = np.array([np.random.uniform(edges[idx], edges[idx+1])
                                 for idx in range(n_trial * self.N_SESSION)]) * 180.0
-            np.random.shuffle(samples)
-            stim_seq = samples.astype(np.int).tolist()
-            resp_seq = []
+                np.random.shuffle(samples)
+                stim_seq.extend(samples.astype(np.int).tolist())
 
             # sequence of conditions
             cond = []
@@ -95,14 +96,11 @@ class OrientEncode:
                                'Ses_Counter' : 0,
                                'Cond_Counter' : [0, 0, 0],
                                'Stim_Seq' : stim_seq,
-                               'Resp_Seq' : resp_seq}
+                               'Resp_Seq' : []}
 
             self._save_json()
             print('create subject file at ' + self.record_path)
-
-        stim_seq = np.reshape(np.array(self.sub_record['Stim_Seq']),
-                             (self.N_SESSION, n_trial))
-
+        
         # will be used for recording response
         self.resp_flag = True
         self.increment = 0
@@ -123,8 +121,11 @@ class OrientEncode:
         # get the stimulus sequence
         self.run_idx = self.sub_record['Ses_Counter']
         self.cond_idx = self.sub_record['Cond_List'][self.run_idx]
+       
+        all_stims = np.reshape(np.array(self.sub_record['Stim_Seq']), (self.N_COND, -1))
+        stim_seq = np.reshape(all_stims[self.cond_idx, :], (self.N_SESSION, n_trial))
         self.stim_seq = stim_seq[self.sub_record['Cond_Counter'][self.cond_idx], :]
-
+        
         # initialize window, message
         # monitor = 'rm_413' for psychophysics and 'sc_3t' for imaging session
         self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, screen=1, monitor='sc_3t', units='deg', winType=window_backend)
@@ -156,8 +157,8 @@ class OrientEncode:
 
     def start(self):
         # determine condition and sequence
-        print('Acquisition ID %d' % self.run_idx)
-        print('Surround Cond %d #%d' % (self.cond_idx, 
+        print('Acquisition Total Run #%d' % self.run_idx)
+        print('Surround Cond %d, Run #%d' % (self.cond_idx, 
             self.sub_record['Cond_Counter'][self.cond_idx]))
         
         self.sub_record['Ses_Counter'] += 1    
