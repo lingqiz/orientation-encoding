@@ -25,4 +25,5 @@ for _ in range(N_BLOCK):
 
         exp.run()
         exp.save_data()
-        print('Finished 1 Run')
+        
+        print('Finished 1 Run \n')
