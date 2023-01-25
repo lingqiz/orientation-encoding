@@ -2,7 +2,7 @@
 /analysis/circstat
 /preprocess/cifti-matlab
 /docs
-/Behavior
+/Behavior/*
 /Neural/*
 /data/*
 __pycache__
