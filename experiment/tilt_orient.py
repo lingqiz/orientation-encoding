@@ -146,7 +146,7 @@ class OrientEncode:
 
         return
 
-    def start(self):
+    def start(self, wait_on_key=True):
         # get the stimulus sequence
         self.run_idx = self.sub_record['Ses_Counter']
         self.cond_idx = self.sub_record['Cond_List'][self.run_idx]
@@ -169,34 +169,30 @@ class OrientEncode:
         self.target.ori = self.stim_seq[0]
         self.target.phase = np.random.rand()
 
-        # wait for scanner signal
-        self.io_wait(wait_key='T')
+        # wait for confirmation
+        if wait_on_key:
+            self.io_wait(wait_key='space')
 
         return
 
     def run(self):
-        '''
-        Experiment parameters:
-            12.0s * 1 blank (beginning)
-            20 trial * (1.5s stim + 10.5s delay)
-            252s total, 252/0.8 = 315 TRs
-        '''
+        
         # start experiment
         # clock for global and trial timing
         self.global_clock = core.Clock()
-        self.global_ctd = core.Clock()
+        self.clock = core.Clock()
 
         # initial blank period
-        self.global_ctd.add(self.blank)        
-        while self.global_ctd.getTime () <= 0:
+        self.clock.reset()
+        while self.clock.getTime () <= self.blank:
             self._draw_blank()
 
         for idx in range(self.n_trial):
             # draw stimulus for a fixed duration
-            self.global_ctd.add(self.stim_dur)
-            while self.global_ctd.getTime() <= 0:
+            self.clock.reset()           
+            while self.clock.getTime() <= self.stim_dur:
                 # 2 hz contrast modulation
-                t = self.global_ctd.getTime() + self.stim_dur
+                t = self.clock.getTime()
                 crst = 0.05 * np.cos(4.0 * np.pi * t + np.pi) + 0.05
 
                 if self.cond_idx == 0:
@@ -215,13 +211,10 @@ class OrientEncode:
                 # draw fixation dot
                 self.fixation.draw()
                 self.win.flip()
-
-            # slight jitter (+/- 0.5 sec) in delay period
-            delta = np.random.uniform(0, 1) - 0.5
-
+          
             # blank screen for delay duration
             # also set up the next stim
-            self.global_ctd.add(self.delay + delta)
+            self.clock.reset()
 
             # setup stim condition for next trial
             if idx < self.n_trial - 1:
@@ -235,18 +228,16 @@ class OrientEncode:
                     self.surround.phase = np.random.rand()
 
             # blank period
-            while self.global_ctd.getTime() <= 0:
+            while self.clock.getTime() <= self.delay:
                 self._draw_blank()
 
             # response period
-            resp_dur = self.resp_dur - delta
-            self.global_ctd.add(resp_dur)
-            response = self.io_response(resp_dur)
+            response = self.io_response()
             self.sub_record['Resp_Seq'].append(int(response))
 
             # ISI
-            self.global_ctd.add(self.isi)
-            while self.global_ctd.getTime() <= 0:
+            self.clock.reset()
+            while self.clock.getTime() <= self.isi:
                 self._draw_blank()
 
         # record session time
@@ -278,26 +269,29 @@ class OrientEncode:
 # Implement IO method with keyboard
 class OrientEncodeKeyboard(OrientEncode):
 
-    def io_wait(self, wait_key='space'):
+    def io_wait(self):
         '''override io_wait'''
         self.resp_flag = True
         def confirm_callback(event):
             self.resp_flag= False
 
         # register callback, wait for key press
-        keyboard.on_release_key(wait_key, confirm_callback)
+        keyboard.on_release_key('space', confirm_callback)
         while self.resp_flag:
+            self.welcome.draw()
+            self.inst1.draw()
+            self.inst2.draw()
             self.win.flip()
 
-        keyboard.unhook_all()
         return
 
-    def io_response(self, dur):
+    def io_response(self):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
         self.prob.setOri(resp)
 
         # global variable for recording response
+        self.resp_flag = True
         self.increment = 0
 
         # define callback function for keyboard event
@@ -310,19 +304,24 @@ class OrientEncodeKeyboard(OrientEncode):
         def release_callback(event):
             self.increment = 0.0
 
+        def confirm_callback(event):
+            self.resp_flag = False
+
+        def aboard_callback(event):
+            self.resp_flag = False
+            self.win.close()
+            core.quit()
+
         # key binding for recording response
-        key_bind = {'A':left_callback, 'D':right_callback}
+        key_bind = {'left':left_callback, 'right':right_callback, 'space':confirm_callback, 'escape':aboard_callback}
         for key, callback in key_bind.items():
             keyboard.on_press_key(key, callback)
 
-        for key in ['A', 'D']:
+        for key in ['left', 'right']:
             keyboard.on_release_key(key, release_callback)
 
         # wait/record for response
-        while self.global_ctd.getTime() <= 0:
-            t = self.global_ctd.getTime()
-            self.prob.contrast = np.abs(t / dur * 0.75)
-
+        while self.resp_flag:
             if not self.increment == 0:
                 resp += self.increment
                 resp %= 180
@@ -359,7 +358,9 @@ class OrientEncodeButtons(OrientEncode):
             self.welcome.draw()
             self.inst1.draw()
             self.inst2.draw()
-            self.win.flip()        
+            self.win.flip()
+
+        self.record = DataRecord()
 
     def pause(self):
         core.wait(0.5)
@@ -373,7 +374,7 @@ class OrientEncodeButtons(OrientEncode):
         '''override io_wait'''
         return
 
-    def io_response(self, dur):
+    def io_response(self):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
         self.prob.setOri(resp)
