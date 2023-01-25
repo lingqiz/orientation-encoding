@@ -52,7 +52,7 @@ class OrientEncode:
     # default parameters for the experiment
     DEFAULT_DUR = 0.5
     DEFAULT_BLANK = 4.0
-    DEFAULT_DELAY = 1.0        
+    DEFAULT_DELAY = 1.5
     DEFAULT_RESP = 3.5
     DEFAULT_ISI = 1.5
     DEFAULT_LEN = 5.0
