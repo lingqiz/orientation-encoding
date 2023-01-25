@@ -171,7 +171,7 @@ class OrientEncode:
 
         # wait for confirmation
         if wait_on_key:
-            self.io_wait(wait_key='space')
+            self.io_wait()
 
         return
 
@@ -263,11 +263,15 @@ class OrientEncode:
     def io_wait(self):
         raise NotImplementedError("IO Method not implemented in the base class")
 
-    def io_response(self, dur):
+    def io_response(self):
         raise NotImplementedError("IO Method not implemented in the base class")
 
 # Implement IO method with keyboard
 class OrientEncodeKeyboard(OrientEncode):
+
+    def __init__(self, sub_val):
+        super().__init__(sub_val)
+        self.pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Press Space when you are ready to continue.')
 
     def io_wait(self):
         '''override io_wait'''
@@ -278,9 +282,7 @@ class OrientEncodeKeyboard(OrientEncode):
         # register callback, wait for key press
         keyboard.on_release_key('space', confirm_callback)
         while self.resp_flag:
-            self.welcome.draw()
-            self.inst1.draw()
-            self.inst2.draw()
+            self.pause_msg.draw()
             self.win.flip()
 
         return
@@ -337,15 +339,15 @@ class OrientEncodeKeyboard(OrientEncode):
 # IO with joystick button push
 class OrientEncodeButtons(OrientEncode):
 
-    def __init__(self, sub_val, n_trial, mode='uniform', show_fb=False, joy_id=0):
-        super(OrientEncodeButtons, self).__init__(sub_val, n_trial, mode, show_fb)
+    def __init__(self, sub_val, joy_id=0):
+        super().__init__(sub_val)        
+        self.pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Press L2 or R2 when you are ready to continue.')
+
+        # joystick setup
         self.L1 = 4
         self.L2 = 6
         self.R1 = 5
         self.R2 = 7
-
-        self.welcome = visual.TextStim(self.win, pos=[0,-5], text='Thanks for your time. Press L2 or R2 to continue.')
-        self.pause_msg = visual.TextStim(self.win, pos=[0, 0], text='Take a short break. Press L2 or R2 when you are ready to continue.')
 
         nJoys = joystick.getNumJoysticks()
         if nJoys < joy_id:
@@ -353,25 +355,12 @@ class OrientEncodeButtons(OrientEncode):
 
         self.joy = joystick.Joystick(joy_id)
 
-    def start(self):
-        while not self.confirm_press():
-            self.welcome.draw()
-            self.inst1.draw()
-            self.inst2.draw()
-            self.win.flip()
-
-        self.record = DataRecord()
-
-    def pause(self):
-        core.wait(0.5)
-        self.win.flip()
+    def io_wait(self):
+        '''override io_wait'''
         while not self.confirm_press():
             self.pause_msg.draw()
             self.win.flip()
 
-    # override start and pause so io_wait is not required anymore
-    def io_wait(self):
-        '''override io_wait'''
         return
 
     def io_response(self):
