@@ -53,13 +53,12 @@ class OrientEncode:
     DEFAULT_DUR = 0.5
     DEFAULT_BLANK = 4.0
     DEFAULT_DELAY = 2.0
-    DEFAULT_RESP = 3.5
     DEFAULT_ISI = 1.5
     DEFAULT_LEN = 5.0
 
     # conditions of the experiment
     N_COND = 3
-    N_SESSION = 20
+    N_SESSION = 24
     N_TRIAL = 20
     SURROUND_VAL = [-1, 30.0, 135.0]
 
@@ -74,7 +73,6 @@ class OrientEncode:
         self.stim_dur = self.DEFAULT_DUR
         self.blank = self.DEFAULT_BLANK
         self.delay = self.DEFAULT_DELAY
-        self.resp_dur = self.DEFAULT_RESP
         self.isi = self.DEFAULT_ISI
 
         # create condition sequence / record file for each subject
