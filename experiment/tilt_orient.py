@@ -49,20 +49,33 @@ class DataRecord:
 
 class OrientEncode:
 
+    # default parameters for the experiment
     DEFAULT_DUR = 1.5
-    DEFAULT_DELAY = 10.5
-    DEFAULT_BLANK = 12.0
-    DEFAULT_LEN = 5.0
+    DEFAULT_BLANK = 4.0
+    DEFAULT_DELAY = 4.5        
     DEFAULT_RESP = 4.0
-    DEFAULT_ISI = 4.0
-    N_SESSION = 20
+    DEFAULT_ISI = 2.0
+    DEFAULT_LEN = 5.0
+
+    # conditions of the experiment
     N_COND = 3
+    N_SESSION = 20
+    N_TRIAL = 20
     SURROUND_VAL = [-1, 35.0, 145.0]
 
-    def __init__(self, sub_val, n_trial, mode='uniform', atten_task=False):
+    def __init__(self, sub_val):
         # subject name/id
         self.sub_val = sub_val
         self.time_stmp = datetime.now().strftime("%d_%m_%Y_%H_%M_")
+
+        # set parameter for the experiment
+        self.n_trial = self.N_TRIAL
+        self.line_len = self.DEFAULT_LEN
+        self.stim_dur = self.DEFAULT_DUR
+        self.blank = self.DEFAULT_BLANK
+        self.delay = self.DEFAULT_DELAY
+        self.resp_dur = self.DEFAULT_RESP
+        self.isi = self.DEFAULT_ISI
 
         # create condition sequence / record file for each subject
         self.data_dir = os.path.join('.', 'Neural', self.sub_val)
@@ -78,9 +91,9 @@ class OrientEncode:
             # using stratified sampling over [0, 1] to ensure uniformity
             stim_seq = []
             for _ in range(self.N_COND):
-                edges = np.linspace(0, 1, n_trial * self.N_SESSION + 1)
+                edges = np.linspace(0, 1, self.n_trial * self.N_SESSION + 1)
                 samples = np.array([np.random.uniform(edges[idx], edges[idx+1])
-                                for idx in range(n_trial * self.N_SESSION)]) * 180.0
+                                for idx in range(self.n_trial * self.N_SESSION)]) * 180.0
                 np.random.shuffle(samples)
                 stim_seq.extend(samples.astype(np.int).tolist())
 
@@ -105,25 +118,12 @@ class OrientEncode:
         self.resp_flag = True
         self.increment = 0
 
-        # parameter for the experiment
-        self.n_trial = n_trial
-        self.mode = mode
-        self.atten_task = atten_task
-        self.show_center = True
-
-        self.line_len = self.DEFAULT_LEN
-        self.stim_dur = self.DEFAULT_DUR
-        self.delay = self.DEFAULT_DELAY
-        self.blank = self.DEFAULT_BLANK
-        self.resp_dur = self.DEFAULT_RESP
-        self.isi = self.DEFAULT_ISI
-
         # get the stimulus sequence
         self.run_idx = self.sub_record['Ses_Counter']
         self.cond_idx = self.sub_record['Cond_List'][self.run_idx]
        
         all_stims = np.reshape(np.array(self.sub_record['Stim_Seq']), (self.N_COND, -1))
-        stim_seq = np.reshape(all_stims[self.cond_idx, :], (self.N_SESSION, n_trial))
+        stim_seq = np.reshape(all_stims[self.cond_idx, :], (self.N_SESSION, self.n_trial))
         self.stim_seq = stim_seq[self.sub_record['Cond_Counter'][self.cond_idx], :]
         
         # initialize window, message
