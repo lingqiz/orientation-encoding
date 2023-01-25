@@ -215,9 +215,12 @@ class OrientEncode:
                 self.fixation.draw()
                 self.win.flip()
 
+            # slight jitter (+/- 0.5 sec) in delay period
+            delta = np.random.uniform(0, 1) - 0.5
+
             # blank screen for delay duration
             # also set up the next stim
-            self.global_ctd.add(self.delay)
+            self.global_ctd.add(self.delay + delta)
 
             # setup stim condition for next trial
             if idx < self.n_trial - 1:
@@ -235,8 +238,9 @@ class OrientEncode:
                 self._draw_blank()
 
             # response period
-            self.global_ctd.add(self.resp_dur)
-            response = self.io_response()
+            resp_dur = self.resp_dur - delta
+            self.global_ctd.add(resp_dur)
+            response = self.io_response(resp_dur)
             self.sub_record['Resp_Seq'].append(int(response))
 
             # ISI
@@ -271,7 +275,7 @@ class OrientEncode:
     def io_wait(self):
         raise NotImplementedError("IO Method not implemented in the base class")
 
-    def io_response(self):
+    def io_response(self, dur):
         raise NotImplementedError("IO Method not implemented in the base class")
 
 # Implement IO method with keyboard
@@ -291,7 +295,7 @@ class OrientEncodeKeyboard(OrientEncode):
         keyboard.unhook_all()
         return
 
-    def io_response(self):
+    def io_response(self, dur):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
         self.prob.setOri(resp)
@@ -320,7 +324,7 @@ class OrientEncodeKeyboard(OrientEncode):
         # wait/record for response
         while self.global_ctd.getTime() <= 0:
             t = self.global_ctd.getTime()
-            self.prob.contrast = np.abs(t / self.resp_dur * 0.75)
+            self.prob.contrast = np.abs(t / dur * 0.75)
 
             if not self.increment == 0:
                 resp += self.increment
@@ -374,7 +378,7 @@ class OrientEncodeButtons(OrientEncode):
         '''override io_wait'''
         return
 
-    def io_response(self):
+    def io_response(self, dur):
         '''override io_response'''
         resp = int(sample_orientation(n_sample=1, uniform=True))
         self.prob.setOri(resp)
