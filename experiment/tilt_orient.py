@@ -58,7 +58,7 @@ class OrientEncode:
 
     # conditions of the experiment
     N_COND = 3
-    N_SESSION = 24
+    N_SESSION = 16
     N_TRIAL = 20
     SURROUND_VAL = [-1, 30.0, 135.0]
 
