@@ -251,10 +251,6 @@ class OrientEncode:
         # record session time
         self.session_time = self.global_clock.getTime()
 
-        if self.atten_task:
-            self.exp_run = False
-            self.atten_thread.join()
-
         return
 
     def save_data(self):
