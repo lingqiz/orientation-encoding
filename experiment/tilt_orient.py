@@ -50,18 +50,18 @@ class DataRecord:
 class OrientEncode:
 
     # default parameters for the experiment
-    DEFAULT_DUR = 1.5
+    DEFAULT_DUR = 0.5
     DEFAULT_BLANK = 4.0
-    DEFAULT_DELAY = 4.5        
-    DEFAULT_RESP = 4.0
-    DEFAULT_ISI = 2.0
+    DEFAULT_DELAY = 1.0        
+    DEFAULT_RESP = 3.5
+    DEFAULT_ISI = 1.5
     DEFAULT_LEN = 5.0
 
     # conditions of the experiment
     N_COND = 3
     N_SESSION = 20
     N_TRIAL = 20
-    SURROUND_VAL = [-1, 35.0, 145.0]
+    SURROUND_VAL = [-1, 30.0, 135.0]
 
     def __init__(self, sub_val):
         # subject name/id
@@ -78,7 +78,7 @@ class OrientEncode:
         self.isi = self.DEFAULT_ISI
 
         # create condition sequence / record file for each subject
-        self.data_dir = os.path.join('.', 'Neural', self.sub_val)
+        self.data_dir = os.path.join('.', 'Behavior', self.sub_val)
         self.record_path = os.path.join(self.data_dir, self.sub_val + '.json')
 
         if os.path.exists(self.record_path):
@@ -117,26 +117,17 @@ class OrientEncode:
         # will be used for recording response
         self.resp_flag = True
         self.increment = 0
-
-        # get the stimulus sequence
-        self.run_idx = self.sub_record['Ses_Counter']
-        self.cond_idx = self.sub_record['Cond_List'][self.run_idx]
-       
-        all_stims = np.reshape(np.array(self.sub_record['Stim_Seq']), (self.N_COND, -1))
-        stim_seq = np.reshape(all_stims[self.cond_idx, :], (self.N_SESSION, self.n_trial))
-        self.stim_seq = stim_seq[self.sub_record['Cond_Counter'][self.cond_idx], :]
         
         # initialize window, message
         # monitor = 'rm_413' for psychophysics and 'sc_3t' for imaging session
-        self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, screen=1, monitor='sc_3t', units='deg', winType=window_backend)
+        self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, screen=1, monitor='rm_413', units='deg', winType=window_backend)
 
         # initialize stimulus
         self.target = visual.GratingStim(self.win, sf=1.0, size=10.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.20)
         self.noise = visual.NoiseStim(self.win, units='pix', mask='raisedCos', size=1024, contrast=0.10, noiseClip=3.0,
                                     noiseType='Filtered', texRes=1024, noiseElementSize=4, noiseFractalPower=0,
                                     noiseFilterLower=15.0/1024.0, noiseFilterUpper=25.0/1024.0, noiseFilterOrder=3.0)        
-        self.surround = visual.GratingStim(self.win, sf=1.0, size=18.0, mask='raisedCos', contrast=0.10)
-        self.surround.ori = self.SURROUND_VAL[self.cond_idx]
+        self.surround = visual.GratingStim(self.win, sf=1.0, size=18.0, mask='raisedCos', contrast=0.10)        
 
         self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='raisedCos', size=0.25)
         self.center = visual.GratingStim(self.win, sf=0.0, size=2.0, mask='raisedCos', maskParams={'fringeWidth':0.15}, contrast=0.0)
@@ -156,6 +147,16 @@ class OrientEncode:
         return
 
     def start(self):
+        # get the stimulus sequence
+        self.run_idx = self.sub_record['Ses_Counter']
+        self.cond_idx = self.sub_record['Cond_List'][self.run_idx]
+       
+        all_stims = np.reshape(np.array(self.sub_record['Stim_Seq']), (self.N_COND, -1))
+        stim_seq = np.reshape(all_stims[self.cond_idx, :], (self.N_SESSION, self.n_trial))
+        self.stim_seq = stim_seq[self.sub_record['Cond_Counter'][self.cond_idx], :]
+
+        self.surround.ori = self.SURROUND_VAL[self.cond_idx]
+
         # determine condition and sequence
         print('Acquisition Total Run #%d' % self.run_idx)
         print('Surround Cond %d, Run #%d' % (self.cond_idx, 
@@ -310,11 +311,11 @@ class OrientEncodeKeyboard(OrientEncode):
             self.increment = 0.0
 
         # key binding for recording response
-        key_bind = {'B':left_callback, 'Y':right_callback}
+        key_bind = {'A':left_callback, 'D':right_callback}
         for key, callback in key_bind.items():
             keyboard.on_press_key(key, callback)
 
-        for key in ['B', 'Y']:
+        for key in ['A', 'D']:
             keyboard.on_release_key(key, release_callback)
 
         # wait/record for response
@@ -358,9 +359,7 @@ class OrientEncodeButtons(OrientEncode):
             self.welcome.draw()
             self.inst1.draw()
             self.inst2.draw()
-            self.win.flip()
-
-        self.record = DataRecord()
+            self.win.flip()        
 
     def pause(self):
         core.wait(0.5)
