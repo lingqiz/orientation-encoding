@@ -123,7 +123,7 @@ class OrientEncode:
         self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, screen=1, monitor='rm_413', units='deg', winType=window_backend)
 
         # initialize stimulus
-        self.target = visual.GratingStim(self.win, sf=1.0, size=10.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.20)
+        self.target = visual.GratingStim(self.win, sf=1.0, size=10.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.10)
         self.noise = visual.NoiseStim(self.win, units='pix', mask='raisedCos', size=1024, contrast=0.10, noiseClip=3.0,
                                     noiseType='Filtered', texRes=1024, noiseElementSize=4, noiseFractalPower=0,
                                     noiseFilterLower=15.0/1024.0, noiseFilterUpper=25.0/1024.0, noiseFilterOrder=3.0)        
@@ -197,7 +197,7 @@ class OrientEncode:
             while self.global_ctd.getTime() <= 0:
                 # 2 hz contrast modulation
                 t = self.global_ctd.getTime() + self.stim_dur
-                crst = 0.10 * np.cos(4.0 * np.pi * t + np.pi) + 0.10
+                crst = 0.05 * np.cos(4.0 * np.pi * t + np.pi) + 0.05
 
                 if self.cond_idx == 0:
                     # draw noise surround
