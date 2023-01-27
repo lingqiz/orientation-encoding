@@ -38,10 +38,14 @@ for subject in subjects:
     print(subject_id)
 
     for st in struct:
-        if subject.id == st.parents.subject:
-            struct_gear = st
-            struct_result = struct_gear.get_file(subject_id + '_hcpstruct.zip')
-
+        if subject.id == st.parents.subject:            
+            struct_result = st.get_file(subject_id + '_hcpstruct.zip')
+            
+            # backwards compatibility with HERO_SUBJ labels
+            if struct_result is None:
+                old_id = 'HERO' + subject_id[4:]                
+                struct_result = st.get_file(old_id + '_hcpstruct.zip')
+                
     # Loop through sessions and run hcp_func if not already done
     sessions = subject.sessions()
     for session in sessions:
@@ -91,7 +95,7 @@ for subject in subjects:
 
                     new_analysis_label = analysis_label + ' ' + acquisition.label + ' ' + now
 
-                    # Submit the gear
+                    # Submit the gear                    
                     print('Submitting %s' % acquisition.label)
                     _id = qp.run(analysis_label=new_analysis_label, config=config,
                                 inputs=inputs, destination=session)
