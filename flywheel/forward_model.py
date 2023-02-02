@@ -39,7 +39,7 @@ for sub_label in all_data.keys():
     analyses = prf_ses.analyses
 
     # Index for the icafix zip file
-    func_index = 2
+    func_index = 4
     func_data = []
     ts_filter = None
     struct_data = None
