@@ -34,11 +34,18 @@ for sub_label in all_data.keys():
     print('\nDownload time series data for: %s' % sub_label)
     sessions = all_data[sub_label]
 
+    sub_dir = os.path.join(base, sub_label)
+    if not os.path.exists(sub_dir):
+        os.system("mkdir %s" % sub_dir)
+
     for ses_name in sessions.keys():
         if ses_name.startswith('Neural0'):
             print(ses_name)
             base_dir = os.path.join(base, sub_label, ses_name)
             analyses = all_data[sub_label][ses_name].analyses
+
+            if not os.path.exists(base_dir):
+                os.system("mkdir %s" % base_dir)
 
             for ana in analyses:
                 regex = r'hcp-func.*acq.*run-([0-9][0-9]).*'
@@ -49,8 +56,9 @@ for sub_label in all_data.keys():
 
                     # Local file name
                     file_dest= os.path.join(base_dir, local_fl % run_id)
-
                     # Remote file path
                     file_name = prefix + (suffix % int(match.group(1)))
                     file_path = remote_fl % (prefix, run_id, run_id)
+
+                    # download file
                     ana.download_file_zip_member(file_name, file_path, file_dest)
