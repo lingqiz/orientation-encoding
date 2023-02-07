@@ -4,11 +4,15 @@
 import sys, os, re
 from local_utils import *
 
-# Setup directories
+# Setup directories and file target names
 home = os.path.expanduser('~')
 base = os.path.join(home, 'Data', 'fMRI')
+
 local_fl = 'func-%02d_Atlas.dtseries.nii'
 remote_fl = '%s/MNINonLinear/Results/func-%02d/func-%02d_Atlas.dtseries.nii'
+
+regs_local = 'func-%02d_Movement_Regressors_dt.txt'
+regs_remote = '%s/MNINonLinear/Results/func-%02d/Movement_Regressors_dt.txt'
 
 # Initialize flywheel client
 label = 'label=orientation_encoding'
@@ -53,12 +57,16 @@ for sub_label in all_data.keys():
                 if match:
                     print(ana.label)
                     run_id = int(match.group(1))
+                    file_name = prefix + (suffix % run_id)
 
+                    # Download the time series file
                     # Local file name
                     file_dest= os.path.join(base_dir, local_fl % run_id)
                     # Remote file path
-                    file_name = prefix + (suffix % int(match.group(1)))
                     file_path = remote_fl % (prefix, run_id, run_id)
+                    ana.download_file_zip_member(file_name, file_path, file_dest)
 
-                    # download file
+                    # Download the regressor file
+                    file_dest= os.path.join(base_dir, regs_local % run_id)
+                    file_path = regs_remote % (prefix, run_id)
                     ana.download_file_zip_member(file_name, file_path, file_dest)
