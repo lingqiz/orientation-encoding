@@ -18,12 +18,18 @@ regs_remote = '%s/MNINonLinear/Results/func-%02d/Movement_Regressors_dt.txt'
 label = 'label=orientation_encoding'
 fw, project, time_stamp = flywheel_init(label)
 
-# Only run on specified subjects
-# given by command line argument
-# Second argument is mag_factor
-sub_name = sys.argv[-2]
-prefix = sys.argv[-1]
+# Only run on specified subjects given by command line argument
+# prefix is used for backwards backwards compatibility (HERO_SUB)
 suffix = '_func-%02d_hcpfunc.zip'
+
+if len(sys.argv) == 2:
+    sub_name = sys.argv[-1]
+    prefix = sys.argv[-1]
+elif len(sys.argv) == 3:
+    sub_name = sys.argv[-2]
+    prefix = sys.argv[-1]
+else:
+    raise TypeError('Incorrect number of input arguments.')
 
 # Iterate and record all sessions, sort by subject
 all_data = get_all_data(project)
