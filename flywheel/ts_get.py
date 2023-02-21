@@ -34,13 +34,11 @@ else:
 # Iterate and record all sessions, sort by subject
 all_data = get_all_data(project)
 
-# Run forward model on subject's pRF data
 for sub_label in all_data.keys():
     # Only run on specified subjects
     if sub_label != sub_name:
         continue
 
-    # Locate Neural sessions
     print('\nDownload time series data for: %s' % sub_label)
     sessions = all_data[sub_label]
 
@@ -48,6 +46,18 @@ for sub_label in all_data.keys():
     if not os.path.exists(sub_dir):
         os.system("mkdir %s" % sub_dir)
 
+    # Locate pRF session
+    analysis = sessions['pRF'].analyses
+    for ana in analysis:
+        if ana.label.startswith('Bayes_pRF'):
+            target = os.path.join(sub_dir, 'bayes_pRF.zip')
+            ana.download_file(prefix+'_cifti_maps.zip', target)
+
+        if ana.label.startswith('ForwardModel_pRF'):
+            target = os.path.join(sub_dir, 'forward_pRF.zip')
+            ana.download_file(prefix+'_maps_cifti.zip', target)
+
+    # Locate Neural sessions
     for ses_name in sessions.keys():
         if ses_name.startswith('Neural0'):
             print(ses_name)
