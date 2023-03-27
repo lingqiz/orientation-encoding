@@ -1,3 +1,7 @@
+%% Analysis behavioral data from orientation estimation data
+% 2022 LQZ 
+% This code was written to analysis data from the plioting experiment
+
 %% Setup path and plotting format
 try
     tbUse('plotlab');

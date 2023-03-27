@@ -23,7 +23,7 @@ plot(support, average, 'k', 'LineWidth', 2, 'color', lineColor); hold on;
 
 % axis and axis ticks
 xlim([0, 180]);
-ylim([-15, 15]);
+ylim([-18, 18]);
 
 xticks(0:45:180);
 xlabel('Orientation (deg)');
