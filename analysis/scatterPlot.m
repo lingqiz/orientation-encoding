@@ -16,7 +16,9 @@ average = result.average / (2 * pi) * 180;
 
 markerColor = ones(1, 3) * 0.5;
 if showData
-    scatter(target, bias, 12, 'MarkerFaceColor', markerColor, 'MarkerEdgeColor', markerColor); hold on;
+    scatter(target, bias, 12, 'MarkerFaceColor', markerColor, ...
+        'MarkerEdgeColor', markerColor, 'MarkerEdgeAlpha', 0);
+    hold on;
 end
 
 plot(support, average, 'k', 'LineWidth', 2, 'color', lineColor); hold on;
