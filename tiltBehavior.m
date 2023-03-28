@@ -5,17 +5,6 @@
 
 % Run behavior.py in preprocess to convert JSON file to MAT format
 
-%% Setup path and plotting format
-try
-    tbUse('plotlab');
-    plotlabOBJ = plotlab();
-    plotlabOBJ.applyRecipe(...
-        'figureWidthInches', 10, ...
-        'figureHeightInches', 12);
-catch EXP
-    fprintf('plotlab not available, use default MATLAB style \n');
-end
-
 %% Set library and data path
 addpath('./analysis/');
 addpath('./analysis/circstat/');
@@ -58,7 +47,7 @@ fiBase = fiBase / length(subID);
 fi_1 = fi_1 / length(subID);
 fi_2 = fi_2 / length(subID);
 
-% plot average the FI
+%% Plot average the FI
 figure();
 subplot(3, 2, 1);
 plot(support, fiBase, 'k', 'LineWidth', 2);

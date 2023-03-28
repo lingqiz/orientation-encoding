@@ -35,6 +35,7 @@ if showPlot
     xlabel('Orientation (deg)');
     
     ylim([0.0 0.40]);
+    yticks(0:0.1:0.4);
     ylabel('Normalized FI');
     
     % add reference lines
