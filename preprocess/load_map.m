@@ -1,10 +1,9 @@
 function [eccen, varea, rsqr] = load_map(sub_name)
 
 % Data directories
-base_dir = '~/Data/fMRI';
-acq_type = 'pRF';
-data_dir = fullfile(base_dir, sub_name, acq_type, ...
-                strcat(sub_name, '_cifti_maps'));
+base_dir = '~/Data/fMRI/ORNT';
+acq_type = 'cifti_maps';
+data_dir = fullfile(base_dir, sub_name, acq_type);
 
 % Load cifti data
 eccen_fl = strcat(sub_name, '_inferred_eccen.dtseries.nii');

@@ -1,9 +1,7 @@
-function average_hrf(sub_name)
+function [tRange, meanSig] = avg_hrf(sub_name, acq_type, run_idx)
 %% Setup the subject ROI index
-acq_type = 'NeuralCoding01';
-
 addpath('cifti-matlab');
-base_dir = strcat('~/Data/fMRI', '/', sub_name, '/', acq_type);
+base_dir = strcat('~/Data/fMRI/ORNT', '/', sub_name, '/', acq_type);
 [roi_mask, ~, ~] = define_roi(sub_name);
 
 %% Setup the stimulus structure of a single acquisition
@@ -23,9 +21,8 @@ stimTime = (stimTime - 1) * (stimDur + stimDly) + blankDur;
 
 %% Extract the HRF as the average stimulus invoked time course
 % load the data file from a single session
-idx = 1;
-ses_name = sprintf('func-%02d', idx);
-[cifti_data, ~] = load_data(base_dir, sub_name, ses_name);
+ses_name = sprintf('func-%02d', run_idx);
+[cifti_data, ~] = load_data(base_dir, ses_name);
 
 ts = cifti_data.cdata';
 ts = ts(:, roi_mask);
@@ -50,11 +47,3 @@ for idy = 1:nStim
 end
 
 meanSig = mean(mean(signal, 3), 1);
-
-figure();
-plot(tRange, meanSig, '-ok', 'LineWidth', 1.5);
-ylim([-0.75, 0.75])
-box off;
-set(gcf,'Position',[0 0 1000 800])
-xlabel('Time(s)');
-ylabel('Percent Change');

@@ -5,7 +5,7 @@ addpath('cifti-matlab');
 % acq_type: Acquisition label
 % n_session: Number of sessions
 
-base_dir = strcat('~/Data/fMRI', '/', sub_name, '/', acq_type);
+base_dir = strcat('~/Data/fMRI', '/ORNT/', sub_name, '/', acq_type);
 [roi_mask, v_label, e_label] = define_roi(sub_name);
 
 % default cutoff temporal frequency
@@ -35,8 +35,7 @@ fprintf('Run preprocessing for %d sessions \n', n_session);
 for idx = 1 : n_session
     
     ses_name = sprintf('func-%02d', idx);
-    [cifti_data, motion_rg] = load_data(base_dir, ...
-        sub_name, ses_name);
+    [cifti_data, motion_rg] = load_data(base_dir, ses_name);        
     
     %% High-pass filtering
     % load data
@@ -103,8 +102,8 @@ for idx = 1 : n_session
 end
 
 %% Save results
-fl_path = fullfile('~/Data/fMRI', sub_name, ...
-    sprintf('%s_%s_%s.mat', 'avg', sub_name, acq_type));
+fl_path = fullfile('~/Data/fMRI/ORNT', sub_name, ...
+    sprintf('%s_%s.mat', 'avg', acq_type));
 
 results = struct('params', allBeta, 'v_label', v_label, 'e_label', e_label);
 save(fl_path, 'results', 'sub_name', 'acq_type', 'roi_mask');
