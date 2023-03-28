@@ -6,7 +6,7 @@ import os, json, random, numpy as np
 # for keyboard IO
 try:
     import keyboard
-    
+
 except Exception as exc:
     print(exc)
     print('Unable to import keyboard module, \
@@ -52,7 +52,7 @@ class OrientEncode:
     # default parameters for the experiment
     DEFAULT_DUR = 1.5
     DEFAULT_BLANK = 4.0
-    DEFAULT_DELAY = 4.5        
+    DEFAULT_DELAY = 4.5
     DEFAULT_RESP = 4.0
     DEFAULT_ISI = 2.0
     DEFAULT_LEN = 5.0
@@ -113,7 +113,7 @@ class OrientEncode:
 
             self._save_json()
             print('create subject file at ' + self.record_path)
-        
+
         # will be used for recording response
         self.resp_flag = True
         self.increment = 0
@@ -121,11 +121,11 @@ class OrientEncode:
         # get the stimulus sequence
         self.run_idx = self.sub_record['Ses_Counter']
         self.cond_idx = self.sub_record['Cond_List'][self.run_idx]
-       
+
         all_stims = np.reshape(np.array(self.sub_record['Stim_Seq']), (self.N_COND, -1))
         stim_seq = np.reshape(all_stims[self.cond_idx, :], (self.N_SESSION, self.n_trial))
         self.stim_seq = stim_seq[self.sub_record['Cond_Counter'][self.cond_idx], :]
-        
+
         # initialize window, message
         # monitor = 'rm_413' for psychophysics and 'sc_3t' for imaging session
         self.win = visual.Window(size=(1920, 1080), fullscr=True, allowGUI=True, screen=1, monitor='sc_3t', units='deg', winType=window_backend)
@@ -134,14 +134,14 @@ class OrientEncode:
         self.target = visual.GratingStim(self.win, sf=1.0, size=10.0, mask='raisedCos', maskParams={'fringeWidth':0.25}, contrast=0.20)
         self.noise = visual.NoiseStim(self.win, units='pix', mask='raisedCos', size=1024, contrast=0.10, noiseClip=3.0,
                                     noiseType='Filtered', texRes=1024, noiseElementSize=4, noiseFractalPower=0,
-                                    noiseFilterLower=15.0/1024.0, noiseFilterUpper=25.0/1024.0, noiseFilterOrder=3.0)        
+                                    noiseFilterLower=15.0/1024.0, noiseFilterUpper=25.0/1024.0, noiseFilterOrder=3.0)
         self.surround = visual.GratingStim(self.win, sf=1.0, size=18.0, mask='raisedCos', contrast=0.10)
         self.surround.ori = self.SURROUND_VAL[self.cond_idx]
 
         self.fixation = visual.GratingStim(self.win, color=0.5, colorSpace='rgb', tex=None, mask='raisedCos', size=0.25)
         self.center = visual.GratingStim(self.win, sf=0.0, size=2.0, mask='raisedCos', maskParams={'fringeWidth':0.15}, contrast=0.0)
         self.prob = visual.Line(self.win, start=(0.0, -self.line_len), end=(0.0, self.line_len), lineWidth=10.0, lineColor='black', size=1, contrast=0.80)
-        
+
         return
 
     def _save_json(self):
@@ -158,10 +158,10 @@ class OrientEncode:
     def start(self):
         # determine condition and sequence
         print('Acquisition Total Run #%d' % self.run_idx)
-        print('Surround Cond %d, Run #%d' % (self.cond_idx, 
+        print('Surround Cond %d, Run #%d' % (self.cond_idx,
             self.sub_record['Cond_Counter'][self.cond_idx]))
-        
-        self.sub_record['Ses_Counter'] += 1    
+
+        self.sub_record['Ses_Counter'] += 1
         self.sub_record['Cond_Counter'][self.cond_idx] += 1
 
         # set up for the first trial
@@ -176,9 +176,9 @@ class OrientEncode:
     def run(self):
         '''
         Experiment parameters:
-            12.0s * 1 blank (beginning)
+            4.0s * 1 blank (beginning)
             20 trial * (1.5s stim + 10.5s delay)
-            252s total, 252/0.8 = 315 TRs
+            244s total, 244/0.8 = 305 TRs
         '''
         # start experiment
         # clock for global and trial timing
@@ -186,7 +186,7 @@ class OrientEncode:
         self.global_ctd = core.Clock()
 
         # initial blank period
-        self.global_ctd.add(self.blank)        
+        self.global_ctd.add(self.blank)
         while self.global_ctd.getTime () <= 0:
             self._draw_blank()
 
@@ -206,7 +206,7 @@ class OrientEncode:
                     # draw oriented surround
                     self.surround.contrast = crst
                     self.surround.draw()
-                
+
                 self.target.contrast = crst
                 self.target.draw()
                 self.center.draw()
