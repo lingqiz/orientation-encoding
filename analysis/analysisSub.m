@@ -5,16 +5,6 @@ figure();
 set(gcf, 'units', 'points', ...
     'position', [0, 0, 650, 850]);
 
-function figure_format
-    set(gca, 'linewidth', 1);
-    set(gca, 'TickDir', 'out');
-    set(gca, 'TickLength', [0.02, 0.025]);
-
-    ax = gca;
-    ax.XAxis.FontSize = 14;
-    ax.YAxis.FontSize = 14;
-end
-
 if ~exist('scatter', 'var')
     scatter = 'true';
 end
@@ -29,12 +19,12 @@ result_1 = analysisBlock(baseline, 'blockIndex', 1, 'blockLength', ...
 % plot data and stats
 subplot(3, 2, 1);
 scatterPlot(result_1, 'showData', scatter);
-figure_format;
+figureFormat(1);
 
 % fisherPlot applies addtional smoothing before calculating the FI
 subplot(3, 2, 2);
 [support, fisher_1] = fisherPlot(result_1, 'smoothPara', fiSmooth);
-figure_format;
+figureFormat(1);
 
 %% Analysis: surround condition 1
 surround = 35.0;
@@ -47,13 +37,13 @@ result_2 = analysisBlock(condData, 'blockIndex', 1, 'blockLength', ...
 subplot(3, 2, 3);
 scatterPlot(result_2, 'showData', scatter);
 xline(surround, '--r', 'LineWidth', 2);
-figure_format;
+figureFormat(1);
 
 % fisherPlot applies addtional smoothing before calculating the FI
 subplot(3, 2, 4);
 [~, fisher_2] = fisherPlot(result_2, 'smoothPara', fiSmooth);
 xline(surround, '--r', 'LineWidth', 2);
-figure_format;
+figureFormat(1);
 
 %% Analysis: surround condition 2
 surround = 145.0;
@@ -66,13 +56,13 @@ result_3 = analysisBlock(condData, 'blockIndex', 1, 'blockLength', ...
 subplot(3, 2, 5);
 scatterPlot(result_3, 'showData', scatter);
 xline(surround, '--r', 'LineWidth', 2);
-figure_format;
+figureFormat(1);
 
 % fisherPlot applies addtional smoothing before calculating the FI
 subplot(3, 2, 6);
 [~, fisher_3] = fisherPlot(result_3, 'smoothPara', fiSmooth);
 xline(surround, '--r', 'LineWidth', 2);
-figure_format;
+figureFormat(1);
 
 %% Return value
 allResult = {result_1, result_2, result_3};

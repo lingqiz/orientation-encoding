@@ -49,6 +49,9 @@ fi_2 = fi_2 / length(subID);
 
 %% Plot average the FI
 figure();
+set(gcf, 'units', 'points', ...
+    'position', [0, 0, 650, 850]);
+
 subplot(3, 2, 1);
 plot(support, fiBase, 'k', 'LineWidth', 2);
 xlabel('Orientation'); ylabel('Norm FI');
@@ -105,22 +108,27 @@ fiSmooth = 0.06;
 
 [results, fi] = analysisSub(allStim, allResp, binSize, fiSmooth, false);
 
-% FI difference plot from combined subject
+%% FI difference plot from combined subject
 support = fi{1};
 diff_1 = fi{3} - fi{2};
 diff_2 = fi{4} - fi{2};
 
 figure();
+set(gcf, 'units', 'points', ...
+    'position', [0, 0, 400, 750]);
+
 subplot(2, 1, 1);
 plot(support, diff_1, 'k', 'LineWidth', 2);
 xline(35.0, '--r', 'LineWidth', 2);
 ylim([-0.16, 0.16]);
-xlabel('Orientation'); ylabel('Delta FI');
+ylabel('Delta FI');
 box off; grid off;
+figureFormat(2);
 
 subplot(2, 1, 2);
 plot(support, diff_2, 'k', 'LineWidth', 2);
 xline(145.0, '--r', 'LineWidth', 2);
 ylim([-0.16, 0.16]);
-xlabel('Orientation'); ylabel('Delta FI');
+ylabel('Delta FI');
 box off; grid off;
+figureFormat(2);
