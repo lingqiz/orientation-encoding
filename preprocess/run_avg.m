@@ -1,5 +1,5 @@
 %% Preprocessing with average response within a time window
-sub_name = 'ORNT_CMH';
+sub_name = 'ORNT_TW';
 n_runs = 10;
 n_sessions = 6;
 cutoff = 180.0;
