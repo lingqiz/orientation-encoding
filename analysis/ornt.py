@@ -122,7 +122,7 @@ def svr_decode(stimulus, response, batchSize):
 
     return np.concatenate(decode_stim), np.concatenate(decode_esti)
 
-def llhd_derivative(stimulus, response, batchSize, device):
+def llhd_derivative(stimulus, response, batchSize, device, pbar=True):
     '''
     Compute the first and second derivative for the likelihood of each trial,
     based on the model fit on the training set
@@ -134,7 +134,7 @@ def llhd_derivative(stimulus, response, batchSize, device):
     fst_dev = []
     snd_dev = []
 
-    for idx in tqdm(range(nFold)):
+    for idx in tqdm(range(nFold), disable=(not pbar)):
         # leave-one-run-out cross-validation
         hold = np.arange(idx * batchSize, (idx + 1) * batchSize, step=1)
         binary = np.ones(stimulus.shape[0]).astype(np.bool)
