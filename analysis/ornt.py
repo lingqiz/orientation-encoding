@@ -1,6 +1,6 @@
 import os, json, numpy as np
 import scipy.io as sio
-import torch.autograd as autograd 
+import torch.autograd as autograd
 from analysis.encode import *
 from analysis.svr import *
 from tqdm.notebook import tqdm
@@ -110,11 +110,11 @@ def svr_decode(stimulus, response, batchSize):
 
         stim_tr, resp_tr = (stimulus[binary], response[:, binary])
         stim_ts, resp_ts = stimulus[~binary], response[:, ~binary]
-        
+
         # fit the decoding model with SVR
         model = RegressDecode()
         model.fit_model(stim_tr, resp_tr)
-    
+
         # run deocding for validation trial
         est = model.decode(resp_ts)
         decode_stim.append(stim_ts)
@@ -126,7 +126,7 @@ def llhd_derivative(stimulus, response, batchSize, device, pbar=True):
     '''
     Compute the first and second derivative for the likelihood of each trial,
     based on the model fit on the training set
-    '''        
+    '''
     nFold = int(stimulus.shape[0] / batchSize)
 
     # record the derivative value
@@ -146,20 +146,20 @@ def llhd_derivative(stimulus, response, batchSize, device, pbar=True):
         # fit four models with shifted tuning curve
         # to correct for potential bias in the model
         shift_vals = np.linspace(0, 1, 4, endpoint=False)
-        for shift in shift_vals:    
+        for shift in shift_vals:
             model = VoxelEncode(n_func=8, shift=shift, device=device)
             model.ols(stim_tr, resp_tr)
             _ = model.mle_bnd(stim_tr, resp_tr, verbose=False)
 
             # run deocding for validation trial
             for idy in range(resp_ts.shape[1]):
-                stim = torch.tensor([stim_ts[idy]], dtype=torch.float32, 
+                stim = torch.tensor([stim_ts[idy]], dtype=torch.float32,
                                     device=device, requires_grad=True)
-                resp = torch.tensor(resp_ts[:, idy], dtype=torch.float32, 
+                resp = torch.tensor(resp_ts[:, idy], dtype=torch.float32,
                                     device=device).unsqueeze(-1)
 
                 # compute likelihood and its derivatives
-                log_llhd = model.likelihood(stim, resp)        
+                log_llhd = model.likelihood(stim, resp)
                 fd = autograd.grad(log_llhd, stim, create_graph=True)[0]
                 sd = autograd.grad(fd, stim)[0]
 
@@ -167,9 +167,9 @@ def llhd_derivative(stimulus, response, batchSize, device, pbar=True):
                 stim_val.append(stim_ts[idy])
                 fst_dev.append(fd.item())
                 snd_dev.append(sd.item())
-        
+
     return np.array(stim_val), np.array(fst_dev), np.array(snd_dev)
-    
+
 def slide_average(stim, data, avg_func, delta, window):
     '''
     Compute sliding average
@@ -191,5 +191,5 @@ def slide_average(stim, data, avg_func, delta, window):
 
         # compute statistics
         value.append(avg_func(data[index]))
-        
+
     return center, np.array(value)
