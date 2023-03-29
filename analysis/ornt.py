@@ -1,5 +1,6 @@
 import os, json, numpy as np
 import scipy.io as sio
+import torch.autograd as autograd 
 from analysis.encode import *
 from analysis.svr import *
 from tqdm.notebook import tqdm
@@ -59,6 +60,9 @@ def load_data(sub_name, model_type):
             beta_sorted.astype(np.float))
 
 def cv_decode(stimulus, response, batchSize, device):
+    '''
+    Cross-validated orientation decoding based on the forward encoding model
+    '''
     nFold = int(stimulus.shape[0] / batchSize)
 
     decode_stim = []
@@ -89,7 +93,10 @@ def cv_decode(stimulus, response, batchSize, device):
 
     return np.array(decode_stim), np.array(decode_esti), np.array(decode_stdv)
 
-def svr_decode(stimulus, response, batchSize):    
+def svr_decode(stimulus, response, batchSize):
+    '''
+    Cross-validated decoding based on support vector regression
+    '''
     nFold = int(stimulus.shape[0] / batchSize)
 
     decode_stim = []
@@ -113,4 +120,76 @@ def svr_decode(stimulus, response, batchSize):
         decode_stim.append(stim_ts)
         decode_esti.append(est)
 
-    return np.concatenate(decode_stim), np.concatenate(decode_esti)    
+    return np.concatenate(decode_stim), np.concatenate(decode_esti)
+
+def llhd_derivative(stimulus, response, batchSize, device):
+    '''
+    Compute the first and second derivative for the likelihood of each trial,
+    based on the model fit on the training set
+    '''        
+    nFold = int(stimulus.shape[0] / batchSize)
+
+    # record the derivative value
+    stim_val = []
+    fst_dev = []
+    snd_dev = []
+
+    for idx in tqdm(range(nFold)):
+        # leave-one-run-out cross-validation
+        hold = np.arange(idx * batchSize, (idx + 1) * batchSize, step=1)
+        binary = np.ones(stimulus.shape[0]).astype(np.bool)
+        binary[hold] = False
+
+        stim_tr, resp_tr = (stimulus[binary], response[:, binary])
+        stim_ts, resp_ts = stimulus[~binary], response[:, ~binary]
+
+        # fit four models with shifted tuning curve
+        # to correct for potential bias in the model
+        shift_vals = np.linspace(0, 1, 4, endpoint=False)
+        for shift in shift_vals:    
+            model = VoxelEncode(n_func=8, shift=shift, device=device)
+            model.ols(stim_tr, resp_tr)
+            _ = model.mle_bnd(stim_tr, resp_tr, verbose=False)
+
+            # run deocding for validation trial
+            for idy in range(resp_ts.shape[1]):
+                stim = torch.tensor([stim_ts[idy]], dtype=torch.float32, 
+                                    device=device, requires_grad=True)
+                resp = torch.tensor(resp_ts[:, idy], dtype=torch.float32, 
+                                    device=device).unsqueeze(-1)
+
+                # compute likelihood and its derivatives
+                log_llhd = model.likelihood(stim, resp)        
+                fd = autograd.grad(log_llhd, stim, create_graph=True)[0]
+                sd = autograd.grad(fd, stim)[0]
+
+                # save results
+                stim_val.append(stim_ts[idy])
+                fst_dev.append(fd.item())
+                snd_dev.append(sd.item())
+        
+    return np.array(stim_val), np.array(fst_dev), np.array(snd_dev)
+    
+def slide_average(stim, data, avg_func, delta, window):
+    '''
+    Compute sliding average
+    '''
+    value = []
+    center = np.arange(0, 181, delta)
+    for ctr in center:
+        # define window
+        bin_lb = ctr - window
+        bin_ub = ctr + window
+
+        # indexing into the data
+        if bin_lb < 0:
+            index = np.logical_or(stim >= bin_lb + 180, stim < bin_ub)
+        elif bin_ub > 180:
+            index = np.logical_or(stim >= bin_lb, stim < bin_ub - 180)
+        else:
+            index = np.logical_and(stim >= bin_lb, stim < bin_ub)
+
+        # compute statistics
+        value.append(avg_func(data[index]))
+        
+    return center, np.array(value)
