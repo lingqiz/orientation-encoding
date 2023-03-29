@@ -1,6 +1,7 @@
 import os, json, numpy as np
 import scipy.io as sio
 from analysis.encode import *
+from analysis.svr import *
 from tqdm.notebook import tqdm
 
 # Parameters of the experiment
@@ -87,3 +88,29 @@ def cv_decode(stimulus, response, batchSize, device):
             decode_stdv.append(std)
 
     return np.array(decode_stim), np.array(decode_esti), np.array(decode_stdv)
+
+def svr_decode(stimulus, response, batchSize):    
+    nFold = int(stimulus.shape[0] / batchSize)
+
+    decode_stim = []
+    decode_esti = []
+
+    for idx in tqdm(range(nFold)):
+        # leave-one-run-out cross-validation
+        hold = np.arange(idx * batchSize, (idx + 1) * batchSize, step=1)
+        binary = np.ones(stimulus.shape[0]).astype(np.bool)
+        binary[hold] = False
+
+        stim_tr, resp_tr = (stimulus[binary], response[:, binary])
+        stim_ts, resp_ts = stimulus[~binary], response[:, ~binary]
+        
+        # fit the decoding model with SVR
+        model = RegressDecode()
+        model.fit_model(stim_tr, resp_tr)
+    
+        # run deocding for validation trial
+        est = model.decode(resp_ts)
+        decode_stim.append(stim_ts)
+        decode_esti.append(est)
+
+    return np.concatenate(decode_stim), np.concatenate(decode_esti)    
