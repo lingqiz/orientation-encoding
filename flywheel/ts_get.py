@@ -6,7 +6,7 @@ from local_utils import *
 
 # Setup directories and file target names
 home = os.path.expanduser('~')
-base = os.path.join(home, 'Data', 'fMRI')
+base = os.path.join(home, 'Data', 'fMRI', 'ORNT')
 
 local_fl = 'func-%02d_Atlas.dtseries.nii'
 remote_fl = '%s/MNINonLinear/Results/func-%02d/func-%02d_Atlas.dtseries.nii'
