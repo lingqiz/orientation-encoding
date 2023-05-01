@@ -216,7 +216,11 @@ class OrientEncode:
                 self.win.flip()
 
             # slight jitter (+/- 0.5 sec) in delay period
-            delta = np.random.uniform(0, 1) - 0.5
+            jitter = False
+            if jitter:
+                delta = np.random.uniform(0, 1) - 0.5
+            else:
+                delta = 0.0
 
             # blank screen for delay duration
             # also set up the next stim
