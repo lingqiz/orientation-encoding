@@ -13,7 +13,7 @@ base = fullfile('~', 'Data', 'fMRI', 'ORNT');
 subID = {'TW', 'MT', 'CMH', 'CR', 'SO', 'BH'};
 
 %% Plot data from individual subject
-binSize = 12;
+binSize = 18;
 fiSmooth = 0.06;
 allFi = cell(1, length(subID));
 
@@ -22,8 +22,11 @@ for idx = 1:length(subID)
     filePath = fullfile(base, fullID, strcat(fullID, '.mat'));
     data = load(filePath);
     
-    [~, fi] = analysisSub(data.stim, data.resp, binSize, fiSmooth);
+    [~, fi] = analysisSub(data.stim, data.resp, binSize, fiSmooth, true, [0, 20]);
     allFi{idx} = fi;
+
+    set(gcf, 'units', 'points', ...
+    'position', [0, 0, 975, 850]);
 end
 
 %% Average FI pattern across individual subject
@@ -50,39 +53,45 @@ fi_2 = fi_2 / length(subID);
 %% Plot average the FI
 figure();
 set(gcf, 'units', 'points', ...
-    'position', [0, 0, 650, 850]);
+    'position', [0, 0, 1500, 400]);
 
-subplot(3, 2, 1);
+subplot(1, 3, 1);
 plot(support, fiBase, 'k', 'LineWidth', 2);
 xlabel('Orientation'); ylabel('Norm FI');
 box off; grid off;
 
-subplot(3, 2, 3);
+subplot(1, 3, 2);
 plot(support, fi_1, 'k', 'LineWidth', 2);
 xline(35.0, '--r', 'LineWidth', 2);
 xlabel('Orientation'); ylabel('Norm FI');
 box off; grid off;
 
-subplot(3, 2, 5);
+subplot(1, 3, 3);
 plot(support, fi_2, 'k', 'LineWidth', 2);
 xline(145.0, '--r', 'LineWidth', 2);
 xlabel('Orientation'); ylabel('Norm FI');
 box off; grid off;
 
-% difference from average FI
-subplot(3, 2, 4);
+%% Difference from average FI
+figure();
+set(gcf, 'units', 'points', ...
+    'position', [0, 0, 400, 750]);
+
+subplot(2, 1, 1);
 plot(support, fi_1 - fiBase, 'k', 'LineWidth', 2);
 xline(35.0, '--r', 'LineWidth', 2);
 ylim([-0.1, 0.1]);
 xlabel('Orientation'); ylabel('Delta FI');
 box off; grid off;
+figureFormat(2);
 
-subplot(3, 2, 6);
+subplot(2, 1, 2);
 plot(support, fi_2 - fiBase, 'k', 'LineWidth', 2);
 xline(145.0, '--r', 'LineWidth', 2);
 ylim([-0.1, 0.1]);
 xlabel('Orientation'); ylabel('Delta FI');
 box off; grid off;
+figureFormat(2);
 
 %% Combined Subject
 index = 1:length(subID);
@@ -106,7 +115,9 @@ end
 binSize = 12;
 fiSmooth = 0.06;
 
-[results, fi] = analysisSub(allStim, allResp, binSize, fiSmooth, false);
+[results, fi] = analysisSub(allStim, allResp, binSize, fiSmooth, false, [5, 15]);
+set(gcf, 'units', 'points', ...
+    'position', [0, 0, 975, 850]);
 
 %% FI difference plot from combined subject
 support = fi{1};
