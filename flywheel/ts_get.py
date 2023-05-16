@@ -1,6 +1,5 @@
 # Download the time series file from FlyWheel
-# Useage: python3 ts_get.py SUB_NAME FILE_PREFIX
-
+# Useage: python3 ts_get.py TYPE SUB_NAME FILE_PREFIX
 import sys, os, re
 from local_utils import *
 
@@ -8,24 +7,32 @@ from local_utils import *
 home = os.path.expanduser('~')
 base = os.path.join(home, 'Data', 'fMRI', 'ORNT')
 
-local_fl = 'func-%02d_Atlas.dtseries.nii'
-remote_fl = '%s/MNINonLinear/Results/func-%02d/func-%02d_Atlas.dtseries.nii'
-
-regs_local = 'func-%02d_Movement_Regressors_dt.txt'
-regs_remote = '%s/MNINonLinear/Results/func-%02d/Movement_Regressors_dt.txt'
-
 # Initialize flywheel client
 label = 'label=orientation_encoding'
 fw, project, time_stamp = flywheel_init(label)
 
 # Only run on specified subjects given by command line argument
 # prefix is used for backwards backwards compatibility (HERO_SUB)
+data_type = int(sys.argv[1])
+if data_type == 0:
+    print('Download HCP Surface Pipeline')
+    local_fl = 'func-%02d_Atlas.dtseries.nii'
+    remote_fl = '%s/MNINonLinear/Results/func-%02d/func-%02d_Atlas.dtseries.nii'
+
+elif data_type == 1:
+    print('Download HCP Volumn Pipeline')
+    local_fl = 'func-%02d.nii.gz'
+    remote_fl = '%s/MNINonLinear/Results/func-%02d/func-%02d.nii.gz'
+
+regs_local = 'func-%02d_Movement_Regressors_dt.txt'
+regs_remote = '%s/MNINonLinear/Results/func-%02d/Movement_Regressors_dt.txt'
+
 suffix = '_func-%02d_hcpfunc.zip'
 
-if len(sys.argv) == 2:
+if len(sys.argv) == 3:
     sub_name = sys.argv[-1]
     prefix = sys.argv[-1]
-elif len(sys.argv) == 3:
+elif len(sys.argv) == 4:
     sub_name = sys.argv[-2]
     prefix = sys.argv[-1]
 else:
