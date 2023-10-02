@@ -16,7 +16,7 @@ function run_avg_sub(sub_name, plotHRF)
     
     n_runs = 10;
     n_sessions = 6;
-    cutoff = 120.0;
+    cutoff = 180.0;
     
     if plotHRF
         figure();
