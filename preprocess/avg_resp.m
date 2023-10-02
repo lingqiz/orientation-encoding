@@ -35,7 +35,7 @@ fprintf('Run preprocessing for %d sessions \n', n_session);
 for idx = 1 : n_session
     
     ses_name = sprintf('func-%02d', idx);
-    [cifti_data, motion_rg] = load_data(base_dir, ses_name);        
+    [cifti_data, motion_rg] = load_data(base_dir, ses_name);
     
     %% High-pass filtering
     % load data
@@ -46,7 +46,7 @@ for idx = 1 : n_session
     ts = ts(:, roi_mask);
     sigTime = ((1 : size(ts, 1)) - 1) * spPeriod;
     
-    % cutoff frequency 
+    % cutoff frequency
     cutoff = 1 / cutoff_t;
     ts = highpass(ts, cutoff, spRate);
     
@@ -81,7 +81,7 @@ for idx = 1 : n_session
         signal(idy, :, :) = value;
     end
     
-    % z-score for corresponding time point    
+    % z-score for corresponding time point
     for idz = 1:length(tRange)
         value = signal(:, idz, :);
         arySize = size(value);
@@ -92,7 +92,7 @@ for idx = 1 : n_session
         stdVec = std(value, 0, 1);
         value = (value - meanVec) ./ stdVec;
         
-        signal(:, idz, :) = reshape(value, arySize);        
+        signal(:, idz, :) = reshape(value, arySize);
     end
     
     % beta (responses)
