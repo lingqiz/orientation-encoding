@@ -4,7 +4,7 @@ plotHRF = true;
 run_avg_sub('ORNT_TW', plotHRF);
 
 %% Run processing for all subjects
-sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH'};
+sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF'};
 for idx = 1:length(sub)    
     sub_name = strcat('ORNT_', sub{idx});
     fprintf(sub_name);
@@ -16,7 +16,7 @@ function run_avg_sub(sub_name, plotHRF)
     
     n_runs = 10;
     n_sessions = 6;
-    cutoff = 200.0;
+    cutoff = 120.0;
     
     if plotHRF
         figure();

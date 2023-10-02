@@ -56,8 +56,8 @@ def load_data(sub_name, model_type):
         beta_sorted.append(beta_cond)
 
     beta_sorted = np.stack(beta_sorted)
-    return (stim.astype(np.float),
-            beta_sorted.astype(np.float))
+    return (stim.astype(float),
+            beta_sorted.astype(float))
 
 def cv_decode(stimulus, response, batchSize, device):
     '''
@@ -72,7 +72,7 @@ def cv_decode(stimulus, response, batchSize, device):
     for idx in tqdm(range(nFold)):
         # leave-one-run-out cross-validation
         hold = np.arange(idx * batchSize, (idx + 1) * batchSize, step=1)
-        binary = np.ones(stimulus.shape[0]).astype(np.bool)
+        binary = np.ones(stimulus.shape[0]).astype(bool)
         binary[hold] = False
 
         stim_tr, resp_tr = (stimulus[binary], response[:, binary])
@@ -105,7 +105,7 @@ def svr_decode(stimulus, response, batchSize):
     for idx in tqdm(range(nFold)):
         # leave-one-run-out cross-validation
         hold = np.arange(idx * batchSize, (idx + 1) * batchSize, step=1)
-        binary = np.ones(stimulus.shape[0]).astype(np.bool)
+        binary = np.ones(stimulus.shape[0]).astype(bool)
         binary[hold] = False
 
         stim_tr, resp_tr = (stimulus[binary], response[:, binary])
@@ -137,7 +137,7 @@ def llhd_derivative(stimulus, response, batchSize, device, pbar=True):
     for idx in tqdm(range(nFold), disable=(not pbar)):
         # leave-one-run-out cross-validation
         hold = np.arange(idx * batchSize, (idx + 1) * batchSize, step=1)
-        binary = np.ones(stimulus.shape[0]).astype(np.bool)
+        binary = np.ones(stimulus.shape[0]).astype(bool)
         binary[hold] = False
 
         stim_tr, resp_tr = (stimulus[binary], response[:, binary])

@@ -10,7 +10,7 @@ base_dir = strcat('~/Data/fMRI', '/ORNT/', sub_name, '/', acq_type);
 
 % default cutoff temporal frequency
 if ~exist('cutoff_t','var')
-    cutoff_t = 200.0;
+    cutoff_t = 120.0;
 end
 
 %% Time course of the stimulus
