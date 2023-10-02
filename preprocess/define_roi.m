@@ -4,7 +4,7 @@ p = inputParser;
 
 % Default ROI: V1 - V3 area, 1.5 - 7.5 degree eccentricity
 p.addParameter('areaIndex', [1, 2, 3]);
-p.addParameter('eccLo', 1.0, @(x)(isnumeric(x) && numel(x) == 1));
+p.addParameter('eccLo', 1.5, @(x)(isnumeric(x) && numel(x) == 1));
 p.addParameter('eccHi', 7.5, @(x)(isnumeric(x) && numel(x) == 1));
 
 parse(p, varargin{:});
