@@ -5,6 +5,7 @@
 /Behavior/*
 /Neural/*
 /data/*
+/figure/*
 __pycache__
 .vscode
 _Data
