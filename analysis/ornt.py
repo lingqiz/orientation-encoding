@@ -170,22 +170,25 @@ def llhd_derivative(stimulus, response, batchSize, device, pbar=True):
 
     return np.array(stim_val), np.array(fst_dev), np.array(snd_dev)
 
-def slide_average(stim, data, avg_func, delta, window):
+def slide_average(stim, data, avg_func, window, config):
     '''
     Compute sliding average
     '''
     value = []
-    center = np.arange(0, 181, delta)
+    center = config['center']
     for ctr in center:
         # define window
         bin_lb = ctr - window
         bin_ub = ctr + window
 
         # indexing into the data
-        if bin_lb < 0:
-            index = np.logical_or(stim >= bin_lb + 180, stim < bin_ub)
-        elif bin_ub > 180:
-            index = np.logical_or(stim >= bin_lb, stim < bin_ub - 180)
+        if config['cyclical']:
+            if bin_lb < config['lb']:            
+                index = np.logical_or(stim >= bin_lb + config['cycle'], stim < bin_ub)
+            elif bin_ub > config['ub']:
+                index = np.logical_or(stim >= bin_lb, stim < bin_ub - config['cycle'])
+            else:
+                index = np.logical_and(stim >= bin_lb, stim < bin_ub)
         else:
             index = np.logical_and(stim >= bin_lb, stim < bin_ub)
 
