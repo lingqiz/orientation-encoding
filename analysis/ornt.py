@@ -195,4 +195,8 @@ def slide_average(stim, data, avg_func, window, config):
         # compute statistics
         value.append(avg_func(data[index]))
 
+    # return bin center and value
+    center = np.copy(config['center'])
+    center[0] = config['lb']
+    center[-1] = config['ub']
     return center, np.array(value)
