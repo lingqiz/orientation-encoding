@@ -20,8 +20,8 @@ Note: To calculate the magnification factor, use
 `tbUse('gkaModelEye');
 open d003_spectacleMag`
 
-- Stimulus session:  
-*(option 1)* `ts_filter.m` (high-pass filter, motion regression, z-score within each run)  
-Next, run `glm_fit.m` (nonlinear fitting of GLM + HRF based on [ForwardModel](https://github.com/gkaguirrelab/forwardModel))    
-  
-  *(option 2)* `avg_resp.m` (high-pass filter, motion regression, align time course after each stimulus presentation, z-score across corresponding time points, average within a time window [4s, 8s])  
+- Stimulus session:    
+  `avg_resp.m` (high-pass filter, motion regression, align time course after each stimulus presentation, z-score across corresponding time points, average within a time window [4s, 8s])  
+
+  *(not in use)* `ts_filter.m` (high-pass filter, motion regression, z-score within each run)  
+  Next, run `glm_fit.m` (nonlinear fitting of GLM + HRF based on [ForwardModel](https://github.com/gkaguirrelab/forwardModel))  
