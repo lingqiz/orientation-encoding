@@ -1,11 +1,11 @@
 %% Preprocessing with average response within a time window
 % compute average and plot HRF
 plotHRF = true;
-run_avg_sub('ORNT_TW', 180, plotHRF);
+run_avg_sub('ORNT_TW', 150, plotHRF);
 
 %% Run processing for all subjects
 sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
-cutoff = 180;
+cutoff = 150;
 for idx = 1:length(sub)
     sub_name = strcat('ORNT_', sub{idx});
     fprintf(sub_name);
