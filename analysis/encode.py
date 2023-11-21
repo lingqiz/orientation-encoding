@@ -324,7 +324,7 @@ class VoxelEncode(VoxelEncodeNoise):
         # run optimization
         # scipy Sequential Least SQuares Programming
         res = minimize(fun, x0, jac=True, bounds=bounds,
-                        options={'maxiter':1e4, 'disp':True})
+                        options={'maxiter':1e4, 'disp':False})
 
         if verbose:
             print('Success:', res.success, res.message)
