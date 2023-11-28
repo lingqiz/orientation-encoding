@@ -1,30 +1,44 @@
 %% Run processing for different ROIs
-% Cond 1: Control
-
 sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
+
+% Cond 1: Control
 for idx = 1:length(sub)
     sub_name = strcat('ORNT_', sub{idx});
     fprintf(sub_name);
 
     run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
-        'eccLo', 12, 'eccHi', 25, 'saveDir', 'control');
+        'eccLo', 12.5, 'eccHi', 25, 'saveDir', 'Control');
 end
 
 %% Cond 2 - 3: [V1; V2 + V3] (Early vs. Late)
-sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
 for idx = 1:length(sub)
     sub_name = strcat('ORNT_', sub{idx});
     fprintf(sub_name);
 
-    run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
-        'eccLo', 1.0, 'eccHi', 7.0, 'saveDir', 'control');
+    run_avg_sub(sub_name, 'areaIndex', 1, ...
+        'eccLo', 1.0, 'eccHi', 7.0, 'saveDir', 'V1');
+
+    run_avg_sub(sub_name, 'areaIndex', [2, 3], ...
+        'eccLo', 1.0, 'eccHi', 7.0, 'saveDir', 'V2_V3');
 end
 
-%% hV4 + VO1
+%% Higher visual area
+for idx = 1:length(sub)
+    sub_name = strcat('ORNT_', sub{idx});
+    fprintf(sub_name);
 
-%% V3a + V3b
+    % hV4 + VO1
+    run_avg_sub(sub_name, 'areaIndex', [4, 5, 6], ...
+        'eccLo', 1.0, 'eccHi', 7.0, 'saveDir', 'HV4_VO1_2');
 
-%% LO1 + LO2
+    % V3a + V3b
+    run_avg_sub(sub_name, 'areaIndex', [11, 12], ...
+        'eccLo', 1.0, 'eccHi', 7.0, 'saveDir', 'V3A_B');
+
+    % LO1 + LO2
+    run_avg_sub(sub_name, 'areaIndex', [7, 8], ...
+        'eccLo', 1.0, 'eccHi', 7.0, 'saveDir', 'LO1_2');
+end
 
 %% Helper Function
 function run_avg_sub(sub_name, varargin)
