@@ -28,7 +28,7 @@ for idx = 1 : n_sessions
     fprintf('\nSession %s \n', acq_type);
     
     % average response
-    avg_resp(sub_name, acq_type, n_runs, cutoff);
+    avg_resp(sub_name, acq_type, n_runs, 'cutoffT', cutoff);
     
     if plotHRF
         % compute HRF

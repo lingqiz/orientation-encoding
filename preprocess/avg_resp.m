@@ -1,19 +1,41 @@
-function avg_resp(sub_name, acq_type, n_session, cutoff_t, varargin)
+function avg_resp(sub_name, acq_type, n_session, varargin)
 addpath('cifti-matlab');
 
+%% Required rarameters
 % sub_name: Subject label
 % acq_type: Acquisition label
 % n_session: Number of sessions
 
-base_dir = strcat('~/Data/fMRI', '/ORNT/', sub_name, '/', acq_type);
-[roi_mask, v_label, e_label] = define_roi(sub_name);
+%% Optional parameters
+% Define ROI: visual area index and eccentricity
+% Stimulus: 0 - 1.5 deg; 1.5 - 7 deg; 7 - 12.5 deg
 
-% default cutoff temporal frequency
-if ~exist('cutoff_t','var')
-    cutoff_t = 150.0;
-end
+% Area - Index Correspondence
+% {1:  'V1',   2: 'V2',  3: 'V3',  4: 'hV4',  5: 'VO1', 6:  'VO2',  
+% 7: 'LO1', 8: 'LO2', 9: 'TO1', 10: 'TO2', 11: 'V3b', 12: 'V3a'}
 
-%% Time course of the stimulus
+%% Extract "beta" response from voxel time series
+p = inputParser;
+
+% Default ROI: V1 - V3 area, foeval - 7.0 degree eccentricity
+p.addParameter('areaIndex', [1, 2, 3]);
+p.addParameter('eccLo', 1.0, @(x)(isnumeric(x) && numel(x) == 1));
+p.addParameter('eccHi', 7.0, @(x)(isnumeric(x) && numel(x) == 1));
+p.addParameter('cutoffT', 150, @(x)(isnumeric(x) && numel(x) == 1))
+p.addParameter('saveDir', '');
+
+parse(p, varargin{:});
+areaIndex = p.Results.areaIndex;
+eccLo = p.Results.eccLo;
+eccHi = p.Results.eccHi;
+cutOffT = p.Results.cutoffT;
+saveDir = p.Results.saveDir;
+
+% Define ROI
+[roi_mask, v_label, e_label] = define_roi(sub_name, 'areaIndex', areaIndex, ...
+                                        'eccLo', eccLo, 'eccHi', eccHi);
+
+% Setup the time course of the stimulus
 expPara = struct('acqLen', 244, 'nStim', 20, ...
     'stimDur', 1.5, 'stimDly', 10.50, 'blankDur', 4.0);
 
@@ -28,8 +50,9 @@ blankDur = expPara.blankDur;
 stimTime = 1:nStim;
 stimTime = (stimTime - 1) * (stimDur + stimDly) + blankDur;
 
-%% load the data file for each session
+% load the data file for each session
 allBeta = [];
+base_dir = strcat('~/Data/fMRI', '/ORNT/', sub_name, '/', acq_type);
 fprintf('Run preprocessing for %d sessions \n', n_session);
 
 for idx = 1 : n_session
@@ -37,7 +60,7 @@ for idx = 1 : n_session
     ses_name = sprintf('func-%02d', idx);
     [cifti_data, motion_rg] = load_data(base_dir, ses_name);
     
-    %% High-pass filtering
+    % High-pass filtering
     % load data
     spPeriod = 0.80;
     spRate = 1 / spPeriod;
@@ -47,10 +70,10 @@ for idx = 1 : n_session
     sigTime = ((1 : size(ts, 1)) - 1) * spPeriod;
     
     % cutoff frequency
-    cutoff = 1 / cutoff_t;
+    cutoff = 1 / cutOffT;
     ts = highpass(ts, cutoff, spRate);
     
-    %% Motion regression
+    % Motion regression
     % setup nuisance variables
     % decorrelation using PCA
     [~, score, latent] = pca(motion_rg);
@@ -69,7 +92,7 @@ for idx = 1 : n_session
     theta = (rgs' * rgs) \ (rgs' * ts);
     ts = ts - rgs * theta;
     
-    %% Extract time course
+    % Extract time course
     baseShift = 4.0;
     tRange = 0 : 0.8 : 4.0;
     signal = zeros(nStim, length(tRange), size(ts, 2));
@@ -101,9 +124,19 @@ for idx = 1 : n_session
     
 end
 
-%% Save results
-fl_path = fullfile('~/Data/fMRI/ORNT', sub_name, ...
+% Save results
+if strcmp(saveDir, '')
+    fl_path = fullfile('~/Data/fMRI/ORNT', sub_name, ...
     sprintf('%s_%s.mat', 'avg', acq_type));
+else
+    fl_dir = fullfile('~/Data/fMRI/ORNT', sub_name, 'roi', saveDir);
+
+    if ~exist(fl_dir, 'dir')
+       mkdir(fl_dir)
+    end
+    
+    fl_path = fullfile(fl_dir, sprintf('%s_%s.mat', 'avg', acq_type));
+end
 
 results = struct('params', allBeta, 'v_label', v_label, 'e_label', e_label);
 save(fl_path, 'results', 'sub_name', 'acq_type', 'roi_mask');
