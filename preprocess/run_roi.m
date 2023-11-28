@@ -1,5 +1,5 @@
-%% Run processing for all subjects
-% Cond 1: Control (7.5 - 12.5 deg eccentricity)
+%% Run processing for different ROIs
+% Cond 1: Control
 
 sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
 for idx = 1:length(sub)
@@ -7,8 +7,24 @@ for idx = 1:length(sub)
     fprintf(sub_name);
 
     run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
-        'eccLo', 7.5, 'eccHi', 12.5, 'saveDir', 'control');
+        'eccLo', 12, 'eccHi', 25, 'saveDir', 'control');
 end
+
+%% Cond 2 - 3: [V1; V2 + V3] (Early vs. Late)
+sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
+for idx = 1:length(sub)
+    sub_name = strcat('ORNT_', sub{idx});
+    fprintf(sub_name);
+
+    run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
+        'eccLo', 1.0, 'eccHi', 7.0, 'saveDir', 'control');
+end
+
+%% hV4 + VO1
+
+%% V3a + V3b
+
+%% LO1 + LO2
 
 %% Helper Function
 function run_avg_sub(sub_name, varargin)

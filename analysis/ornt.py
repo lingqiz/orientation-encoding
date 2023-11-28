@@ -12,7 +12,7 @@ N_TRIAL = 20
 N_COND = 3
 SES_NAME = 'Neural%02d'
 
-def load_data(sub_name, model_type):
+def load_data(sub_name, model_type, roi_name=None):
     '''
     load the behavioral and neural data from file
     for a single subject specified by sub_name
@@ -33,6 +33,9 @@ def load_data(sub_name, model_type):
     assert(cond.size == N_SESSION * N_RUNS)
 
     # load neural data
+    if roi_name is not None:
+        data_path = os.path.join(data_path, 'roi', roi_name)
+
     all_response = []
     for idx in range(N_SESSION):
         # file name
