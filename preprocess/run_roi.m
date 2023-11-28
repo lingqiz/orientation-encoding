@@ -1,5 +1,5 @@
 %% Run processing for all subjects
-% Cond 1: Control (7.5 - 13.0 deg eccentricity)
+% Cond 1: Control (7.5 - 12.5 deg eccentricity)
 
 sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
 for idx = 1:length(sub)
@@ -7,7 +7,7 @@ for idx = 1:length(sub)
     fprintf(sub_name);
 
     run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
-        'eccLo', 7.5, 'eccHi', 13.0, 'saveDir', 'control');
+        'eccLo', 7.5, 'eccHi', 12.5, 'saveDir', 'control');
 end
 
 %% Helper Function
