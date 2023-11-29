@@ -50,6 +50,7 @@ for idx = 1:length(sub)
     sub_name = strcat('ORNT_', sub{idx});
     fprintf(sub_name);
 
+    % Select voxel from different eccentricity
     run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
         'eccLo', 1.0, 'eccHi', 5.0, 'saveDir', 'Stim_Inner');
 
