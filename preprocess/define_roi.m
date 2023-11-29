@@ -29,7 +29,7 @@ if nonVisual
     visual = cifti_read(mask_path);
     visual = visual.cdata;
 
-    rng("default");
+    rng(1024);
     nonIndex = 1:length(visual);
     nonIndex = nonIndex(~visual);
     nonIndex = nonIndex(randperm(length(nonIndex)));
