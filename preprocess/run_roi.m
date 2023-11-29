@@ -6,8 +6,7 @@ for idx = 1:length(sub)
     sub_name = strcat('ORNT_', sub{idx});
     fprintf(sub_name);
 
-    run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
-        'eccLo', 12.5, 'eccHi', 25, 'saveDir', 'Control');
+    run_avg_sub(sub_name, 'nonVisual', true, 'saveDir', 'NonVisual');
 end
 
 %% Cond 2 - 3: [V1; V2 + V3] (Early vs. Late)
