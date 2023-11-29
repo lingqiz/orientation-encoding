@@ -62,7 +62,7 @@ def load_data(sub_name, model_type, roi_name=None):
     return (stim.astype(float),
             beta_sorted.astype(float))
 
-def cv_decode(stimulus, response, batchSize, device):
+def cv_decode(stimulus, response, batchSize, device, pbar=True):
     '''
     Cross-validated orientation decoding based on the forward encoding model
     '''
@@ -72,7 +72,7 @@ def cv_decode(stimulus, response, batchSize, device):
     decode_esti = []
     decode_stdv = []
 
-    for idx in tqdm(range(nFold)):
+    for idx in tqdm(range(nFold), disable=(not pbar)):
         # leave-one-run-out cross-validation
         hold = np.arange(idx * batchSize, (idx + 1) * batchSize, step=1)
         binary = np.ones(stimulus.shape[0]).astype(bool)
@@ -96,7 +96,7 @@ def cv_decode(stimulus, response, batchSize, device):
 
     return np.array(decode_stim), np.array(decode_esti), np.array(decode_stdv)
 
-def svr_decode(stimulus, response, batchSize):
+def svr_decode(stimulus, response, batchSize, pbar=True):
     '''
     Cross-validated decoding based on support vector regression
     '''
@@ -105,7 +105,7 @@ def svr_decode(stimulus, response, batchSize):
     decode_stim = []
     decode_esti = []
 
-    for idx in tqdm(range(nFold)):
+    for idx in tqdm(range(nFold), disable=(not pbar)):
         # leave-one-run-out cross-validation
         hold = np.arange(idx * batchSize, (idx + 1) * batchSize, step=1)
         binary = np.ones(stimulus.shape[0]).astype(bool)

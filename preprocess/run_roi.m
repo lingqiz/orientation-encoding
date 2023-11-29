@@ -46,6 +46,8 @@ end
 %% Visual Eccentricity
 sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
 
+% Setup log-spaced bins for visual eccentricity
+
 for idx = 1:length(sub)
     sub_name = strcat('ORNT_', sub{idx});
     fprintf(sub_name);
