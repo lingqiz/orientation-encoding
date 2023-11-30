@@ -59,25 +59,21 @@ end
 %% Visual Eccentricity
 sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
 
-% TO-DO:
-% Setup log-spaced bins for visual eccentricity
+bins = round(cumsum(2 .^ (0:1.02:6)));
+binEdge = [0, bins];
 
 for idx = 1:length(sub)
     sub_name = strcat('ORNT_', sub{idx});
-    fprintf(sub_name);
+    fprintf(strcat(sub_name, '\n'));
 
     % Select voxel from different eccentricity
-    run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
-        'eccLo', 1.0, 'eccHi', 5.0, 'saveDir', 'Stim_Inner');
+    for idy = 1:(length(binEdge) - 1)
+        fprintf('\nEcc %d - %d', binEdge(idy), binEdge(idy + 1))
 
-    run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
-        'eccLo', 5.0, 'eccHi', 12.5, 'saveDir', 'Stim_Outer');
-
-    run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
-        'eccLo', 12.5, 'eccHi', 30.0, 'saveDir', 'Stim_Surround');
-
-    run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
-        'eccLo', 30.0, 'eccHi', 90.0, 'saveDir', 'Stim_Null');
+        run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
+            'eccLo', binEdge(idy), 'eccHi', binEdge(idy + 1), ...
+            'saveDir', sprintf('EccBin_%d', idy));
+    end
 end
 
 %% Helper Function
