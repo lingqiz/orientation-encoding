@@ -12,7 +12,7 @@ p = inputParser;
 p.addParameter('areaIndex', [1, 2, 3]);
 p.addParameter('eccLo', 1.0, @(x)(isnumeric(x) && numel(x) == 1));
 p.addParameter('eccHi', 7.0, @(x)(isnumeric(x) && numel(x) == 1));
-p.addParameter('nonVisual', false);
+p.addParameter('nonVisual', 0);
 
 parse(p, varargin{:});
 areaIndex = p.Results.areaIndex;
@@ -20,26 +20,8 @@ eccLo = p.Results.eccLo;
 eccHi = p.Results.eccHi;
 nonVisual = p.Results.nonVisual;
 
-if nonVisual
-    % return 1,000 voxel from non-visual area
-    nVoxel = 1000;
-    fprintf('Select %d Non-Visual Voxel \n', nVoxel);
-    
-    mask_path = '~/Data/fMRI/ORNT/visual_areas_mask.nii';
-    visual = cifti_read(mask_path);
-    visual = visual.cdata;
-
-    rng(1024);
-    nonIndex = 1:length(visual);
-    nonIndex = nonIndex(~visual);
-    nonIndex = nonIndex(randperm(length(nonIndex)));
-
-    roi_mask = boolean(zeros(size(visual)));
-    roi_mask(nonIndex(1:nVoxel)) = 1;
-    v_label = '';
-    e_label = '';
-
-else
+if nonVisual == 0
+    % Select voxels from visual area based on ROI
     [eccen, varea, ~] = load_map(sub_name);
     roi_mask = boolean(zeros(size(varea)));
 
@@ -58,6 +40,68 @@ else
     % visual area and ecc label
     v_label = varea(roi_mask);
     e_label = eccen(roi_mask);
+
+elseif nonVisual == 1
+    % Return 1,000 voxel from non-visual area
+    nVoxel = 1000;
+    fprintf('Select %d Non-Visual Voxel \n', nVoxel);
+
+    mask_path = '~/Data/fMRI/ORNT/visual_areas_mask.nii';
+    visual = cifti_read(mask_path);
+    visual = visual.cdata;
+
+    rng(0);
+    nonIndex = 1:length(visual);
+    nonIndex = nonIndex(~visual);
+    nonIndex = nonIndex(randperm(length(nonIndex)));
+
+    roi_mask = boolean(zeros(size(visual)));
+    roi_mask(nonIndex(1:nVoxel)) = 1;
+
+    v_label = '';
+    e_label = '';
+
+elseif nonVisual == 2
+    % Return M1 (motor) cortex indices
+    atlas_path = '~/Data/fMRI/ORNT/cortical_areas.nii';
+    atlas = cifti_read(atlas_path);
+    index = atlas.cdata;
+    roi_mask = boolean(zeros(size(index)));
+
+    % Area 4 (primary motor cortex)
+    % R_4 = 8, L_4 = 188
+    target = [8, 188];
+    for t = target
+        roi_mask(index == t) = 1;
+    end
+
+    fprintf('Select %d M1 (Motor) Voxel \n', sum(roi_mask));
+
+    v_label = '';
+    e_label = '';
+
+elseif nonVisual == 3
+    % Return auditory cortex indices
+    atlas_path = '~/Data/fMRI/ORNT/cortical_areas.nii';
+    atlas = cifti_read(atlas_path);
+    index = atlas.cdata;
+    roi_mask = boolean(zeros(size(index)));
+
+    % R_A1 = 24, L_A1 = 204
+    % R_Belt: 124, 173, 174
+    % L_Belt: 304, 353, 354
+    target = [24, 204, 124, 173, 174, 304, 353, 354];
+    for t = target
+        roi_mask(index == t) = 1;
+    end
+
+    fprintf('Select %d Auditory Cortex Voxel \n', sum(roi_mask));
+
+    v_label = '';
+    e_label = '';
+
+else
+    fprintf('Non Visual Index Not Valid \n');
 end
 
 end

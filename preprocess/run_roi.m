@@ -6,7 +6,8 @@ for idx = 1:length(sub)
     sub_name = strcat('ORNT_', sub{idx});
     fprintf(sub_name);
 
-    run_avg_sub(sub_name, 'nonVisual', true, 'saveDir', 'NonVisual');
+    run_avg_sub(sub_name, 'nonVisual', 2, 'saveDir', 'Motor');
+    run_avg_sub(sub_name, 'nonVisual', 3, 'saveDir', 'Auditory');
 end
 
 %% Cond 2 - 3: [V1; V2 + V3] (Early vs. Late)
@@ -46,6 +47,7 @@ end
 %% Visual Eccentricity
 sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
 
+% TO-DO:
 % Setup log-spaced bins for visual eccentricity
 
 for idx = 1:length(sub)

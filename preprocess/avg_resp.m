@@ -21,7 +21,7 @@ p = inputParser;
 p.addParameter('areaIndex', [1, 2, 3]);
 p.addParameter('eccLo', 1.0, @(x)(isnumeric(x) && numel(x) == 1));
 p.addParameter('eccHi', 7.0, @(x)(isnumeric(x) && numel(x) == 1));
-p.addParameter('nonVisual', false);
+p.addParameter('nonVisual', 0);
 p.addParameter('cutoffT', 150, @(x)(isnumeric(x) && numel(x) == 1))
 p.addParameter('saveDir', '');
 
