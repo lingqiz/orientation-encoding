@@ -84,13 +84,13 @@ for idx = 1:length(sub)
     fprintf(sub_name);
 
     run_avg_sub(sub_name, 'areaIndex', 1, ...
-        'eccLo', 2.0, 'eccHi', 18.0, 'saveDir', 'V1_Large');
+        'eccLo', 1.0, 'eccHi', 15.0, 'saveDir', 'V1_Large');
 
     run_avg_sub(sub_name, 'areaIndex', [2, 3], ...
-        'eccLo', 2.0, 'eccHi', 18.0, 'saveDir', 'V2_V3_Large');
+        'eccLo', 1.0, 'eccHi', 15.0, 'saveDir', 'V2_V3_Large');
 
     run_avg_sub(sub_name, 'areaIndex', [4, 5, 6], ...
-        'eccLo', 2.0, 'eccHi', 18.0, 'saveDir', 'HV4_VO1_2_Large');
+        'eccLo', 1.0, 'eccHi', 15.0, 'saveDir', 'HV4_VO1_2_Large');
 end
 
 %% Helper Function
