@@ -76,7 +76,7 @@ for idx = 1:length(sub)
     end
 end
 
-%% Larger Ecc ROIs
+%% Use Larger Ecc ROIs
 sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
 
 for idx = 1:length(sub)
