@@ -76,6 +76,23 @@ for idx = 1:length(sub)
     end
 end
 
+%% Larger Ecc ROIs
+sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
+
+for idx = 1:length(sub)
+    sub_name = strcat('ORNT_', sub{idx});
+    fprintf(sub_name);
+
+    run_avg_sub(sub_name, 'areaIndex', 1, ...
+        'eccLo', 3.0, 'eccHi', 15.0, 'saveDir', 'V1_Large');
+
+    run_avg_sub(sub_name, 'areaIndex', [2, 3], ...
+        'eccLo', 3.0, 'eccHi', 15.0, 'saveDir', 'V2_V3_Large');
+
+    run_avg_sub(sub_name, 'areaIndex', [4, 5, 6], ...
+        'eccLo', 3.0, 'eccHi', 15.0, 'saveDir', 'HV4_VO1_2_Large');
+end
+
 %% Helper Function
 function run_avg_sub(sub_name, varargin)
 
