@@ -124,18 +124,16 @@ class VoxelEncodeNoise(VoxelEncodeBase):
         self.sigma = None
         self.cov = None
 
-    def response_mean(self, stim):
+    def voxel_mean(self, stim):
         '''
         Return the mean response through tuning function
         '''
         return super().forward(stim)
-
-    def forward(self, stim):
+    
+    def sample_resp(self, mean_resp):
         '''
-        Sample from a multivariate normal distribution model of voxel responses
+        Sample voxel response from the noise model
         '''
-        # mean response through tuning function
-        mean_resp = super().forward(stim)
         sample = torch.zeros_like(mean_resp, device=self.device)
 
         # sample from multivariate normal distribution
@@ -144,6 +142,13 @@ class VoxelEncodeNoise(VoxelEncodeBase):
             sample[:, idx] = dist.sample()
 
         return sample
+
+    def forward(self, stim):
+        '''
+        Sample from a multivariate normal distribution model of voxel responses
+        '''
+        mean_resp = self.voxel_mean(stim)
+        return self.sample_resp(mean_resp) 
 
     def fisher(self, delta=1.0):
         '''
