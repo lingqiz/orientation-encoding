@@ -124,6 +124,12 @@ class VoxelEncodeNoise(VoxelEncodeBase):
         self.sigma = None
         self.cov = None
 
+    def response_mean(self, stim):
+        '''
+        Return the mean response through tuning function
+        '''
+        return super().forward(stim)
+
     def forward(self, stim):
         '''
         Sample from a multivariate normal distribution model of voxel responses
