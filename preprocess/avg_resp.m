@@ -22,6 +22,7 @@ p.addParameter('areaIndex', [1, 2, 3]);
 p.addParameter('eccLo', 1.0, @(x)(isnumeric(x) && numel(x) == 1));
 p.addParameter('eccHi', 7.0, @(x)(isnumeric(x) && numel(x) == 1));
 p.addParameter('nonVisual', 0);
+p.addParameter('prfROI', 0);
 p.addParameter('cutoffT', 150, @(x)(isnumeric(x) && numel(x) == 1))
 p.addParameter('saveDir', '');
 
@@ -30,13 +31,14 @@ areaIndex = p.Results.areaIndex;
 eccLo = p.Results.eccLo;
 eccHi = p.Results.eccHi;
 nonVisual = p.Results.nonVisual;
+prfROI = p.Results.prfROI;
 cutOffT = p.Results.cutoffT;
 saveDir = p.Results.saveDir;
 
 % Define ROI
 [roi_mask, v_label, e_label] = define_roi(sub_name, 'areaIndex', areaIndex, ...
                                         'eccLo', eccLo, 'eccHi', eccHi, ...
-                                        'nonVisual', nonVisual);
+                                        'nonVisual', nonVisual, 'prfROI', prfROI);
 
 % Setup the time course of the stimulus
 expPara = struct('acqLen', 244, 'nStim', 20, ...

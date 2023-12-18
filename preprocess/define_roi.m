@@ -13,33 +13,80 @@ p.addParameter('areaIndex', [1, 2, 3]);
 p.addParameter('eccLo', 1.0, @(x)(isnumeric(x) && numel(x) == 1));
 p.addParameter('eccHi', 7.0, @(x)(isnumeric(x) && numel(x) == 1));
 p.addParameter('nonVisual', 0);
+p.addParameter('prfROI', 0);
 
 parse(p, varargin{:});
 areaIndex = p.Results.areaIndex;
 eccLo = p.Results.eccLo;
 eccHi = p.Results.eccHi;
 nonVisual = p.Results.nonVisual;
+prfROI = p.Results.prfROI;
 
 if nonVisual == 0
-    % Select voxels from visual area based on ROI
-    [eccen, varea, ~] = load_map(sub_name);
-    roi_mask = boolean(zeros(size(varea)));
+    if prfROI == 0
+        % Select voxels from visual area based on ROI
+        [eccen, varea, ~] = load_map(sub_name);
+        roi_mask = boolean(zeros(size(varea)));
 
-    % select visual area
-    for idx = areaIndex
-        roi_mask = roi_mask | varea == idx;
-        fprintf('V%d ', idx)
+        % select visual area
+        for idx = areaIndex
+            roi_mask = roi_mask | varea == idx;
+            fprintf('V%d ', idx)
+        end
+        fprintf('# of Voxel: %d \n', sum(roi_mask));
+        nVoxel = sum(roi_mask);
+
+        % apply eccentricity map
+        roi_mask  = roi_mask & (eccen > eccLo) & (eccen <= eccHi);
+        fprintf('Eccen mask: %d / %d selected \n', sum(roi_mask), nVoxel);
+
+        % visual area and ecc label
+        v_label = varea(roi_mask);
+        e_label = eccen(roi_mask);
+
+    elseif prfROI == 1
+        % Define ROI using pRF size information
+        [eccen, varea, sigma] = load_map(sub_name);
+        roi_mask = boolean(zeros(size(varea)));
+
+        prfLo = eccen - 2 * sigma;
+
+        % select visual area
+        for idx = areaIndex
+            roi_mask = roi_mask | varea == idx;
+            fprintf('V%d ', idx)
+        end
+        fprintf('# of Voxel: %d \n', sum(roi_mask));
+        nVoxel = sum(roi_mask);
+
+        roi_mask  = roi_mask & (prfLo > eccLo) & (prfLo < eccHi);
+        fprintf('pRF mask: %d / %d selected \n', sum(roi_mask), nVoxel);
+
+        v_label = varea(roi_mask);
+        e_label = eccen(roi_mask);
+
+    elseif prfROI == 2
+        % Define ROI using pRF size information
+        [eccen, varea, sigma] = load_map(sub_name);
+        roi_mask = boolean(zeros(size(varea)));
+
+        prfHi = eccen + 2 * sigma;
+
+        % select visual area
+        for idx = areaIndex
+            roi_mask = roi_mask | varea == idx;
+            fprintf('V%d ', idx)
+        end
+        fprintf('# of Voxel: %d \n', sum(roi_mask));
+        nVoxel = sum(roi_mask);
+
+        roi_mask  = roi_mask & (prfHi > eccLo) & (prfHi < eccHi);
+        fprintf('pRF mask: %d / %d selected \n', sum(roi_mask), nVoxel);
+
+        v_label = varea(roi_mask);
+        e_label = eccen(roi_mask);
+
     end
-    fprintf('# of Voxel: %d \n', sum(roi_mask));
-    nVoxel = sum(roi_mask);
-
-    % apply eccentricity map
-    roi_mask  = roi_mask & (eccen > eccLo) & (eccen <= eccHi);
-    fprintf('Eccen mask: %d / %d selected \n', sum(roi_mask), nVoxel);
-
-    % visual area and ecc label
-    v_label = varea(roi_mask);
-    e_label = eccen(roi_mask);
 
 elseif nonVisual == 1
     % Return 1,000 voxel from non-visual area

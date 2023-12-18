@@ -93,6 +93,22 @@ for idx = 1:length(sub)
         'eccLo', 1.0, 'eccHi', 15.0, 'saveDir', 'HV4_VO1_2_Large');
 end
 
+%% Using pRF to define ROIs
+sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
+
+for idx = 1:length(sub)
+    sub_name = strcat('ORNT_', sub{idx});
+    fprintf(sub_name);
+
+    run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
+        'eccLo', 1.5, 'eccHi', 6.5, ...
+        'saveDir', 'pRF_Center', 'prfROI', 2);
+
+    run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
+        'eccLo', 7.5, 'eccHi', 12.5, ...
+        'saveDir', 'pRF_Surround', 'prfROI', 1);
+end
+
 %% Helper Function
 function run_avg_sub(sub_name, varargin)
 
