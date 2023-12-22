@@ -1,24 +1,4 @@
-%% Run processing for different ROIs
-% Base: V1 - V3, 1.5 deg - 12.5 (Full Stimulus Range)
-sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
-
-for idx = 1:length(sub)
-    sub_name = strcat('ORNT_', sub{idx});
-    fprintf(sub_name);
-
-    run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
-        'eccLo', 1.5, 'eccHi', 12.5, 'saveDir', 'Stim_Visual');
-
-    run_avg_sub(sub_name, 'areaIndex', [1], ...
-        'eccLo', 1.5, 'eccHi', 12.5, 'saveDir', 'Stim_V1');
-
-    run_avg_sub(sub_name, 'areaIndex', [2, 3], ...
-        'eccLo', 1.5, 'eccHi', 12.5, 'saveDir', 'Stim_V2_V3');
-
-    run_avg_sub(sub_name, 'areaIndex', [4, 5, 6], ...
-        'eccLo', 1.5, 'eccHi', 12.5, 'saveDir', 'Stim_HV4_VO1_2');
-end
-
+% Run processing for different ROIs
 %% Base: V1 - V3
 sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
 
