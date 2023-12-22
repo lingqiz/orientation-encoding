@@ -1,5 +1,16 @@
 %% Run processing for different ROIs
-% Base: V1 - V3
+%% Base: V1 - V3, 1.5 deg - 12
+sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
+
+for idx = 1:length(sub)
+    sub_name = strcat('ORNT_', sub{idx});
+    fprintf(sub_name);
+
+    run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
+        'eccLo', 1.0, 'eccHi', 7.0, 'saveDir', 'V1_V2_V3');
+end
+
+%% Base: V1 - V3
 sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
 
 for idx = 1:length(sub)
