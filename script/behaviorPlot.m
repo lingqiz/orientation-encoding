@@ -16,20 +16,25 @@ for idx = index
     % setup file path
     fullID = strcat('ORNT_', subID{idx});
     filePath = fullfile(base, fullID, strcat(fullID, '.mat'));
-    
+
     % load data file
     data = load(filePath);
-    
+
     allStim = [allStim, data.stim];
     allResp = [allResp, data.resp];
 end
 
-%% Baseline
-condIdx = 1;
-baseline = [allStim(condIdx, :); allResp(condIdx, :)];
+%% Extract Statistics
+fileName = {'Base', 'Surr1', 'Surr2'};
 
-nRun = 500;
-[~, average, stdv, fisher] = statAll(baseline);
-[support, allAverage, allStdv, allFisher] = statBootstrap(baseline, nRun);
+for condIdx = 1:3   
+    baseline = [allStim(condIdx, :); allResp(condIdx, :)];
 
+    nRun = 500;
+    [~, average, stdv, fisher] = statAll(baseline);
+    [support, allAverage, allStdv, allFisher] = statBootstrap(baseline, nRun);
 
+    name = sprintf('./%s.mat', fileName{condIdx});
+    save(name, 'support', 'average', 'stdv', ...
+        'fisher', 'allAverage', 'allStdv', 'allFisher');
+end
