@@ -24,7 +24,7 @@ for idx = index
     allResp = [allResp, data.resp];
 end
 
-binSize = 12;
+binSize = 18;
 fiSmooth = 0.05;
 
 [results, fi] = analysisSub(allStim, allResp, binSize, fiSmooth, false, [5, 15]);
