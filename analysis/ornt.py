@@ -62,15 +62,21 @@ def load_data(sub_name, model_type, roi_name=None):
     return (stim.astype(float),
             beta_sorted.astype(float))
 
-def cv_decode(stimulus, response, batchSize, device, pbar=True):
+def cv_decode(stimulus, response, batchSize, device, llhd=False, pbar=True):
     '''
     Cross-validated orientation decoding based on the forward encoding model
     '''
     nFold = int(stimulus.shape[0] / batchSize)
 
-    decode_stim = []
-    decode_esti = []
-    decode_stdv = []
+    # compute the log-lihelihood for each trial
+    if llhd:
+        decode_stim = []
+        decode_llhd = []
+
+    else:
+        decode_stim = []
+        decode_esti = []
+        decode_stdv = []
 
     for idx in tqdm(range(nFold), disable=(not pbar)):
         # leave-one-run-out cross-validation
@@ -88,12 +94,22 @@ def cv_decode(stimulus, response, batchSize, device, pbar=True):
 
         # run deocding for validation trial
         for idy in range(resp_ts.shape[1]):
-            est, std, _ = model.decode(resp_ts[:, idy], method='mean')
+            if llhd:
+                _, llhd_val = model.decode(resp_ts[:, idy], method='mle')
+                decode_stim.append(stim_ts[idy])
+                decode_llhd.append(llhd_val.cpu().numpy())
 
-            decode_stim.append(stim_ts[idy])
-            decode_esti.append(est)
-            decode_stdv.append(std)
+            else:
+                est, std, _ = model.decode(resp_ts[:, idy], method='mean')
+                decode_stim.append(stim_ts[idy])
+                decode_esti.append(est)
+                decode_stdv.append(std)
 
+    # return the log-likelihood
+    if llhd:
+        return np.array(decode_stim), np.array(decode_llhd)
+
+    # return decoding results
     return np.array(decode_stim), np.array(decode_esti), np.array(decode_stdv)
 
 def svr_decode(stimulus, response, batchSize, pbar=True):
@@ -186,7 +202,7 @@ def slide_average(stim, data, avg_func, window, config):
 
         # indexing into the data
         if config['cyclical']:
-            if bin_lb < config['lb']:            
+            if bin_lb < config['lb']:
                 index = np.logical_or(stim >= bin_lb + config['cycle'], stim < bin_ub)
             elif bin_ub > config['ub']:
                 index = np.logical_or(stim >= bin_lb, stim < bin_ub - config['cycle'])
