@@ -10,8 +10,7 @@ addpath('./analysis/');
 addpath('./analysis/circstat/');
 
 base = fullfile('~', 'Data', 'fMRI', 'ORNT');
-subID = {'TW', 'MT', 'CMH', 'CR', 'SO', 
-    'BH', 'DW', 'QF', 'JM', 'MA'};
+subID = {'TW', 'MT', 'CMH', 'CR', 'SO', 'BH', 'DW', 'QF', 'JM', 'MA'};
 
 %% Plot data from individual subject
 binSize = 18;
