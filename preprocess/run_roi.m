@@ -51,6 +51,10 @@ for idx = 1:length(sub)
     run_avg_sub(sub_name, 'areaIndex', [11, 12], ...
         'eccLo', 1.0, 'eccHi', 7.0, 'saveDir', 'V3A_B');
 
+    % TO1 + TO2
+    run_avg_sub(sub_name, 'areaIndex', [9, 10], ...
+        'eccLo', 1.0, 'eccHi', 7.0, 'saveDir', 'TO1_2');
+
     % LO1 + LO2
     run_avg_sub(sub_name, 'areaIndex', [7, 8], ...
         'eccLo', 1.0, 'eccHi', 7.0, 'saveDir', 'LO1_2');
