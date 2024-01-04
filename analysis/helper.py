@@ -1,8 +1,9 @@
 import numpy as np
 import scipy.io as sio
 from analysis.ornt import slide_average
+from scipy.interpolate import splev, splrep
 
-def behavior_analysis(cond):
+def behavior_analysis(cond, data_smooth=2.5, fi_smooth=5e-3):
     # load behavioral data
     mat_data = sio.loadmat('./data/%s.mat' % cond)
 
@@ -42,13 +43,25 @@ def behavior_analysis(cond):
         data[i] = data[i][resort]
         bootstrap[i] = bootstrap[i][resort, :]
 
+    # smooth the data with spline fit
+    for i in range(len(data)):
+        spl = splrep(support, data[i], s=data_smooth)
+        data[i] = splev(support, spl)
+
+        for j in range(bootstrap[i].shape[1]):
+            spl = splrep(support, bootstrap[i][:, j], s=data_smooth)
+            bootstrap[i][:, j] = splev(support, spl)
+
     # resample fisher information to the same axis
-    fisher = np.interp(support, fi_axis, fisher)
+    # with spline smoothing
+    spl = splrep(fi_axis, fisher, s=fi_smooth)
+    fisher = splev(support, spl)
     data.append(fisher)
 
     resampleFisher = np.zeros((len(support), allFisher.shape[1]))
     for i in range(allFisher.shape[1]):
-        resampleFisher[:, i] = np.interp(support, fi_axis, allFisher[:, i])
+        spl = splrep(fi_axis, allFisher[:, i], s=fi_smooth)
+        resampleFisher[:, i] = splev(support, spl)
     bootstrap.append(resampleFisher)
 
     return support, data, bootstrap
