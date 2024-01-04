@@ -182,8 +182,8 @@ def modulation_index(roi):
     ornt, snd = neural_analysis(roi)
     ornt, snd = _combine_surr(ornt[1:], snd[1:])
 
-    with_surr = snd[(ornt > 20) & (ornt < 50)]
-    no_surr = snd[(ornt > -50) & (ornt < -20)]
+    with_surr = snd[(ornt > 22.5) & (ornt < 47.5)]
+    no_surr = snd[(ornt > -47.5) & (ornt < -22.5)]
 
     # compute modulation index
     base = np.abs(np.mean(no_surr))
@@ -195,4 +195,4 @@ def modulation_index(roi):
 
     # compute p-value
     p_val = stats.ttest_ind(with_surr, no_surr)[1]
-    return base, delta, sem, p_val
+    return np.mean(-snd), delta, sem, p_val
