@@ -2,6 +2,7 @@ import numpy as np
 import scipy.io as sio
 from analysis.ornt import slide_average
 from scipy.interpolate import splev, splrep
+from scipy import stats
 
 def behavior_analysis(cond, data_smooth=2.5, fi_smooth=5e-3):
     # load behavioral data
@@ -78,12 +79,29 @@ def neural_analysis(roi):
         _ = np.load(fl)
         all_snd = np.load(fl)
 
+    # change axis
     cmb_ornt = np.transpose(all_ornt, (1, 0, 2)).reshape(N_COND, N_SUB * COUNT)
     cmb_snd = np.transpose(all_snd, (1, 0, 2)).reshape(N_COND, N_SUB * COUNT)
-    # change axis
     cmb_ornt[cmb_ornt > 90] -= 180
 
     return cmb_ornt, cmb_snd
+
+def _combine_surr(ornt, snd):
+    '''
+    Combine data from the two surround conditions
+    '''
+    # context 1
+    ornt_cxt1, snd_cxt1 = (ornt[0], snd[0])
+
+    # context 2 + mirroring
+    ornt_cxt2, snd_cxt2 = (ornt[1], snd[1])
+    ornt_cxt2 *= -1
+
+    # combine
+    ornt_adpt = np.concatenate([ornt_cxt1, ornt_cxt2])
+    snd_adpt = np.concatenate([snd_cxt1, snd_cxt2])
+
+    return ornt_adpt, snd_adpt
 
 def normalize_fisher(axis, fi_avg, error, fold=1):
     '''
@@ -128,16 +146,7 @@ def fisher_surround(ornt, snd, normalize=True):
     Compute the normalized Fisher information for the surround condition
     '''
     # combine the two contexts conditions
-    # context 1
-    ornt_cxt1, snd_cxt1 = (ornt[0], snd[0])
-
-    # context 2 + mirroring
-    ornt_cxt2, snd_cxt2 = (ornt[1], snd[1])
-    ornt_cxt2 *= -1
-
-    # combine
-    ornt_adpt = np.concatenate([ornt_cxt1, ornt_cxt2])
-    snd_adpt = np.concatenate([snd_cxt1, snd_cxt2])
+    ornt_adpt, snd_adpt = _combine_surr(ornt, snd)
 
     # config the sliding average
     center = np.array([10, 20, 35, 50, 65, 80, 95])
@@ -164,3 +173,26 @@ def fisher_surround(ornt, snd, normalize=True):
                error[:zero_idx+1][::-1]]
 
     return with_surr, no_surr
+
+def modulation_index(roi):
+    '''
+    Compute the modulation index
+    '''
+    # load data
+    ornt, snd = neural_analysis(roi)
+    ornt, snd = _combine_surr(ornt[1:], snd[1:])
+
+    with_surr = snd[(ornt > 20.0) & (ornt < 50.0)]
+    no_surr = snd[(ornt > -50.0) & (ornt < -20.0)]
+
+    # compute modulation index
+    base = np.abs(np.mean(no_surr))
+    delta = np.abs(np.mean(with_surr)) - base
+
+    svm = np.var(with_surr) / len(with_surr) \
+        + np.var(no_surr) / len(no_surr)
+    sem = np.sqrt(svm)
+
+    # compute p-value
+    p_val = stats.ttest_ind(with_surr, no_surr)[1]
+    return base, delta, sem, p_val
