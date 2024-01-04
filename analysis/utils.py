@@ -110,8 +110,7 @@ def fisher_base(ornt, snd, normalize=True):
     # config the sliding average
     center = [-5, 10, 20, 35, 50, 65, 80, 95]
     window = 12.5
-    config = {'center' : center,
-            'lb' : 0, 'ub' : 90, 'cyclical' : False}
+    config = {'center' : center, 'lb' : 0, 'ub' : 90, 'cyclical' : False}
 
     # sliding average
     axis, fi_avg = slide_average(ornt, snd, np.mean, window, config)
@@ -144,8 +143,7 @@ def fisher_surround(ornt, snd, normalize=True):
     center = np.array([10, 20, 35, 50, 65, 80, 95])
     center = np.concatenate([-center[::-1], [0], center])
     window = 12.5
-    config = {'center' : center, 'lb' : -90, 'ub' : 90,
-            'cyclical' : False}
+    config = {'center' : center, 'lb' : -90, 'ub' : 90, 'cyclical' : False}
 
     # sliding average
     axis, fi_avg = slide_average(ornt_adpt, snd_adpt, np.mean, window, config)
