@@ -66,7 +66,41 @@ def behavior_analysis(cond, data_smooth=2.5, fi_smooth=5e-3):
 
     return support, data, bootstrap
 
-def fisher_base(ornt, snd):
+def neural_analysis(roi):
+    N_SUB = 10
+    N_COND = 3
+    COUNT = 1600
+
+    data_path = './data/roi/ORNT_Fisher_{}.npy'.format(roi)
+
+    with open(data_path, 'rb') as fl:
+        all_ornt = np.load(fl)
+        _ = np.load(fl)
+        all_snd = np.load(fl)
+
+    cmb_ornt = np.transpose(all_ornt, (1, 0, 2)).reshape(N_COND, N_SUB * COUNT)
+    cmb_snd = np.transpose(all_snd, (1, 0, 2)).reshape(N_COND, N_SUB * COUNT)
+    # change axis
+    cmb_ornt[cmb_ornt > 90] -= 180
+
+    return cmb_ornt, cmb_snd
+
+def normalize_fisher(axis, fi_avg, error, fold=1):
+    '''
+    Normalize the fisher information
+    '''
+    # compute normalized fisher information
+    fisher = np.sqrt(-fi_avg)
+    fi_error = error / (2 * fisher)
+
+    convert = 180 / (2 * np.pi)
+    scale = 1 / np.trapz(fisher, axis / convert) / fold
+    fisher *= scale
+    fi_error *= scale
+
+    return axis, fisher, fi_error
+
+def fisher_base(ornt, snd, normalize=True):
     '''
     Compute the normalized Fisher information for the baseline condition
     '''
@@ -75,7 +109,7 @@ def fisher_base(ornt, snd):
 
     # config the sliding average
     center = [-5, 10, 20, 35, 50, 65, 80, 95]
-    window = 15
+    window = 12.5
     config = {'center' : center,
             'lb' : 0, 'ub' : 90, 'cyclical' : False}
 
@@ -85,13 +119,50 @@ def fisher_base(ornt, snd):
     n_data = slide_average(ornt, snd, np.size, window, config)[-1]
     error = error / np.sqrt(n_data)
 
-    # compute normalized fisher information
-    fisher = np.sqrt(-fi_avg)
-    fi_error = error / (2 * fisher)
+    if not normalize:
+        return axis, -fi_avg, error
 
-    convert = 180 / (2 * np.pi)
-    scale = 1 / np.trapz(fisher, axis / convert) / 2
-    fisher *= scale
-    fi_error *= scale
+    return normalize_fisher(axis, fi_avg, error, fold=2)
 
-    return axis, fisher, fi_error
+def fisher_surround(ornt, snd, normalize=True):
+    '''
+    Compute the normalized Fisher information for the surround condition
+    '''
+    # combine the two contexts conditions
+    # context 1
+    ornt_cxt1, snd_cxt1 = (ornt[0], snd[0])
+
+    # context 2 + mirroring
+    ornt_cxt2, snd_cxt2 = (ornt[1], snd[1])
+    ornt_cxt2 *= -1
+
+    # combine
+    ornt_adpt = np.concatenate([ornt_cxt1, ornt_cxt2])
+    snd_adpt = np.concatenate([snd_cxt1, snd_cxt2])
+
+    # config the sliding average
+    center = np.array([10, 20, 35, 50, 65, 80, 95])
+    center = np.concatenate([-center[::-1], [0], center])
+    window = 12.5
+    config = {'center' : center, 'lb' : -90, 'ub' : 90,
+            'cyclical' : False}
+
+    # sliding average
+    axis, fi_avg = slide_average(ornt_adpt, snd_adpt, np.mean, window, config)
+    error = slide_average(ornt_adpt, snd_adpt, np.std, window, config)[-1]
+    n_data = slide_average(ornt_adpt, snd_adpt, np.size, window, config)[-1]
+    error = error / np.sqrt(n_data)
+
+    if normalize:
+        axis, fisher, error = normalize_fisher(axis, fi_avg, error, fold=1)
+    else:
+        fisher = -fi_avg
+
+    # split the data into with and without surround
+    zero_idx = int(np.where((axis == 0))[0][0])
+    with_surr = [axis[zero_idx:], fisher[zero_idx:], error[zero_idx:]]
+    no_surr = [-axis[:zero_idx+1][::-1],
+               fisher[:zero_idx+1][::-1],
+               error[:zero_idx+1][::-1]]
+
+    return with_surr, no_surr
