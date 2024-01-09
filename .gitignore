@@ -5,12 +5,12 @@
 /Behavior/*
 /Neural/*
 /data/*
-/figure/*
+/notebook/*
 __pycache__
 .vscode
 _Data
 flywheel.key
-*.ipynb
+/*.ipynb
 *.mlx
 *.mat
 .DS_Store
