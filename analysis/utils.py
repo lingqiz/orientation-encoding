@@ -3,6 +3,7 @@ import scipy.io as sio
 from analysis.ornt import slide_average
 from scipy.interpolate import splev, splrep
 from scipy import stats
+from symfit import parameters, variables, sin, cos, Fit
 
 def behavior_analysis(cond, data_smooth=2.5, fi_smooth=5e-3):
     # load behavioral data
@@ -196,3 +197,37 @@ def modulation_index(roi):
     # compute p-value
     p_val = stats.ttest_ind(with_surr, no_surr)[1]
     return np.mean(-snd), delta, sem, p_val
+
+def fourier_fit(x_data, y_data, order=3, scale=2):
+    '''
+    Fit data with Fourier series
+    '''
+    x, y = variables('x, y')
+    w, = parameters('w')
+    model_dict = {y: fourier_series(x, f=w, n=order)}
+
+    x_data = x_data / 180.0 * scale * np.pi
+    fit = Fit(model_dict, x=x_data, y=y_data)
+    fit_result = fit.execute()
+
+    fit_axis = np.linspace(x_data.min(), x_data.max(), 180)
+    fit_value = fit.model(x=fit_axis, **fit_result.params).y
+
+    return fit_axis / (scale * np.pi) * 180.0, fit_value
+
+def fourier_series(x, f, n=0):
+    """
+    https://symfit.readthedocs.io/en/stable/examples/ex_fourier_series.html
+    Returns a symbolic fourier series of order `n`.
+
+    :param n: Order of the fourier series.
+    :param x: Independent variable
+    :param f: Frequency of the fourier series
+    """
+    # Make the parameter objects for all the terms
+    a0, *cos_a = parameters(','.join(['a{}'.format(i) for i in range(0, n + 1)]))
+    sin_b = parameters(','.join(['b{}'.format(i) for i in range(1, n + 1)]))
+    # Construct the series
+    series = a0 + sum(ai * cos(i * f * x) + bi * sin(i * f * x)
+                     for i, (ai, bi) in enumerate(zip(cos_a, sin_b), start=1))
+    return series
