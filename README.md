@@ -29,5 +29,5 @@ open d003_spectacleMag`
 2. Use `cv_decode` from `analysis/ornt.py` to perform cross-validated decoding analysis.
 3. Use `llhd_derivative` from `analysis/ornt.py` to compute the second derivatives of likelihood, based on which the neural Fisher information is computed. 
 
-- (under construction) See `script/decoding.ipynb` for an example of running orientation decoding from area V2 + V3.
-- (under construction) See `script/fisher.ipynb` for an example of extracting the neural FI from area V2 + V3, and computing the effect of surround modulation.
+- (under construction) See `script/decoding.ipynb` for an example of running orientation decoding.
+- (under construction) See `script/fisher.ipynb` for an example of extracting the neural FI, and computing the effect of surround modulation.
