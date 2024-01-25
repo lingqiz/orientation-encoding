@@ -1,19 +1,16 @@
 # Orientation-Encode
 
-### Instruction
-Each subject should be assigned a unique `subject_ID`.
-- fMRI session: `python3 main.py subject_ID`.
-The code automatically tracks the acquisition number.
-- behavioral session: (switch to the behavior branch)
-`python3 main.py subject_ID`.
-- See `analysisTilt.m` for analysis of behavioral data.
-
 ### Dependencies
 - [PsychoPy](https://www.psychopy.org/)
 - [cifti-matlab](https://github.com/Washington-University/cifti-matlab)
 
-### Pre-processing Note
-- pRF session (flywheel): HcpStruct - HcpFunc - ICAFIX - [ForwardModel](https://github.com/gkaguirrelab/forwardModel) - [BayesPRF](https://elifesciences.org/articles/40224)  
+### Run Experiment
+Each subject should be assigned a unique `subject_ID`.
+- fMRI session: `python3 main.py subject_ID`.
+The code automatically tracks the acquisition number.
+
+### Pre-processing (flywheel)
+- Retinotopic Mapping: HcpStruct - HcpFunc - ICAFIX - [ForwardModel](https://github.com/gkaguirrelab/forwardModel) - [BayesPRF](https://elifesciences.org/articles/40224)  
 See here for information regarding the [HCP pre-processing pipeline](https://github.com/Washington-University/HCPpipelines)  
 
 Note: To calculate the magnification factor, use   
@@ -21,7 +18,13 @@ Note: To calculate the magnification factor, use
 open d003_spectacleMag`
 
 - Stimulus session:    
-  `avg_resp.m` (high-pass filter, motion regression, align time course after each stimulus presentation, z-score across corresponding time points, average within a time window [4s, 8s])  
+  `avg_resp.m` (high-pass filter, motion regression, align time course after each stimulus presentation, z-score across corresponding time points, average within a time window [4s, 8s]) 
 
-  *(not in use)* `ts_filter.m` (high-pass filter, motion regression, z-score within each run)  
-  Next, run `glm_fit.m` (nonlinear fitting of GLM + HRF based on [ForwardModel](https://github.com/gkaguirrelab/forwardModel))  
+### Behavioral data analysis
+- See `script/combineSub.m` for analysis of behavioral data. 
+- `script/behaviorPlot.m` performs bootstrapping.
+
+### Neural data analysis
+1. Use `preprocess/run_roi.m` to extract the voxel activity pattern from the ROI(s) of interest.
+2. Use `cv_decode` from `analysis/ornt.py` to perform cross-validated decoding analysis.
+3. Use `llhd_derivative` from `analysis/ornt.py` to compute the second-derivatives of likelihood (Fisher information)
