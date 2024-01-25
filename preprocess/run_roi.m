@@ -50,34 +50,6 @@ for idx = 1:length(sub)
     % V3a + V3b
     run_avg_sub(sub_name, 'areaIndex', [11, 12], ...
         'eccLo', 1.0, 'eccHi', 7.0, 'saveDir', 'V3A_B');
-
-    % TO1 + TO2
-    run_avg_sub(sub_name, 'areaIndex', [9, 10], ...
-        'eccLo', 1.0, 'eccHi', 7.0, 'saveDir', 'TO1_2');
-
-    % LO1 + LO2
-    run_avg_sub(sub_name, 'areaIndex', [7, 8], ...
-        'eccLo', 1.0, 'eccHi', 7.0, 'saveDir', 'LO1_2');
-end
-
-%% Visual Eccentricity
-sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
-
-bins = round(cumsum(2 .^ (0:1.02:6)));
-binEdge = [0, bins];
-
-for idx = 1:length(sub)
-    sub_name = strcat('ORNT_', sub{idx});
-    fprintf(strcat(sub_name, '\n'));
-
-    % Select voxel from different eccentricity
-    for idy = 1:(length(binEdge) - 1)
-        fprintf('\nEcc %d - %d', binEdge(idy), binEdge(idy + 1))
-
-        run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
-            'eccLo', binEdge(idy), 'eccHi', binEdge(idy + 1), ...
-            'saveDir', sprintf('EccBin_%d', idy));
-    end
 end
 
 %% Use Larger Ecc ROIs
@@ -125,6 +97,26 @@ for idx = 1:length(sub)
     run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
         'eccLo', 15, 'eccHi', 30, ...
         'saveDir', 'pRF_4', 'prfROI', 1);
+end
+
+%% Visual Eccentricity of pRF center (Deprecated)
+sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
+
+bins = round(cumsum(2 .^ (0:1.02:6)));
+binEdge = [0, bins];
+
+for idx = 1:length(sub)
+    sub_name = strcat('ORNT_', sub{idx});
+    fprintf(strcat(sub_name, '\n'));
+
+    % Select voxel from different eccentricity
+    for idy = 1:(length(binEdge) - 1)
+        fprintf('\nEcc %d - %d', binEdge(idy), binEdge(idy + 1))
+
+        run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
+            'eccLo', binEdge(idy), 'eccHi', binEdge(idy + 1), ...
+            'saveDir', sprintf('EccBin_%d', idy));
+    end
 end
 
 %% Helper Function
