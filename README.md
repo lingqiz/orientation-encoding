@@ -10,7 +10,7 @@ Each subject should be assigned a unique `subject_ID`.
 The code automatically tracks the acquisition number.
 
 ### Pre-processing (flywheel)
-- Retinotopic Mapping: HcpStruct - HcpFunc - ICAFIX - [ForwardModel](https://github.com/gkaguirrelab/forwardModel) - [BayesPRF](https://elifesciences.org/articles/40224)  
+- Retinotopic mapping: HcpStruct - HcpFunc - ICAFIX - [ForwardModel](https://github.com/gkaguirrelab/forwardModel) - [BayesPRF](https://elifesciences.org/articles/40224)  
 See here for information regarding the [HCP pre-processing pipeline](https://github.com/Washington-University/HCPpipelines)  
 
 Note: To calculate the magnification factor, use   
