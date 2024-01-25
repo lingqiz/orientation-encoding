@@ -95,6 +95,9 @@ for idx = 1:length(sub)
 
     run_avg_sub(sub_name, 'areaIndex', [4, 5, 6], ...
         'eccLo', 1.0, 'eccHi', 15.0, 'saveDir', 'HV4_VO1_2_Large');
+
+    run_avg_sub(sub_name, 'areaIndex', [11, 12], ...
+        'eccLo', 1.0, 'eccHi', 15.0, 'saveDir', 'V3A_B_Large');
 end
 
 %% Using pRF to define ROIs
