@@ -24,10 +24,11 @@ open d003_spectacleMag`
 - See `script/combineSub.m` for analysis of behavioral data. 
 - `script/behaviorPlot.m` performs bootstrapping.
 
-### Neural data analysis
+### Neural data analysis 
 1. Use `preprocess/run_roi.m` to extract the voxel activity pattern from the ROI(s) of interest.
 2. Use `cv_decode` from `analysis/ornt.py` to perform cross-validated decoding analysis.
 3. Use `llhd_derivative` from `analysis/ornt.py` to compute the second derivatives of likelihood, based on which the neural Fisher information is computed. 
 
 - (under construction) See `script/decoding.ipynb` for an example of running orientation decoding.
 - (under construction) See `script/fisher.ipynb` for an example of extracting the neural FI, and computing the effect of surround modulation.
+- If you are interested in the analysis method, the forward encoding model, please refer to `analysis/encode.py` for the code.  
