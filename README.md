@@ -17,7 +17,7 @@ Note: To calculate the magnification factor, use
 `tbUse('gkaModelEye');
 open d003_spectacleMag`
 
-- Stimulus session:    
+- Stimulus session: (HcpStruct) - HcpFunc
   `avg_resp.m` (high-pass filter, motion regression, align time course after each stimulus presentation, z-score across corresponding time points, average within a time window [4s, 8s]) 
 
 ### Behavioral data analysis
