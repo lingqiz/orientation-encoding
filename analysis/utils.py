@@ -175,7 +175,33 @@ def fisher_surround(ornt, snd, normalize=True):
 
     return with_surr, no_surr
 
-def modulation_index(roi, use_base=False, lb=22.5, ub=47.5):
+def mod_index(roi, lb=22.5, ub=47.5):
+    '''
+    Compute the modulation index
+    '''
+
+    # load data
+    ornt, snd = neural_analysis(roi)
+
+    # surround condition
+    ornt, snd = _combine_surr(ornt[1:], snd[1:])
+    with_surr = snd[(ornt > lb) & (ornt < ub)]
+    # no surround condition
+    no_surr = snd[(ornt > -ub) & (ornt < -lb)]
+
+    # compute modulation index
+    base = np.abs(np.mean(no_surr))
+    delta = np.abs(np.mean(with_surr)) - base
+
+    svm = np.var(with_surr) / len(with_surr) \
+        + np.var(no_surr) / len(no_surr)
+    sem = np.sqrt(svm)
+
+    # compute p-value
+    p_val = stats.ttest_ind(with_surr, no_surr)[1]
+    return np.mean(-snd), delta, sem, p_val
+
+def mod_index_ecc(roi, lb=22.5, ub=47.5):
     '''
     Compute the modulation index
     '''
@@ -183,17 +209,14 @@ def modulation_index(roi, use_base=False, lb=22.5, ub=47.5):
     ornt, snd = neural_analysis(roi)
 
     # baseline condition
-    ornt_base, snd_base = ornt[0], snd[0]    
+    ornt_base, snd_base = ornt[0], snd[0]
     ornt_base[ornt_base < 0] *= -1
 
     # surround condition
     ornt, snd = _combine_surr(ornt[1:], snd[1:])
     with_surr = snd[(ornt > lb) & (ornt < ub)]
-
-    if use_base:
-        no_surr = snd_base[(ornt_base > lb) & (ornt_base < ub)]
-    else:
-        no_surr = snd[(ornt > -ub) & (ornt < -lb)]
+    # baseline surround condition
+    no_surr = snd_base[(ornt_base > lb) & (ornt_base < ub)]
 
     # compute modulation index
     base = np.abs(np.mean(no_surr))
