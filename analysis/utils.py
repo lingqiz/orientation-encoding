@@ -175,35 +175,28 @@ def fisher_surround(ornt, snd, normalize=True):
 
     return with_surr, no_surr
 
-def mod_index(roi, lb=22.5, ub=47.5):
+def mod_index_vis(roi, lb=22.5, ub=47.5):
     '''
     Compute the modulation index
+    for different visual areas
     '''
-
     # load data
     ornt, snd = neural_analysis(roi)
 
     # surround condition
     ornt, snd = _combine_surr(ornt[1:], snd[1:])
     with_surr = snd[(ornt > lb) & (ornt < ub)]
-    # no surround condition
+    # baseline condition
     no_surr = snd[(ornt > -ub) & (ornt < -lb)]
 
     # compute modulation index
-    base = np.abs(np.mean(no_surr))
-    delta = np.abs(np.mean(with_surr)) - base
-
-    svm = np.var(with_surr) / len(with_surr) \
-        + np.var(no_surr) / len(no_surr)
-    sem = np.sqrt(svm)
-
-    # compute p-value
-    p_val = stats.ttest_ind(with_surr, no_surr)[1]
+    delta, sem, p_val = compute_stats(no_surr, with_surr)    
     return np.mean(-snd), delta, sem, p_val
 
 def mod_index_ecc(roi, lb=22.5, ub=47.5):
     '''
     Compute the modulation index
+    for different visual eccentricities
     '''
     # load data
     ornt, snd = neural_analysis(roi)
@@ -219,16 +212,20 @@ def mod_index_ecc(roi, lb=22.5, ub=47.5):
     no_surr = snd_base[(ornt_base > lb) & (ornt_base < ub)]
 
     # compute modulation index
-    base = np.abs(np.mean(no_surr))
-    delta = np.abs(np.mean(with_surr)) - base
+    delta, sem, p_val = compute_stats(no_surr, with_surr)    
+    return np.mean(-snd), delta, sem, p_val
 
-    svm = np.var(with_surr) / len(with_surr) \
-        + np.var(no_surr) / len(no_surr)
+def compute_stats(null_data, exp_data):
+    base = np.abs(np.mean(null_data))
+    delta = np.abs(np.mean(exp_data)) - base
+
+    svm = np.var(exp_data) / len(exp_data) \
+        + np.var(null_data) / len(null_data)
     sem = np.sqrt(svm)
 
     # compute p-value
-    p_val = stats.ttest_ind(with_surr, no_surr)[1]
-    return np.mean(-snd), delta, sem, p_val
+    p_val = stats.ttest_ind(exp_data, null_data)[1]
+    return delta, sem, p_val
 
 def fourier_fit(x_data, y_data, order=3, scale=2):
     '''
