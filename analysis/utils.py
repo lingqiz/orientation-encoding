@@ -190,7 +190,7 @@ def mod_index_vis(roi, lb=22.5, ub=47.5):
     no_surr = snd[(ornt > -ub) & (ornt < -lb)]
 
     # compute modulation index
-    delta, sem, p_val = compute_stats(no_surr, with_surr)    
+    delta, sem, p_val = compute_stats(no_surr, with_surr)
     return np.mean(-snd), delta, sem, p_val
 
 def mod_index_ecc(roi, lb=22.5, ub=47.5):
@@ -212,7 +212,7 @@ def mod_index_ecc(roi, lb=22.5, ub=47.5):
     no_surr = snd_base[(ornt_base > lb) & (ornt_base < ub)]
 
     # compute modulation index
-    delta, sem, p_val = compute_stats(no_surr, with_surr)    
+    delta, sem, p_val = compute_stats(no_surr, with_surr)
     return np.mean(-snd), delta, sem, p_val
 
 def compute_stats(null_data, exp_data):
@@ -260,3 +260,15 @@ def fourier_series(x, f, n=0):
     series = a0 + sum(ai * cos(i * f * x) + bi * sin(i * f * x)
                      for i, (ai, bi) in enumerate(zip(cos_a, sin_b), start=1))
     return series
+
+def bias_mean(angle):
+    # map from [-90, 90] to 2 * pi
+    angle = angle / 90 * np.pi
+    angle_mean = stats.circmean(angle, high=np.pi, low=-np.pi)
+    return angle_mean / np.pi * 90
+
+def bias_std(angle):
+    # map from [-90, 90] to 2 * pi
+    angle = angle / 90 * np.pi
+    angle_std = stats.circstd(angle, high=np.pi, low=-np.pi)
+    return angle_std / np.pi * 90
