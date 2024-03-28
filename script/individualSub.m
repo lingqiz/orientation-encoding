@@ -30,6 +30,5 @@ for idx = index
         save(name, 'support', 'average', 'stdv', ...
             'fisher', 'allAverage', 'allStdv', 'allFisher');
     end
-
 end
 
