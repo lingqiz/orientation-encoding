@@ -28,11 +28,11 @@ end
 fileName = {'Base', 'Surr1', 'Surr2'};
 
 for condIdx = 1:3   
-    baseline = [allStim(condIdx, :); allResp(condIdx, :)];
+    condData = [allStim(condIdx, :); allResp(condIdx, :)];
 
     nRun = 500;
-    [~, average, stdv, fisher] = statAll(baseline);
-    [support, allAverage, allStdv, allFisher] = statBootstrap(baseline, nRun);
+    [~, average, stdv, fisher] = statAll(condData);
+    [support, allAverage, allStdv, allFisher] = statBootstrap(condData, nRun);
 
     name = sprintf('./%s.mat', fileName{condIdx});
     save(name, 'support', 'average', 'stdv', ...
