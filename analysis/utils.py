@@ -5,7 +5,7 @@ from scipy.interpolate import splev, splrep
 from scipy import stats
 from symfit import parameters, variables, sin, cos, Fit
 
-def behavior_subject(sub_id, cond, data_smooth=5, fi_smooth=1e-2):
+def behavior_subject(sub_id, cond, data_smooth=10, fi_smooth=5e-3):
     '''
     behavior analysis for individual subject
     '''
