@@ -5,10 +5,27 @@ from scipy.interpolate import splev, splrep
 from scipy import stats
 from symfit import parameters, variables, sin, cos, Fit
 
+def behavior_subject(sub_id, cond, data_smooth=5, fi_smooth=1e-2):
+    '''
+    behavior analysis for individual subject
+    '''
+    # load behavioral data
+    mat_data = sio.loadmat('./data/behavior/%s_%s.mat' % (sub_id, cond))
+
+    support, data, bootstrap = run_behavior_analysis(mat_data, data_smooth, fi_smooth)
+    return support, data, bootstrap
+
 def behavior_analysis(cond, data_smooth=2.5, fi_smooth=5e-3):
+    '''
+    behavior analysis for all subjects
+    '''
     # load behavioral data
     mat_data = sio.loadmat('./data/%s.mat' % cond)
 
+    support, data, bootstrap = run_behavior_analysis(mat_data, data_smooth, fi_smooth)
+    return support, data, bootstrap
+
+def run_behavior_analysis(mat_data, data_smooth=2.5, fi_smooth=5e-3):
     # extract data variables
     support = mat_data['support']
     average = mat_data['average']
