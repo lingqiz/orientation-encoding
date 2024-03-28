@@ -5,6 +5,10 @@ from scipy.interpolate import splev, splrep
 from scipy import stats
 from symfit import parameters, variables, sin, cos, Fit
 
+N_SUB = 10
+N_COND = 3
+COUNT = 1600
+
 def behavior_subject(sub_id, cond, data_smooth=10, fi_smooth=5e-3):
     '''
     behavior analysis for individual subject
@@ -86,10 +90,6 @@ def run_behavior_analysis(mat_data, data_smooth=2.5, fi_smooth=5e-3):
     return support, data, bootstrap
 
 def neural_analysis(roi):
-    N_SUB = 10
-    N_COND = 3
-    COUNT = 1600
-
     data_path = './data/roi/ORNT_Fisher_{}.npy'.format(roi)
 
     with open(data_path, 'rb') as fl:
@@ -100,6 +100,21 @@ def neural_analysis(roi):
     # change axis
     cmb_ornt = np.transpose(all_ornt, (1, 0, 2)).reshape(N_COND, N_SUB * COUNT)
     cmb_snd = np.transpose(all_snd, (1, 0, 2)).reshape(N_COND, N_SUB * COUNT)
+    cmb_ornt[cmb_ornt > 90] -= 180
+
+    return cmb_ornt, cmb_snd
+
+def neural_analysis_subject(sub_id, roi):
+    data_path = './data/roi/ORNT_Fisher_{}.npy'.format(roi)
+
+    with open(data_path, 'rb') as fl:
+        all_ornt = np.load(fl)
+        _ = np.load(fl)
+        all_snd = np.load(fl)
+
+    # change axis
+    cmb_ornt = np.transpose(all_ornt, (1, 0, 2))[:, sub_id, :].reshape(N_COND, COUNT)
+    cmb_snd = np.transpose(all_snd, (1, 0, 2))[:, sub_id, :].reshape(N_COND, COUNT)
     cmb_ornt[cmb_ornt > 90] -= 180
 
     return cmb_ornt, cmb_snd
