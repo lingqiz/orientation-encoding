@@ -2,6 +2,10 @@ import pyrtools as pt
 import numpy as np
 
 class VoxelSimuate():
+    '''
+    Simulate voxel response to images
+    based on steerable pyramid
+    '''
 
     def __init__(self, lyr_idx, order=15, height='auto', weight=None):
         self.lyr_idx = lyr_idx
