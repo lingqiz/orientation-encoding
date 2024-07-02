@@ -1,6 +1,7 @@
 import pyrtools as pt
 import numpy as np
 from PIL import Image
+import cv2
 
 class VoxelSimuate():
     '''
@@ -120,3 +121,15 @@ class PyramidSimulate():
             level_resp.append(r[level])
 
         self.level_resp = level_resp
+
+    def combine_level(self, levels=[2, 3, 4]):
+        combined_resp = []
+
+        for r in self.ornt_resp:
+            combined = np.zeros_like(r[levels[-1]])
+            for l in levels:
+                combined += cv2.resize(r[l], combined.shape)
+
+            combined_resp.append(combined)
+
+        self.combined_resp = combined_resp
