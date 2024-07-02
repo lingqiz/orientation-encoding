@@ -68,7 +68,9 @@ def voxel_response(image, height='auto'):
             # sum of square responses
             all_resp[c] = np.sqrt(band_re**2 + band_im**2)
 
-        response_map.append(np.mean(all_resp, axis=0))
+        # average response
+        avg_resp = np.mean(all_resp, axis=0)
+        response_map.append(avg_resp)
 
     return response_map
 
