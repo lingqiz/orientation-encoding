@@ -117,10 +117,13 @@ class PyramidSimulate():
         elif cond == 'surr':
             self.ornt_resp = all_response(PATH_SURR)
 
-    def set_level(self, level):
+    def set_level(self, level, index=None):
         level_resp = []
         for r in self.ornt_resp:
-            level_resp.append(r[level])
+            if index is None:
+                index = np.ones_like(r[level]).astype(bool)
+
+            level_resp.append(r[level][index])
 
         self.level_resp = level_resp
 
@@ -135,3 +138,29 @@ class PyramidSimulate():
             combined_resp.append(combined)
 
         self.combined_resp = combined_resp
+
+    def select_roi(self, lb, ub, level):
+        # total stimulus radius 15.5 deg
+        # center: 1.5 - 7 degree; surround 7 - 12.5 degree
+
+        length = self.ornt_resp[0][level].shape[0]
+        radius = length / 2
+
+        total = 15.5
+        lb = lb / total * radius
+        ub = ub / total * radius
+
+        # select pixel within ROI based on radius to the center
+        center = length / 2
+        x = np.arange(0, length)
+        y = np.arange(0, length)
+        x, y = np.meshgrid(x, y)
+        z = np.zeros_like(x)
+        for i in range(length):
+            for j in range(length):
+                z[i, j] = np.sqrt((x[i, j] - center)**2 + (y[i, j] - center)**2)
+
+        index = np.logical_and(z >= lb, z <= ub)
+        self.set_level(level, index=index)
+
+        return index
