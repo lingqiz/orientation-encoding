@@ -2,6 +2,7 @@ import pyrtools as pt
 import numpy as np
 from PIL import Image
 import cv2
+from scipy.interpolate import splev, splrep
 
 class VoxelSimuate():
     '''
@@ -89,7 +90,7 @@ def all_response(base_path):
 
     return ornt_resp
 
-def norm_fi(ornt_resp):
+def norm_fi(ornt_resp, s=0.001):
     # Compute FI
     fi_val = []
     for idx in range(len(ornt_resp) - 1):
@@ -103,7 +104,12 @@ def norm_fi(ornt_resp):
     fi_wrap = np.concatenate([fi_val[-89:], fi_val[:90]])
     norm_fi = fi_wrap / (np.trapz(fi_wrap, ornt[:-1]) / 180 * 2 * np.pi)
 
-    return ornt[:-1], norm_fi
+    # Smooth FI
+    axis = ornt[:-1]
+    spl = splrep(axis, norm_fi, s=s)
+    norm_fi = splev(axis, spl)
+
+    return axis, norm_fi
 
 
 PATH_BASE = './docs/Stimulus/unornt/'
