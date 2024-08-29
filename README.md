@@ -27,7 +27,7 @@ open d003_spectacleMag`
 
 ## Data Analysis
 The scripts below outline our data analysis methods.  
-Use [Link to OSF] to access and download our pre-processed fMRI data. 
+Access and download our pre-processed fMRI data on [OSF](https://osf.io/9uqbd/). 
 
 ### Behavioral data analysis
 - See `script/combineSub.m` for analysis of behavioral data. 
