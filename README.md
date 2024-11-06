@@ -6,9 +6,9 @@ https://www.biorxiv.org/content/10.1101/2024.09.17.613538v1
 ---
 
 ## Dependencies
-- [PsychoPy](https://www.psychopy.org/) (For experiment)
+- [PsychoPy](https://www.psychopy.org/) (For running experiment, not required for data analysis code)
 - [cifti-matlab](https://github.com/Washington-University/cifti-matlab) (For fMRI data preprocessing)
-- Use `pip install -r requirements.txt` before running our analysis pipeline.
+- Use `pip install -r requirements.txt` to install other Python dependencies before running our analysis pipeline.
 
 ---
 
