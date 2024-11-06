@@ -13,7 +13,8 @@ https://www.biorxiv.org/content/10.1101/2024.09.17.613538v1
 ---
 
 ## Data Analysis
-The scripts below outline our data analysis methods. Access and download our pre-processed fMRI data from [OSF](https://osf.io/9uqbd/).  
+The scripts below outline our data analysis methods.   
+Access and download our pre-processed fMRI data from [OSF](https://osf.io/9uqbd/).  
 After downloading, unzip the files and place each subject’s data under `~/Data/fMRI/ORNT/`.
 
 ### Behavioral data analysis
