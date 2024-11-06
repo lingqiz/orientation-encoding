@@ -3,6 +3,8 @@
 Ling-Qi Zhang, Jiang Mao, Geoffrey K Aguirre, and Alan A Stocker  
 https://www.biorxiv.org/content/10.1101/2024.09.17.613538v1
 
+---
+
 ## Dependencies
 - [PsychoPy](https://www.psychopy.org/) (For running experiment, not required for data analysis code)
 - [cifti-matlab](https://github.com/Washington-University/cifti-matlab) (For fMRI data preprocessing)
