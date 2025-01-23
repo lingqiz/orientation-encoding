@@ -140,6 +140,26 @@ for idx = 1:length(sub)
         'saveDir', 'PolarNegInc', 'prfROI', 3);
 end
 
+%% Define ROI based on polar angle (V1 - V3; Side ROI)
+sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
+
+% for +35 surround
+for idx = 1:length(sub)
+    sub_name = strcat('ORNT_', sub{idx});
+    fprintf(sub_name);
+
+    run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
+        'saveDir', 'PolarPosSide', 'prfROI', 4);
+end
+
+for idx = 1:length(sub)
+    sub_name = strcat('ORNT_', sub{idx});
+    fprintf(sub_name);
+
+    run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
+        'saveDir', 'PolarNegSide', 'prfROI', 5);
+end
+
 %% Visual Eccentricity of pRF center (Deprecated)
 sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
 

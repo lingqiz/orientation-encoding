@@ -90,7 +90,7 @@ if nonVisual == 0
 
         v_label = varea(roi_mask);
         e_label = eccen(roi_mask);
-    
+
     elseif prfROI == 3
         % Polar angle ROI
         % ecc ROI [1, 9] degree
@@ -120,6 +120,73 @@ if nonVisual == 0
         v_label = varea(roi_mask);
         e_label = eccen(roi_mask);
 
+    elseif prfROI == 4
+        % PolarPostiveSide ROI
+        % Select voxels from visual area based on ROI
+        [eccen, varea, ~, angle] = load_map(sub_name);
+        roi_mask = boolean(zeros(size(varea)));
+
+        % select visual area
+        for idx = areaIndex
+            roi_mask = roi_mask | varea == idx;
+            fprintf('V%d ', idx)
+        end
+        fprintf('# of Voxel: %d \n', sum(roi_mask));
+        nVoxel = sum(roi_mask);
+
+        % apply eccentricity map
+        roi_mask  = roi_mask & (eccen > 1.0) & (eccen <= 9.0);
+        fprintf('Eccen mask: %d / %d selected \n', sum(roi_mask), nVoxel);
+
+        % polar angle
+        polarLo = 5; polarHi = 65;
+        polar_mask = ((angle >= polarLo) & (angle < polarHi)) | ((angle >= polarLo + 180) & (angle < polarHi + 180));
+
+        polarLo = 95; polarHi = 155;
+        polar_mask = polar_mask | ((angle >= polarLo) & (angle < polarHi)) | ((angle >= polarLo + 180) & (angle < polarHi + 180));
+        
+        polar_mask = ~polar_mask;
+
+        roi_mask = roi_mask & polar_mask;
+        fprintf('Polar Angle mask: %d / %d selected \n', sum(roi_mask), nVoxel);
+
+        % visual area and ecc label
+        v_label = varea(roi_mask);
+        e_label = eccen(roi_mask);
+
+    elseif prfROI == 5
+        % PolarNegativeSide ROI
+        % Select voxels from visual area based on ROI
+        [eccen, varea, ~, angle] = load_map(sub_name);
+        roi_mask = boolean(zeros(size(varea)));
+
+        % select visual area
+        for idx = areaIndex
+            roi_mask = roi_mask | varea == idx;
+            fprintf('V%d ', idx)
+        end
+        fprintf('# of Voxel: %d \n', sum(roi_mask));
+        nVoxel = sum(roi_mask);
+
+        % apply eccentricity map
+        roi_mask  = roi_mask & (eccen > 1.0) & (eccen <= 9.0);
+        fprintf('Eccen mask: %d / %d selected \n', sum(roi_mask), nVoxel);
+
+        % polar angle
+        polarLo = 115; polarHi = 175;
+        polar_mask = ((angle >= polarLo) & (angle < polarHi)) | ((angle >= polarLo + 180) & (angle < polarHi + 180));
+
+        polarLo = 25; polarHi = 85;
+        polar_mask = polar_mask | ((angle >= polarLo) & (angle < polarHi)) | ((angle >= polarLo + 180) & (angle < polarHi + 180));
+
+        polar_mask = ~polar_mask;
+
+        roi_mask = roi_mask & polar_mask;
+        fprintf('Polar Angle mask: %d / %d selected \n', sum(roi_mask), nVoxel);
+
+        % visual area and ecc label
+        v_label = varea(roi_mask);
+        e_label = eccen(roi_mask);
     end
 
 elseif nonVisual == 1
