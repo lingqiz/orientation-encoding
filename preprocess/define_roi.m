@@ -31,19 +31,9 @@ if nonVisual == 0
     if prfROI == 0
         % Select voxels from visual area based on ROI
         [eccen, varea, ~, ~] = load_map(sub_name);
-        roi_mask = boolean(zeros(size(varea)));
 
-        % select visual area
-        for idx = areaIndex
-            roi_mask = roi_mask | varea == idx;
-            fprintf('V%d ', idx)
-        end
-        fprintf('# of Voxel: %d \n', sum(roi_mask));
-        nVoxel = sum(roi_mask);
-
-        % apply eccentricity map
-        roi_mask  = roi_mask & (eccen > eccLo) & (eccen <= eccHi);
-        fprintf('Eccen mask: %d / %d selected \n', sum(roi_mask), nVoxel);
+        % select visual area and eccentricity
+        [roi_mask, ~] = ecc_mask(varea, eccen, areaIndex, eccLo, eccHi);
 
         % visual area and ecc label
         v_label = varea(roi_mask);
@@ -93,24 +83,15 @@ if nonVisual == 0
 
     elseif prfROI == 3
         % Polar angle ROI
-        % ecc ROI [1, 7] degree
+        % ecc ROI [1, 9] degree
 
         % Select voxels from visual area based on ROI
         [eccen, varea, ~, angle] = load_map(sub_name);
-        roi_mask = boolean(zeros(size(varea)));
-
-        % select visual area
-        for idx = areaIndex
-            roi_mask = roi_mask | varea == idx;
-            fprintf('V%d ', idx)
-        end
-        fprintf('# of Voxel: %d \n', sum(roi_mask));
-        nVoxel = sum(roi_mask);
-
-        % apply eccentricity map
-        roi_mask  = roi_mask & (eccen > 1.0) & (eccen <= 7.0);
-        fprintf('Eccen mask: %d / %d selected \n', sum(roi_mask), nVoxel);
-
+        
+        % select visual area and eccentricity
+        eccLo = 1; eccHi = 9;
+        [roi_mask, nVoxel] = ecc_mask(varea, eccen, areaIndex, eccLo, eccHi);
+        
         % apply polar angle map
         roi_mask = roi_mask & polar_mask(angle, polarLo, polarHi);
         fprintf('Polar Angle mask: %d / %d selected \n', sum(roi_mask), nVoxel);
@@ -123,19 +104,10 @@ if nonVisual == 0
         % PolarPostiveSide ROI
         % Select voxels from visual area based on ROI
         [eccen, varea, ~, angle] = load_map(sub_name);
-        roi_mask = boolean(zeros(size(varea)));
 
-        % select visual area
-        for idx = areaIndex
-            roi_mask = roi_mask | varea == idx;
-            fprintf('V%d ', idx)
-        end
-        fprintf('# of Voxel: %d \n', sum(roi_mask));
-        nVoxel = sum(roi_mask);
-
-        % apply eccentricity map
-        roi_mask  = roi_mask & (eccen > 1.0) & (eccen <= 7.0);
-        fprintf('Eccen mask: %d / %d selected \n', sum(roi_mask), nVoxel);
+        % select visual area and eccentricity
+        eccLo = 1; eccHi = 9;
+        [roi_mask, nVoxel] = ecc_mask(varea, eccen, areaIndex, eccLo, eccHi);
 
         % polar angle
         polarLo = 5; polarHi = 65;
@@ -155,19 +127,10 @@ if nonVisual == 0
         % PolarNegativeSide ROI
         % Select voxels from visual area based on ROI
         [eccen, varea, ~, angle] = load_map(sub_name);
-        roi_mask = boolean(zeros(size(varea)));
 
-        % select visual area
-        for idx = areaIndex
-            roi_mask = roi_mask | varea == idx;
-            fprintf('V%d ', idx)
-        end
-        fprintf('# of Voxel: %d \n', sum(roi_mask));
-        nVoxel = sum(roi_mask);
-
-        % apply eccentricity map
-        roi_mask  = roi_mask & (eccen > 1.0) & (eccen <= 7.0);
-        fprintf('Eccen mask: %d / %d selected \n', sum(roi_mask), nVoxel);
+        % select visual area and eccentricity
+        eccLo = 1; eccHi = 9;
+        [roi_mask, nVoxel] = ecc_mask(varea, eccen, areaIndex, eccLo, eccHi);
 
         % polar angle
         polarLo = 115; polarHi = 175;
