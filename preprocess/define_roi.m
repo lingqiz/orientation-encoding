@@ -83,13 +83,13 @@ if nonVisual == 0
 
     elseif prfROI == 3
         % Polar angle ROI
-        % ecc ROI [1, 9] degree
+        % ecc ROI [1, 7] degree
 
         % Select voxels from visual area based on ROI
         [eccen, varea, ~, angle] = load_map(sub_name);
         
         % select visual area and eccentricity
-        eccLo = 1; eccHi = 9;
+        eccLo = 1; eccHi = 7;
         [roi_mask, nVoxel] = ecc_mask(varea, eccen, areaIndex, eccLo, eccHi);
         
         % apply polar angle map
@@ -101,12 +101,12 @@ if nonVisual == 0
         e_label = eccen(roi_mask);
 
     elseif prfROI == 4
-        % PolarPostiveSide ROI
+        % PolarPostiveTangent ROI
         % Select voxels from visual area based on ROI
         [eccen, varea, ~, angle] = load_map(sub_name);
 
         % select visual area and eccentricity
-        eccLo = 1; eccHi = 9;
+        eccLo = 1; eccHi = 7;
         [roi_mask, nVoxel] = ecc_mask(varea, eccen, areaIndex, eccLo, eccHi);
 
         % polar angle
@@ -124,12 +124,12 @@ if nonVisual == 0
         e_label = eccen(roi_mask);
 
     elseif prfROI == 5
-        % PolarNegativeSide ROI
+        % PolarNegativeTangent ROI
         % Select voxels from visual area based on ROI
         [eccen, varea, ~, angle] = load_map(sub_name);
 
         % select visual area and eccentricity
-        eccLo = 1; eccHi = 9;
+        eccLo = 1; eccHi = 7;
         [roi_mask, nVoxel] = ecc_mask(varea, eccen, areaIndex, eccLo, eccHi);
 
         % polar angle

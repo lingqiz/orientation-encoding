@@ -107,8 +107,8 @@ for idx = 1:length(sub)
     sub_name = strcat('ORNT_', sub{idx});
     fprintf(sub_name);
 
-    run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
-        'polarLo', 5, 'polarHi', 65, ...
+    run_avg_sub(sub_name, 'areaIndex', [2, 3], ...
+        'polarLo', 0, 'polarHi', 70, ...
         'saveDir', 'PolarPosCon', 'prfROI', 3);
 end
 
@@ -116,8 +116,8 @@ for idx = 1:length(sub)
     sub_name = strcat('ORNT_', sub{idx});
     fprintf(sub_name);
 
-    run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
-        'polarLo', 95, 'polarHi', 155, ...
+    run_avg_sub(sub_name, 'areaIndex', [2, 3], ...
+        'polarLo', 90, 'polarHi', 160, ...
         'saveDir', 'PolarPosInc', 'prfROI', 3);
 end
 
@@ -126,8 +126,8 @@ for idx = 1:length(sub)
     sub_name = strcat('ORNT_', sub{idx});
     fprintf(sub_name);
 
-    run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
-        'polarLo', 115, 'polarHi', 175, ...
+    run_avg_sub(sub_name, 'areaIndex', [2, 3], ...
+        'polarLo', 110, 'polarHi', 180, ...
         'saveDir', 'PolarNegCon', 'prfROI', 3);
 end
 
@@ -135,18 +135,18 @@ for idx = 1:length(sub)
     sub_name = strcat('ORNT_', sub{idx});
     fprintf(sub_name);
 
-    run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
-        'polarLo', 25, 'polarHi', 85, ...
+    run_avg_sub(sub_name, 'areaIndex', [2, 3], ...
+        'polarLo', 20, 'polarHi', 90, ...
         'saveDir', 'PolarNegInc', 'prfROI', 3);
 end
 
-% tangent angle
+%% Polar ROI - Tangent angle
 for idx = 1:length(sub)
     sub_name = strcat('ORNT_', sub{idx});
     fprintf(sub_name);
 
     run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
-        'saveDir', 'PolarPosSide', 'prfROI', 4);
+        'saveDir', 'PolarPosTan', 'prfROI', 4);
 end
 
 for idx = 1:length(sub)
@@ -154,7 +154,7 @@ for idx = 1:length(sub)
     fprintf(sub_name);
 
     run_avg_sub(sub_name, 'areaIndex', [1, 2, 3], ...
-        'saveDir', 'PolarNegSide', 'prfROI', 5);
+        'saveDir', 'PolarNegTan', 'prfROI', 5);
 end
 
 %% Visual Eccentricity of pRF center (Deprecated)
