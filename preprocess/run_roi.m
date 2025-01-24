@@ -140,10 +140,7 @@ for idx = 1:length(sub)
         'saveDir', 'PolarNegInc', 'prfROI', 3);
 end
 
-%% Define ROI based on polar angle (V1 - V3; Side ROI)
-sub = {'TW', 'MT', 'CMH', 'SO', 'CR', 'BH', 'DW', 'QF', 'JM', 'MA'};
-
-% for +35 surround
+% tangent angle
 for idx = 1:length(sub)
     sub_name = strcat('ORNT_', sub{idx});
     fprintf(sub_name);
