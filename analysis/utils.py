@@ -207,6 +207,39 @@ def fisher_surround(ornt, snd, normalize=True):
 
     return with_surr, no_surr
 
+def fisher_combine(ornt, snd, normalize=True):
+    '''
+    Combine Fisher information assuming vertical symmetry
+    '''
+    # combine the two contexts conditions
+    ornt_adpt, snd_adpt = _combine_surr(ornt, snd)
+
+    # config the sliding average
+    center = np.array([5, 20, 35, 50, 65, 80, 95])
+    center = np.concatenate([-center[::-1], [0], center])
+    window = 12.5
+    config = {'center' : center, 'lb' : -90, 'ub' : 90, 'cyclical' : False}
+
+    # sliding average
+    axis, fi_avg = slide_average(ornt_adpt, snd_adpt, np.mean, window, config)
+    error = slide_average(ornt_adpt, snd_adpt, np.std, window, config)[-1]
+    n_data = slide_average(ornt_adpt, snd_adpt, np.size, window, config)[-1]
+    error = error / np.sqrt(n_data)
+
+    if normalize:
+        axis, fisher, error = normalize_fisher(axis, fi_avg, error, fold=1)
+    else:
+        fisher = -fi_avg
+
+    # split the data into with and without surround
+    zero_idx = int(np.where((axis == 0))[0][0])
+    with_surr = [axis[zero_idx:][1:], fisher[zero_idx:][1:], error[zero_idx:][1:]]
+    no_surr = [-axis[:zero_idx+1][::-1][1:],
+               fisher[:zero_idx+1][::-1][1:],
+               error[:zero_idx+1][::-1][1:]]
+
+    return with_surr, no_surr
+
 def mod_index_vis(roi, lb=22.5, ub=47.5):
     '''
     Compute the modulation index
