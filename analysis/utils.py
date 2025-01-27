@@ -280,6 +280,18 @@ def mod_index_ecc(roi, lb=22.5, ub=47.5):
     delta, sem, p_val = compute_stats(no_surr, with_surr)
     return np.mean(-snd), delta, sem, p_val
 
+def effect_size(ornt, snd, lb=22.5, ub=47.5):
+    ornt, snd = _combine_surr(ornt, snd)
+    with_surr = - snd[(ornt > lb) & (ornt < ub)]
+    no_surr = - snd[(ornt > -ub) & (ornt < -lb)]
+    
+    effect = np.mean(with_surr) - np.mean(no_surr)
+    no_std = np.std(no_surr) / np.sqrt(len(no_surr))
+    with_std = np.std(with_surr) / np.sqrt(len(with_surr))
+    effect_std = np.sqrt(no_std**2 + with_std**2)
+    
+    return effect, effect_std
+
 def compute_stats(null_data, exp_data):
     base = np.abs(np.mean(null_data))
     delta = np.abs(np.mean(exp_data)) - base
