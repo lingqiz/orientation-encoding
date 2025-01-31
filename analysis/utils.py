@@ -159,8 +159,8 @@ def fisher_base(ornt, snd, normalize=True):
     ornt[ornt < 0] *= -1
 
     # config the sliding average
-    center = [-5, 10, 20, 35, 50, 65, 80, 95]
-    window = 12.5
+    center = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]
+    window = 9
     config = {'center' : center, 'lb' : 0, 'ub' : 90, 'cyclical' : False}
 
     # sliding average
@@ -182,9 +182,9 @@ def fisher_surround(ornt, snd, normalize=True):
     ornt_adpt, snd_adpt = _combine_surr(ornt, snd)
 
     # config the sliding average
-    center = np.array([10, 20, 35, 50, 65, 80, 95])
+    center = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])
     center = np.concatenate([-center[::-1], [0], center])
-    window = 12.5
+    window = 10
     config = {'center' : center, 'lb' : -90, 'ub' : 90, 'cyclical' : False}
 
     # sliding average
@@ -284,12 +284,12 @@ def effect_size(ornt, snd, lb=22.5, ub=47.5):
     ornt, snd = _combine_surr(ornt, snd)
     with_surr = - snd[(ornt > lb) & (ornt < ub)]
     no_surr = - snd[(ornt > -ub) & (ornt < -lb)]
-    
+
     effect = np.mean(with_surr) - np.mean(no_surr)
     no_std = np.std(no_surr) / np.sqrt(len(no_surr))
     with_std = np.std(with_surr) / np.sqrt(len(with_surr))
     effect_std = np.sqrt(no_std**2 + with_std**2)
-    
+
     return effect, effect_std
 
 def compute_stats(null_data, exp_data):
