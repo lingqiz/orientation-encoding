@@ -98,14 +98,14 @@ def _compute_fi(ornt_resp):
         fi = np.linalg.norm(delta.flatten())
         fi_val.append(np.sqrt(fi))
     fi_val = np.array(fi_val)
-    
+
     ornt = np.arange(-90, 90, 1)
     fi_wrap = np.concatenate([fi_val[-89:], fi_val[:90]])
-    
+
     return ornt, fi_wrap
 
 def norm_fi(ornt_resp, s=0.001):
-    ornt, fi_wrap = _compute_fi(ornt_resp)    
+    ornt, fi_wrap = _compute_fi(ornt_resp)
     norm_fi = fi_wrap / (np.trapz(fi_wrap, ornt[:-1]) / 180 * 2 * np.pi)
 
     # Smooth FI
@@ -116,13 +116,13 @@ def norm_fi(ornt_resp, s=0.001):
     return axis, norm_fi
 
 def absolute_fi(ornt_resp, s=0.001):
-    ornt, fi_wrap = _compute_fi(ornt_resp) 
-    
+    ornt, fi_wrap = _compute_fi(ornt_resp)
+
     # Smooth FI
     axis = ornt[:-1]
     spl = splrep(axis, fi_wrap, s=s)
     fi_wrap = splev(axis, spl)
-    
+
     return axis, fi_wrap
 
 PATH_BASE = './docs/Stimulus/unornt/'
@@ -178,6 +178,30 @@ class PyramidSimulate():
         for i in range(length):
             for j in range(length):
                 z[i, j] = np.sqrt((x[i, j] - center)**2 + (y[i, j] - center)**2)
+
+        index = np.logical_and(z >= lb, z <= ub)
+        self.set_level(level, index=index)
+
+        return index
+
+    def polar_roi(self, lb, ub, level):
+        length = self.ornt_resp[0][level].shape[0]
+        center = length / 2
+
+        x = np.arange(0, length)
+        y = np.arange(0, length)
+        x, y = np.meshgrid(x, y)
+        z = np.zeros_like(x)
+        for i in range(length):
+            for j in range(length):
+                # polar angle
+                angle = -np.arctan2(y[i, j] - center, x[i, j] - center) * 180 / np.pi
+
+                # wrap to [0, 180]
+                if angle < 0:
+                    angle += 180
+
+                z[i, j] = -(angle + 90 - 180)
 
         index = np.logical_and(z >= lb, z <= ub)
         self.set_level(level, index=index)
