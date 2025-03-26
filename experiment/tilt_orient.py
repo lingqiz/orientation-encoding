@@ -20,6 +20,10 @@ joystick.backend = window_backend
 
 # simple class for experiment data
 class DataRecord:
+    '''
+    Record data for the experiment
+    '''
+
     def __init__(self):
         self.surround = []
         self.stimulus = []
@@ -48,6 +52,9 @@ class DataRecord:
         return data_mtx
 
 class OrientEncode:
+    '''
+    Main class for the experiment
+    '''
 
     # default parameters for the experiment
     DEFAULT_DUR = 1.5
@@ -61,7 +68,7 @@ class OrientEncode:
     N_COND = 3
     N_SESSION = 20
     N_TRIAL = 20
-    SURROUND_VAL = [-1, 35.0, 145.0]
+    SURROUND_VAL = [-1, 35.0, 145.0] # -1 = no surround (noise)
 
     def __init__(self, sub_val):
         # subject name/id
@@ -280,6 +287,9 @@ class OrientEncode:
 
 # Implement IO method with keyboard
 class OrientEncodeKeyboard(OrientEncode):
+    '''
+    Record response with keyboard (Y and B for fMRI button box)
+    '''
 
     def io_wait(self, wait_key='space'):
         '''override io_wait'''
