@@ -35,8 +35,8 @@ The following information is for running the experiment and preprocessing the fM
 
 ### PsychoPy
 Each subject should be assigned a unique `subject_ID`.
-- fMRI session: `python3 main.py subject_ID`.
-The code automatically tracks the acquisition number.
+- fMRI session: `python3 run_exp.py subject_ID`.
+The code automatically tracks the acquisition number and conditions across runs.
 
 ### Pre-processing (flywheel)
 - Retinotopic mapping: HcpStruct - HcpFunc - ICAFIX - [ForwardModel](https://github.com/gkaguirrelab/forwardModel) - [BayesPRF](https://elifesciences.org/articles/40224)  
