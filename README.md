@@ -42,9 +42,9 @@ The code automatically tracks the acquisition number and conditions across runs.
 - Retinotopic mapping: HcpStruct - HcpFunc - ICAFIX - [ForwardModel](https://github.com/gkaguirrelab/forwardModel) - [BayesPRF](https://elifesciences.org/articles/40224)  
 See here for information regarding the [HCP pre-processing pipeline](https://github.com/Washington-University/HCPpipelines)  
 
-Note: To calculate the magnification factor, use   
-`tbUse('gkaModelEye');
-open d003_spectacleMag`
+  Note: To calculate the magnification factor, use   
+  `tbUse('gkaModelEye');
+  open d003_spectacleMag`
 
 - Stimulus session: (HcpStruct) - HcpFunc  
   `avg_resp.m` (high-pass filter, motion regression, align time course after each stimulus presentation, z-score across corresponding time points, average within a time window [4s, 8s]) 
