@@ -1,7 +1,8 @@
+[![DOI:10.1073/pnas.2421565122](https://zenodo.org/badge/DOI/10.1073/pnas.2421565122.svg)](https://doi.org/10.1073/pnas.2421565122) 
 # Orientation Encoding in the Tilt Illusion
 **The tilt illusion arises from an efficient reallocation of neural coding resources at the contextual boundary**  
 Ling-Qi Zhang, Jiang Mao, Geoffrey K Aguirre, and Alan A Stocker  
-https://www.biorxiv.org/content/10.1101/2024.09.17.613538v1
+https://www.pnas.org/doi/10.1073/pnas.2421565122
 
 ---
 
